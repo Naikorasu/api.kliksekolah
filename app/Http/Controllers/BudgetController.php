@@ -134,6 +134,7 @@ class BudgetController extends Controller
 
         return response()->json([
             'message' => 'Successfully Add Budget Row Detail',
+            'header' => $header,
             'data' => $process_data,
             'string' => $request->data,
         ], 201);

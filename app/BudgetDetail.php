@@ -11,7 +11,7 @@ class BudgetDetail extends Model
     protected $table = 'budgets_detail';
 
     protected $fillable = [
-        'header_id',
+        'header',
         'coa',
         'title',
         'quantity',
