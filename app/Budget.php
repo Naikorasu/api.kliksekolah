@@ -40,7 +40,7 @@ class Budget extends Model
     ];
 
 
-    public function Detail()
+    public function detail()
     {
         return $this->hasMany('App/BudgetDetail');
     }

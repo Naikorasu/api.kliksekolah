@@ -22,7 +22,7 @@ class BudgetController extends Controller
 
         $result = array();
 
-        $data = Budget::->detail;
+        $data = Budget::where('periode', $request->periode)->where('create_by', $user_email)->orderBy('created_at', 'DESC')->with('detail')->get();
 
         $arr_data = array (
             'data' => $data,

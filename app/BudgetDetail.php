@@ -25,7 +25,7 @@ class BudgetDetail extends Model
         'desc',
     ];
 
-    public function Budget()
+    public function budget()
     {
         return $this->belongsTo('App\Budget');
     }
