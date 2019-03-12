@@ -33,7 +33,7 @@ class BudgetController extends Controller
         return response()->json([
             'message' => 'Load Data Budget Success',
             'result' => $result,
-        ], 201);
+        ], 200);
     }
 
     public function add_header(Request $request) {

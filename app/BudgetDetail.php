@@ -25,9 +25,13 @@ class BudgetDetail extends Model
         'desc',
     ];
 
+
+
     public function budget()
     {
-        return $this->belongsTo('App\Budget');
+        return $this->hasOne('budgets','id','header');
     }
+
+
 }
 

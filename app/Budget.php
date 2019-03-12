@@ -42,6 +42,6 @@ class Budget extends Model
 
     public function detail()
     {
-        return $this->hasMany('App/BudgetDetail');
+        return $this->hasMany(BudgetDetail::Class,'header','id');
     }
 }
