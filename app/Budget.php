@@ -18,7 +18,9 @@ class Budget extends Model
     protected $table = 'budgets';
 
     protected $fillable = [
-        'periode', 'create_by', 'desc',
+        'periode',
+        'create_by',
+        'desc',
     ];
 
     /**
@@ -38,7 +40,7 @@ class Budget extends Model
     ];
 
 
-    public function Budget()
+    public function Detail()
     {
         return $this->hasMany('App/BudgetDetail');
     }
