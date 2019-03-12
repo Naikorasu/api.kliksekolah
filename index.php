@@ -6,9 +6,10 @@
  * @author   Taylor Otwell <taylor@laravel.com>
  */
 
-header('Access-Control-Allow-Header: Content-Type, X-Auth-Token, X-Requested-With, Origin, Authorization');
+header('Access-Control-Allow-Headers: Content-Type, X-Auth-Token, X-Requested-With, Origin, Authorization');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+header('Access-Control-Allow-Method: GET, PUT, POST, DELETE, OPTIONS');
+header('Access-Control-Allow-Credentials: true');
 
 $uri = urldecode(
     parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)

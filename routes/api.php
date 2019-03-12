@@ -60,3 +60,25 @@ Route::group([
         });
     });
 });
+
+
+Route::group([
+    'prefix' => 'param'
+], function() {
+
+    Route::group([
+        'prefix' => 'code'
+    ], function() {
+        Route::post('list','CodeAccountingController@list');
+
+    });
+
+    /*
+    Route::group([
+        'middleware' => 'auth:api'
+    ], function() {
+
+    });
+    */
+
+});
