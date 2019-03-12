@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CodeAccounting extends Model
+class CodeAccount extends Model
 {
     //
 }
