@@ -25,10 +25,3 @@
     RewriteCond %{REQUEST_URI} !^/public/
     RewriteRule ^(css|js|images)/(.*)$ public/$1/$2 [L,NC]
 </IfModule>
-
-<IfModule mod_headers.c>
-    Header set Access-Control-Request-Headers "Content-Type, X-Auth-Token, X-Requested-With, Origin, Authorization"
-    Header set Access-Control-Allow-Origin "*"
-    Header set Access-Control-Request-Method "GET, PUT, POST, DELETE, OPTIONS"
-    Header set Access-Control-Allow-Credentials "true"
-</IfModule>
