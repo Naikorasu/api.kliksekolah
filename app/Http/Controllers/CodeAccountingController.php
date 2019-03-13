@@ -26,7 +26,7 @@ class CodeAccountingController extends Controller
 
 
         return response()->json([
-            'message' => 'Load Data Budget Success',
+            'message' => 'Load Parameter Data Success',
             'result' => $result,
         ], 200);
     }
