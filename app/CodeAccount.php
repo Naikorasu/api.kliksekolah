@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class CodeAccount extends Model
 {
     //
-    protected $table = 'prm_code_group';
+    protected $table = 'prm_code_account';
 
     protected $fillable = [
-        'group',
         'code',
+        'group',
         'title',
         'type',
     ];
@@ -31,4 +31,9 @@ class CodeAccount extends Model
      */
     protected $casts = [
     ];
+
+    public function group()
+    {
+        return $this->belongsTo(CodeGroup::Class,'code');
+    }
 }

@@ -10,8 +10,8 @@ class CodeGroup extends Model
     protected $table = 'prm_code_group';
 
     protected $fillable = [
+        'code',
         'category',
-        'group',
         'title',
     ];
 
@@ -30,4 +30,14 @@ class CodeGroup extends Model
      */
     protected $casts = [
     ];
+
+    public function account()
+    {
+        return $this->hasMany(CodeAccount::Class, 'group', 'code');;
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(CodeCategory::Class,'code');
+    }
 }

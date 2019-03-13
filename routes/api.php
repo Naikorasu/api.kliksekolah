@@ -20,29 +20,34 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 */
 
+//development - test
 Route::post('/test','TestController@index');
 
+//no auth
 Route::group([
     'prefix' => 'auth'
 ], function () {
     Route::post('login', 'AuthController@login');
     Route::post('register', 'AuthController@register');
+});
 
+//middleware auth:api
+Route::group([
+    'middleware' => 'auth:api'
+], function() {
+
+    //auth
     Route::group([
-        'middleware' => 'auth:api'
-    ], function() {
+        'prefix' => 'auth'
+    ], function () {
         Route::get('logout', 'AuthController@logout');
         Route::get('profile', 'AuthController@profile');
     });
-});
 
-
-Route::group([
-    'prefix' => 'budget'
-], function () {
+    //budget
     Route::group([
-        'middleware' => 'auth:api'
-    ], function() {
+        'prefix' => 'budget'
+    ], function () {
         Route::group([
             'prefix' => 'head'
         ],function () {
@@ -59,27 +64,20 @@ Route::group([
             Route::post('delete','BudgetController@delete_detail');
         });
     });
-});
 
-
-Route::group([
-    'prefix' => 'param'
-], function() {
-
+    //param
     Route::group([
-        'prefix' => 'code'
+        'prefix' => 'param'
     ], function() {
-        Route::post('list','CodeAccountingController@list');
+        Route::group([
+            'prefix' => 'code'
+        ], function() {
+            Route::post('list','CodeAccountingController@list');
+        });
 
     });
 
-    /*
-    Route::group([
-        'middleware' => 'auth:api'
-    ], function() {
-
-    });
-    */
-
 });
+
+
 

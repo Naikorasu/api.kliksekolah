@@ -29,7 +29,7 @@ class BudgetDetail extends Model
 
     public function budget()
     {
-        return $this->hasOne('budgets','id','header');
+        return $this->hasOne(Budget::Class,'id','header');
     }
 
 

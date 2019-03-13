@@ -15,34 +15,34 @@ class CreateCodeAccountingsTable extends Migration
     {
         Schema::create('prm_code_class', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer("class");
+            $table->integer("code");
             $table->text("title");
-            $table->timestamps();
+            //$table->timestamps();
         });
 
         Schema::create('prm_code_category', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->integer("code");
             $table->integer("class");
-            $table->integer("category");
             $table->text("title");
-            $table->timestamps();
+            //$table->timestamps();
         });
 
         Schema::create('prm_code_group', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->integer("code");
             $table->integer("category");
-            $table->integer("group");
             $table->text("title");
-            $table->timestamps();
+            //$table->timestamps();
         });
 
         Schema::create('prm_code_account', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer("group");
             $table->integer("code");
+            $table->integer("group");
             $table->text("title");
             $table->string("type");
-            $table->timestamps();
+            //$table->timestamps();
         });
     }
 
@@ -53,6 +53,9 @@ class CreateCodeAccountingsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('code_accountings');
+        Schema::dropIfExists('prm_code_class');
+        Schema::dropIfExists('prm_code_category');
+        Schema::dropIfExists('prm_code_group');
+        Schema::dropIfExists('prm_code_account');
     }
 }

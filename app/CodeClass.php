@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Psy\CodeCleaner;
 
 class CodeClass extends Model
 {
@@ -11,7 +12,7 @@ class CodeClass extends Model
     protected $table = 'prm_code_class';
 
     protected $fillable = [
-        'class',
+        'code',
         'title',
     ];
 
@@ -31,9 +32,9 @@ class CodeClass extends Model
     protected $casts = [
     ];
 
-
-    public function group()
+    public function category()
     {
-        return $this->hasMany(CodeCategory::Class,'class','id');
+        return $this->hasMany(CodeCategory::Class, 'class', 'code');;
     }
+
 }
