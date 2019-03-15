@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+
 class Budget extends Model
 {
     //
@@ -14,10 +15,10 @@ class Budget extends Model
      * @var array
      */
 
-
     protected $table = 'budgets';
 
     protected $fillable = [
+        'unique_id',
         'periode',
         'create_by',
         'desc',
@@ -40,8 +41,8 @@ class Budget extends Model
     ];
 
 
-    public function detail()
+    public function account()
     {
-        return $this->hasMany(BudgetDetail::Class,'header','id');
+        return $this->hasMany(BudgetAccount::Class,'head','unique_id');
     }
 }

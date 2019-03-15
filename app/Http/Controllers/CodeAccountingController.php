@@ -16,12 +16,21 @@ class CodeAccountingController extends Controller
         $user = $request->user();
         $user_email = $user->email;
 
-        $result = array();
-        $data = array();
+        $request->validate([
+            'code' => '',
+        ]);
 
-        $data_class = CodeClass::with('category')->get();
         //$data_category = CodeCategory::with('group')->get();
         //$data_group = CodeGroup::with('account')->get();
+
+        if ($request->code == '') {
+            $data_class = CodeClass::with('category')->get();
+        } else {
+            $data_class = CodeClass::where('code', $request->code)->with('category')->get();
+        }
+
+        $result = array();
+        $data = array();
 
         foreach ($data_class as $classes => $class) {
 

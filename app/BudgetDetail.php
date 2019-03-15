@@ -11,7 +11,9 @@ class BudgetDetail extends Model
     protected $table = 'budgets_detail';
 
     protected $fillable = [
-        'header',
+        'unique_id',
+        'head',
+        'account',
         'coa',
         'title',
         'quantity',
@@ -25,11 +27,9 @@ class BudgetDetail extends Model
         'desc',
     ];
 
-
-
-    public function budget()
+    public function account()
     {
-        return $this->hasOne(Budget::Class,'id','header');
+        return $this->belongsTo(BudgetAccount::Class,'unique_id','account');
     }
 
 

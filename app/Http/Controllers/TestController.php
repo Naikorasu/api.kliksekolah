@@ -23,6 +23,6 @@ class TestController extends Controller
         return response()->json([
             'message' => $request->name,
             'result' => $headers,
-        ], 201);
+        ], 200);
     }
 }

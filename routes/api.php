@@ -51,15 +51,25 @@ Route::group([
         Route::group([
             'prefix' => 'head'
         ],function () {
-            Route::post('list','BudgetController@list_header');
-            Route::post('add','BudgetController@add_header');
-            Route::post('delete','BudgetController@delete_header');
+            Route::post('list','BudgetController@list_head');
+            Route::post('add','BudgetController@add_head');
+            Route::post('delete','BudgetController@delete_head');
         });
+
+        /*
+        Route::group([
+            'prefix' => 'account'
+        ],function () {
+            Route::post('list','BudgetController@list_account');
+            Route::post('add','BudgetController@add_account');
+            Route::post('delete','BudgetController@delete_account');
+        });
+        */
 
         Route::group([
             'prefix' => 'detail'
         ],function () {
-            Route::post('data','BudgetController@data_detail');
+            Route::post('list','BudgetController@list_detail');
             Route::post('add','BudgetController@add_detail');
             Route::post('delete','BudgetController@delete_detail');
         });

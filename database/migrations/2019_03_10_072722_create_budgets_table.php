@@ -13,19 +13,42 @@ class CreateBudgetsTable extends Migration
      */
     public function up()
     {
+
         Schema::create('budgets', function (Blueprint $table) {
             $table->bigIncrements('id');
+
+            $table->string('unique_id');
+
             $table->integer('periode');
             $table->string('create_by');
             $table->text('desc');
+
             $table->timestamps();
+
         });
+
+        Schema::create('budgets_account', function (Blueprint $table) {
+            $table->bigIncrements('id');
+
+            $table->string('unique_id');
+            $table->string('head');
+
+            $table->integer('account_type');
+            $table->string('account_info');
+
+            $table->timestamps();
+
+        });
+
 
         Schema::create('budgets_detail', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('header');
 
-            $table->integer('coa');
+            $table->string('unique_id');
+            $table->string('head');
+            $table->string('account');
+
+            $table->integer('code_of_account');
             $table->string('title');
 
             $table->decimal('quantity',18,0);
@@ -52,6 +75,7 @@ class CreateBudgetsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('budgets');
+        Schema::dropIfExists('budgets_account');
         Schema::dropIfExists('budgets_detail');
     }
 }
