@@ -170,7 +170,12 @@ class BudgetController extends Controller
 
         $data = BudgetAccount::where('unique_id', $request->unique_id)->with('detail')->get();
 
-        array_push($result, $data);
+        $data_result = array (
+            
+            'data' => $data,
+        );
+
+        array_push($result, $data_result);
 
         return response()->json([
             'message' => 'Load Data Detail Success',
