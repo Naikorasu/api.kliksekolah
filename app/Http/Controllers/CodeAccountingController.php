@@ -29,9 +29,6 @@ class CodeAccountingController extends Controller
             $data_class = CodeClass::where('code', $request->code)->with('category')->get();
         }
 
-        $result = array();
-        $data = array();
-
         foreach ($data_class as $classes => $class) {
 
             $data_category = $class['category'];
@@ -43,12 +40,10 @@ class CodeAccountingController extends Controller
             }
         }
 
-        $data = $data_class;
-
-        $arr_data = array(
-            'data' => $data,
+        $result = array(
+            'data' => $data_class,
         );
-        array_push($result, $arr_data);
+
 
 
         return response()->json([

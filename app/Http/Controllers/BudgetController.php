@@ -21,12 +21,12 @@ class BudgetController extends Controller
             'periode' => 'required|integer',
         ]);
 
-        $result = array();
-
         $data = Budget::where('periode', $request->periode)->where('create_by', $user_email)->orderBy('created_at', 'DESC')->with('account')->paginate(5);
 
-        array_push($result, $data);
-
+        $result = array(
+            'data' => $data,
+        );
+        
         return response()->json([
             'message' => 'Load Data Budget Success',
             'result' => $result,
@@ -166,16 +166,11 @@ class BudgetController extends Controller
             'unique_id' => 'required'
         ]);
 
-        $result = array();
-
         $data = BudgetAccount::where('unique_id', $request->unique_id)->with('detail')->get();
 
-        $data_result = array (
-            
+        $result = array (
             'data' => $data,
         );
-
-        array_push($result, $data_result);
 
         return response()->json([
             'message' => 'Load Data Detail Success',
@@ -233,7 +228,7 @@ class BudgetController extends Controller
         $user_email = $user->email;
 
         $request->validate([
-            'id' => 'required',
+            'unique_id' => 'required',
         ]);
     }
 
