@@ -47,6 +47,7 @@ class CreateBudgetsTable extends Migration
             $table->string('unique_id');
             $table->string('head');
             $table->string('account');
+            $table->integer('semester');
 
             $table->integer('code_of_account');
             $table->string('title');

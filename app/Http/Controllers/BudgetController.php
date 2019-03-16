@@ -204,6 +204,7 @@ class BudgetController extends Controller
 
         foreach ($process_data as $key => $val) {
 
+            $semester = $val['semester'];
             $code_of_account = $val['coa'];
             $title = $val['title'];
             $quantity = $val['quantity'];
@@ -223,6 +224,7 @@ class BudgetController extends Controller
                 'unique_id' => $unique_id_detail,
                 'head' => $unique_id_head,
                 'account' => $unique_id_account,
+                'semester' => $semester,
                 'code_of_account' => $code_of_account,
                 'title' => $title,
                 'quantity' => $quantity,

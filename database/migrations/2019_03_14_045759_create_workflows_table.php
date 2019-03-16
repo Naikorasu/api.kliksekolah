@@ -21,13 +21,22 @@ class CreateWorkflowsTable extends Migration
             $table->timestamps();
         });
 
-        Schema::create('workflows_detail', function (Blueprint $table) {
+        Schema::create('workflows_process', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('workflow');
             $table->string('user');
             $table->string('flow');
             $table->timestamps();
         });
+
+        Schema::create('workflows_users', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('module');
+            $table->string('user');
+            $table->string('flow');
+            $table->timestamps();
+        });
+
     }
 
     /**

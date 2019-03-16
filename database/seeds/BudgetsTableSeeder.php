@@ -72,7 +72,7 @@ class BudgetsTableSeeder extends Seeder
 
                 for ($z = 1; $z <= 100; $z++) {
 
-                    $code_of_account = $prefix_code_of_account . $faker->randomNumber(4,true);
+                    $code_of_account = $prefix_code_of_account . "1101";
 
                     $fh = New FunctionHelper();
                     $unique_id_detail = $fh::generate_unique_key("system@kliksekolah.com;" . "DETAIL;" . $code_of_account . ";" . $z . ";");
@@ -82,6 +82,7 @@ class BudgetsTableSeeder extends Seeder
                             'unique_id' => $unique_id_detail,
                             'head' => $unique_id_head,
                             'account' => $unique_id_account,
+                            'semester' => $faker->boolean + 1,
                             'code_of_account' => $code_of_account,
                             'title' => $faker->sentence,
                             'quantity' => $faker->randomNumber(3, false),
