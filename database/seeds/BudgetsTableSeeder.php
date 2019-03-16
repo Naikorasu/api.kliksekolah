@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use App\Classes\FunctionHelper;
 
 class BudgetsTableSeeder extends Seeder
 {
@@ -12,12 +13,12 @@ class BudgetsTableSeeder extends Seeder
     public function run()
     {
         //
-
         $faker = \Faker\Factory::create();
 
-        for ($x = 1; $x <= 2; $x++) {
+        for ($x = 1; $x <= 10; $x++) {
 
-            $unique_id_head = generate_unique_key("system@kliksekolah.com;" . "HEAD;" . $x . ";" . $faker->sha1 . ";");
+            $fh = New FunctionHelper();
+            $unique_id_head = $fh::generate_unique_key("system@kliksekolah.com;" . "HEAD;" . $x . ";");
 
             DB::table('budgets')
                 ->insert([
@@ -31,7 +32,9 @@ class BudgetsTableSeeder extends Seeder
 
                 $prefix_code_of_account = $y;
                 $account_type = $prefix_code_of_account . "0000";
-                $unique_id_account = generate_unique_key("system@kliksekolah.com;" . "ACCOUNT;" . $account_type . ";" . "$y" . ";" . $faker->sha1 . ";");
+
+                $fh = New FunctionHelper();
+                $unique_id_account = $fh::generate_unique_key("system@kliksekolah.com;" . "ACCOUNT;" . $account_type . ";" . "$y" . ";");
 
                 switch ($account_type) {
                     case '10000' :
@@ -69,8 +72,10 @@ class BudgetsTableSeeder extends Seeder
 
                 for ($z = 1; $z <= 100; $z++) {
 
-                    $code_of_account = $prefix_code_of_account . $faker->randomNumber(4);
-                    $unique_id_detail = generate_unique_key("system@kliksekolah.com;" . "DETAIL;" . $code_of_account . ";" . $z . ";" . $faker->sha1 . ";");
+                    $code_of_account = $prefix_code_of_account . $faker->randomNumber(4,true);
+
+                    $fh = New FunctionHelper();
+                    $unique_id_detail = $fh::generate_unique_key("system@kliksekolah.com;" . "DETAIL;" . $code_of_account . ";" . $z . ";");
 
                     DB::table('budgets_detail')
                         ->insert([

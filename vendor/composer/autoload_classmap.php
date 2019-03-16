@@ -10,6 +10,7 @@ return array(
     'App\\Budget' => $baseDir . '/app/Budget.php',
     'App\\BudgetAccount' => $baseDir . '/app/BudgetAccount.php',
     'App\\BudgetDetail' => $baseDir . '/app/BudgetDetail.php',
+    'App\\Classes\\FunctionHelper' => $baseDir . '/app/Classes/FunctionHelper.php',
     'App\\CodeAccount' => $baseDir . '/app/CodeAccount.php',
     'App\\CodeCategory' => $baseDir . '/app/CodeCategory.php',
     'App\\CodeClass' => $baseDir . '/app/CodeClass.php',

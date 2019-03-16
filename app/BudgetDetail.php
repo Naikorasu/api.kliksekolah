@@ -14,7 +14,7 @@ class BudgetDetail extends Model
         'unique_id',
         'head',
         'account',
-        'coa',
+        'code_of_account',
         'title',
         'quantity',
         'price',

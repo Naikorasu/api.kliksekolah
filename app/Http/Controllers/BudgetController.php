@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Budget;
 use App\BudgetAccount;
 use App\BudgetDetail;
+use App\Classes\FunctionHelper;
 use Illuminate\Http\Request;
 
 class BudgetController extends Controller
@@ -26,7 +27,7 @@ class BudgetController extends Controller
         $result = array(
             'data' => $data,
         );
-        
+
         return response()->json([
             'message' => 'Load Data Budget Success',
             'result' => $result,
@@ -45,8 +46,8 @@ class BudgetController extends Controller
             'desc' => 'string',
         ]);
 
-
-        $unique_id_head = generate_unique_key($user_email . ";" . "HEAD;");
+        $fh = New FunctionHelper();
+        $unique_id_head = $fh::generate_unique_key($user_email . ";" . "HEAD;");
 
         $data_head = array(
             'unique_id' => $unique_id_head,
@@ -61,7 +62,9 @@ class BudgetController extends Controller
 
             $prefix_code_of_account = $y + 1;
             $account_type = $prefix_code_of_account . "0000";
-            $unique_id_account = generate_unique_key($user_email . ";" . "ACCOUNT;" . $account_type . ";");
+
+            $fh = New FunctionHelper();
+            $unique_id_account = $fh::generate_unique_key($user_email . ";" . "ACCOUNT;" . $account_type . ";");
 
             switch ($account_type) {
                 case '10000' :
@@ -168,7 +171,7 @@ class BudgetController extends Controller
 
         $data = BudgetAccount::where('unique_id', $request->unique_id)->with('detail')->get();
 
-        $result = array (
+        $result = array(
             'data' => $data,
         );
 
@@ -184,39 +187,70 @@ class BudgetController extends Controller
         $user = $request->user();
         $user_email = $user->email;
 
-
         $request->validate([
             'head_unique_id' => 'required',
             'account_unique_id' => 'required',
+            'account_type' => 'required|integer',
             'data' => 'required',
         ]);
 
-        $header = $request->header;
         $process_data = json_decode($request->data, true);
 
-        /*
-        $data = array();
+        $result = array();
+
+        $unique_id_head = $request->head_unique_id;
+        $unique_id_account = $request->account_unique_id;
+        $account_type = $request->account_type;
 
         foreach ($process_data as $key => $val) {
-            $push = array(
-                'key' => $key,
-                'val' => $val,
+
+            $code_of_account = $val['coa'];
+            $title = $val['title'];
+            $quantity = $val['quantity'];
+            $price = $val['price'];
+            $term = $val['term'];
+            $ypl = $val['ypl'];
+            $committee = $val['committee'];
+            $intern = $val['intern'];
+            $bos = $val['bos'];
+            $total = $val['total'];
+            $desc = $val['desc'];
+
+            $fh = New FunctionHelper();
+            $unique_id_detail = $fh::generate_unique_key($user_email . ";" . "DETAIL" . ";" . $account_type . ";" . $code_of_account . ";");
+
+            $data = array(
+                'unique_id' => $unique_id_detail,
+                'head' => $unique_id_head,
+                'account' => $unique_id_account,
+                'code_of_account' => $code_of_account,
+                'title' => $title,
+                'quantity' => $quantity,
+                'price' => $price,
+                'term' => $term,
+                'ypl' => $ypl,
+                'committee' => $committee,
+                'intern' => $intern,
+                'bos' => $bos,
+                'total' => $total,
+                'desc' => $desc,
+
             );
 
-            array_push($data,$push);
-
-            //$budget_detail = New BudgetDetail($data);
-            //$budget_detail->save();
+            $budget_detail = New BudgetDetail($data);
+            $budget_detail->save();
         }
-        */
 
-
-        return response()->json([
-            'message' => 'Successfully Add Budget Row Detail',
-            'header' => $header,
-            'data' => $process_data,
-            'string' => $request->data,
-        ], 200);
+        if ($budget_detail) {
+            return response()->json([
+                'message' => 'Successfully Add Budget Row Detail',
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Failed Add Budget Row Detail',
+                'error' => $budget_detail,
+            ], 200);
+        }
 
 
     }

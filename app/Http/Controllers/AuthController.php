@@ -52,16 +52,27 @@ class AuthController extends Controller
             'password' => 'required|string',
             'remember_me' => 'boolean'
         ]);
+
         $credentials = request(['email', 'password']);
-        if(!Auth::attempt($credentials))
+
+        if(!Auth::attempt($credentials)) {
             return response()->json([
-                'message' => 'Unauthorized'
-            ], 401);
+                'message' => 'LOGIN FAILED',
+                'errors' => array(
+                    'code' => ['400'],
+                    'stat' => ['FAILED'],
+                ),
+            ], 400);
+        }
+
         $user = $request->user();
         $tokenResult = $user->createToken('API.KLIKSEKOLAH');
         $token = $tokenResult->token;
-        if ($request->remember_me)
+
+        if ($request->remember_me) {
             $token->expires_at = Carbon::now()->addWeeks(1);
+        }
+
         $token->save();
 
         return response()->json([
