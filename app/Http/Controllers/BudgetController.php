@@ -170,21 +170,36 @@ class BudgetController extends Controller
             'unique_id' => 'required'
         ]);
 
-        $data = BudgetAccount::where('unique_id', $request->unique_id)->with('detail')->get();
+        //$data = BudgetAccount::where('unique_id', $request->unique_id)->with('detail')->get();
 
+        $data_ganjil = BudgetDetail::where('account',$request->unique_id)->where('semester', 1)->with('parameter_code')->get();
+        $data_genap = BudgetDetail::where('account',$request->unique_id)->where('semester', 2)->with('parameter_code')->get();
+
+
+        $data = array(
+            'ganjil' => $data_ganjil,
+            'genap' => $data_genap,
+        );
+
+        /*
         foreach ($data as $key => $val) {
             $data_detail = $val['detail'];
+
 
             foreach ($data_detail as $k => $v) {
 
                 $code_of_account = $v['code_of_account'];
+                $semester = $v['semester'];
 
-                $data_code_of_account = CodeAccount::where('code',$code_of_account)->get();
+                $data_code_of_account = CodeAccount::where('code', $code_of_account)->get();
 
+                //$data_detail[$k]['code_of_account'] = $data_code_of_account;
 
                 $data[$key]['detail'][$k]['code_of_account'] = $data_code_of_account[0];
             }
+
         }
+        */
 
         $result = array(
             'data' => $data,

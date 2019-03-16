@@ -17,13 +17,17 @@ class BudgetAccount extends Model
         'account_info',
     ];
 
+
+    /*
     public function detail()
     {
         return $this->hasMany(BudgetDetail::Class,'account','unique_id');
     }
+    */
 
     public function budget()
     {
         return $this->belongsTo(Budget::Class,'unique_id','head');
     }
+
 }

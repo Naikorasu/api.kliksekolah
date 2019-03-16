@@ -28,9 +28,16 @@ class BudgetDetail extends Model
         'desc',
     ];
 
+    /*
     public function account()
     {
         return $this->belongsTo(BudgetAccount::Class,'unique_id','account');
+    }
+    */
+
+    public function parameter_code()
+    {
+        return $this->hasOne(CodeAccount::class,'code','code_of_account');
     }
 
 
