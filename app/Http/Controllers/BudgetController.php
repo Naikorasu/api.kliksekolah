@@ -6,6 +6,7 @@ use App\Budget;
 use App\BudgetAccount;
 use App\BudgetDetail;
 use App\Classes\FunctionHelper;
+use App\CodeAccount;
 use Illuminate\Http\Request;
 
 class BudgetController extends Controller
@@ -170,6 +171,20 @@ class BudgetController extends Controller
         ]);
 
         $data = BudgetAccount::where('unique_id', $request->unique_id)->with('detail')->get();
+
+        foreach ($data as $key => $val) {
+            $data_detail = $val['detail'];
+
+            foreach ($data_detail as $k => $v) {
+
+                $code_of_account = $v['code_of_account'];
+
+                $data_code_of_account = CodeAccount::where('code',$code_of_account)->get();
+
+
+                $data[$key]['detail'][$k]['code_of_account'] = $data_code_of_account[0];
+            }
+        }
 
         $result = array(
             'data' => $data,
