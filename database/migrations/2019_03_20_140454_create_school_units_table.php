@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateFlowTable extends Migration
+class CreateSchoolUnitsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,12 @@ class CreateFlowTable extends Migration
      */
     public function up()
     {
-        Schema::create('flow', function (Blueprint $table) {
+        Schema::create('prm_school_units', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('key');
-            $table->string('mod');
-            $table->string('process');
-            $table->string('user');
-            $table->timestamps();
+            $table->string('code');
+            $table->string('name');
+            $table->text('address');
         });
-
     }
 
     /**
@@ -31,6 +28,6 @@ class CreateFlowTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('flow');
+        Schema::dropIfExists('prm_school_units');
     }
 }

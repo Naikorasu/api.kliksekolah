@@ -56,21 +56,13 @@ Route::group([
             Route::post('delete','BudgetController@delete_head');
         });
 
-        /*
-        Route::group([
-            'prefix' => 'account'
-        ],function () {
-            Route::post('list','BudgetController@list_account');
-            Route::post('add','BudgetController@add_account');
-            Route::post('delete','BudgetController@delete_account');
-        });
-        */
-
         Route::group([
             'prefix' => 'detail'
         ],function () {
             Route::post('list','BudgetController@list_detail');
+            Route::post('rapbu','BudgetController@list_detail_rapbu');
             Route::post('add','BudgetController@add_detail');
+            Route::post('edit','BudgetController@edit_detail');
             Route::post('delete','BudgetController@delete_detail');
         });
     });

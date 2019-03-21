@@ -10,6 +10,8 @@ class BudgetDetail extends Model
 
     protected $table = 'budgets_detail';
 
+    //protected $primaryKey = 'unique_id';
+
     protected $fillable = [
         'unique_id',
         'head',

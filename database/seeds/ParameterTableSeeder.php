@@ -13,6 +13,18 @@ class ParameterTableSeeder extends Seeder
     {
         //
 
+
+        //SCHOOL UNITS
+
+        /*
+        DB::table('prm_school_units')->insert([
+            'code' => "A01",
+            'name' => "YPL PERWAKILAN AMBARAWA",
+            'address' => "",
+        ]);
+        */
+
+
         //CODE CLASS
 
         DB::table('prm_code_class')->insert([
@@ -2785,7 +2797,6 @@ class ParameterTableSeeder extends Seeder
             'title' => "Account Pambalance *",
             'type' => 'D',
         ]);
-
 
     }
 }

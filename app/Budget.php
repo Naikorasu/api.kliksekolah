@@ -17,6 +17,8 @@ class Budget extends Model
 
     protected $table = 'budgets';
 
+    //protected $primaryKey = 'unique_id';
+
     protected $fillable = [
         'unique_id',
         'periode',

@@ -109,20 +109,19 @@ class BudgetController extends Controller
 
     public function delete_head(Request $request)
     {
-
         $user = $request->user();
         $user_email = $user->email;
 
         $request->validate([
-            'unique_id' => 'required',
+            'head_unique_id' => 'required',
         ]);
 
-        $deleted_budget = Budget::where('unique_id', $request->unique_id)->delete();
-        $deleted_account = BudgetAccount::where('head', $request->unique_id)->delete();
-        $deleted_detail = BudgetDetail::where('head', $request->unique_id)->delete();
+        $deleted_budget = Budget::where('unique_id', $request->head_unique_id)->delete();
+        $deleted_account = BudgetAccount::where('head', $request->head_unique_id)->delete();
+        $deleted_detail = BudgetDetail::where('head', $request->head_unique_id)->delete();
 
         if ($deleted_budget > 0 || $deleted_account > 0 || $deleted_detail > 0) {
-            $message = "Successfuly Delete Data with Unique ID $request->unique_id";
+            $message = "Successfuly Delete Data with Unique ID $request->head_unique_id";
             $result = array(
                 'data_budget' => $deleted_budget,
                 'data_account' => $deleted_account,
@@ -167,39 +166,18 @@ class BudgetController extends Controller
         $user_email = $user->email;
 
         $request->validate([
-            'unique_id' => 'required'
+            'account_unique_id' => 'required'
         ]);
 
         //$data = BudgetAccount::where('unique_id', $request->unique_id)->with('detail')->get();
 
-        $data_ganjil = BudgetDetail::where('account',$request->unique_id)->where('semester', 1)->with('parameter_code')->get();
-        $data_genap = BudgetDetail::where('account',$request->unique_id)->where('semester', 2)->with('parameter_code')->get();
-
+        $data_ganjil = BudgetDetail::where('account', $request->account_unique_id)->where('semester', 1)->with('parameter_code')->get();
+        $data_genap = BudgetDetail::where('account', $request->account_unique_id)->where('semester', 2)->with('parameter_code')->get();
 
         $data = array(
             'ganjil' => $data_ganjil,
             'genap' => $data_genap,
         );
-
-        /*
-        foreach ($data as $key => $val) {
-            $data_detail = $val['detail'];
-
-
-            foreach ($data_detail as $k => $v) {
-
-                $code_of_account = $v['code_of_account'];
-                $semester = $v['semester'];
-
-                $data_code_of_account = CodeAccount::where('code', $code_of_account)->get();
-
-                //$data_detail[$k]['code_of_account'] = $data_code_of_account;
-
-                $data[$key]['detail'][$k]['code_of_account'] = $data_code_of_account[0];
-            }
-
-        }
-        */
 
         $result = array(
             'data' => $data,
@@ -211,9 +189,37 @@ class BudgetController extends Controller
         ], 200);
     }
 
+    public function list_detail_rapbu(Request $request)
+    {
+        $user = $request->user();
+        $user_email = $user->email;
+
+        $request->validate([
+            'head_unique_id' => 'required'
+        ]);
+
+        //$data = BudgetAccount::where('unique_id', $request->unique_id)->with('detail')->get();
+
+        $data_ganjil = BudgetDetail::where('head', $request->head_unique_id)->where('semester', 1)->with('parameter_code')->get();
+        $data_genap = BudgetDetail::where('head', $request->head_unique_id)->where('semester', 2)->with('parameter_code')->get();
+
+        $data = array(
+            'ganjil' => $data_ganjil,
+            'genap' => $data_genap,
+        );
+
+        $result = array(
+            'data' => $data,
+        );
+
+        return response()->json([
+            'message' => 'Load Data Detail All Success',
+            'result' => $result,
+        ], 200);
+    }
+
     public function add_detail(Request $request)
     {
-
         $user = $request->user();
         $user_email = $user->email;
 
@@ -225,8 +231,6 @@ class BudgetController extends Controller
         ]);
 
         $process_data = json_decode($request->data, true);
-
-        $result = array();
 
         $unique_id_head = $request->head_unique_id;
         $unique_id_account = $request->account_unique_id;
@@ -266,7 +270,6 @@ class BudgetController extends Controller
                 'bos' => $bos,
                 'total' => $total,
                 'desc' => $desc,
-
             );
 
             $budget_detail = New BudgetDetail($data);
@@ -283,19 +286,107 @@ class BudgetController extends Controller
                 'error' => $budget_detail,
             ], 200);
         }
+    }
+
+    public function edit_detail(Request $request)
+    {
+        $user = $request->user();
+        $user_email = $user->email;
+
+        $request->validate([
+            'head_unique_id' => 'required',
+            'account_unique_id' => 'required',
+            'account_type' => 'required|integer',
+            'data' => 'required',
+        ]);
+
+        $process_data = json_decode($request->data, true);
+
+        $unique_id_head = $request->head_unique_id;
+        $unique_id_account = $request->account_unique_id;
+        $account_type = $request->account_type;
+
+        foreach ($process_data as $key => $val) {
+
+            $unique_id_detail = $val['unique_id'];
+
+            $code_of_account = $val['coa'];
+            $title = $val['title'];
+            $quantity = $val['quantity'];
+            $price = $val['price'];
+            $term = $val['term'];
+            $ypl = $val['ypl'];
+            $committee = $val['committee'];
+            $intern = $val['intern'];
+            $bos = $val['bos'];
+            $total = $val['total'];
+            $desc = $val['desc'];
+
+            $update_data = array(
+                'code_of_account' => $code_of_account,
+                'title' => $title,
+                'quantity' => $quantity,
+                'price' => $price,
+                'term' => $term,
+                'ypl' => $ypl,
+                'committee' => $committee,
+                'intern' => $intern,
+                'bos' => $bos,
+                'total' => $total,
+                'desc' => $desc,
+                'updated_at' => date('Y-m-d H:i:s'),
+            );
+
+            $update = BudgetDetail::where('unique_id', $unique_id_detail)->update($update_data);
+
+            //$update = BudgetDetail::find($unique_id_detail);
+            //$update->update($update_data);
+            //$update->touch();
+
+
+            if ($update) {
+                return response()->json([
+                    'message' => 'Successfully Update Budget Row Detail',
+                    'result' => $update,
+                ], 200);
+
+            } else {
+
+                return response()->json([
+                    'message' => 'Failed Update Budget Row Detail',
+                    'error' => $update,
+                ], 401);
+            }
+        }
 
 
     }
 
     public function delete_detail(Request $request)
     {
-
         $user = $request->user();
         $user_email = $user->email;
 
         $request->validate([
-            'unique_id' => 'required',
+            'detail_unique_id' => 'required',
         ]);
+
+        $delete = BudgetDetail::where('unique_id', $request->detail_unique_id)->delete();
+
+        if ($delete) {
+            return response()->json([
+                'message' => 'Successfully Delete Budget Row Detail',
+                'result' => $delete,
+            ], 200);
+
+        } else {
+
+            return response()->json([
+                'message' => 'Failed Delete Budget Row Detail',
+                'error' => $delete,
+            ], 401);
+        }
+
     }
 
 

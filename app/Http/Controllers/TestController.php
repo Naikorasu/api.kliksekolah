@@ -22,6 +22,7 @@ class TestController extends Controller
 
         return response()->json([
             'message' => $request->name,
+            'time' => round(microtime(true) * 1000),
             'result' => $headers,
         ], 200);
     }
