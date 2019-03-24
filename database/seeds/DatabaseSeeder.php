@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             UsersTableSeeder::class,
             BudgetsTableSeeder::class,
             ParameterTableSeeder::class,
+            SchoolUnitsTableSeeder::class,
         ]);
     }
 }

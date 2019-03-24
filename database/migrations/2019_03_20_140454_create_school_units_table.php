@@ -15,9 +15,16 @@ class CreateSchoolUnitsTable extends Migration
     {
         Schema::create('prm_school_units', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('code');
+            $table->string('code_acc');
+            $table->string('code_acb');
+            $table->string('code_cab');
             $table->string('name');
             $table->text('address');
+            $table->string('city');
+            $table->string('phone_1');
+            $table->string('phone_2');
+            $table->string('tu_name');
+            $table->string('ks_name');
         });
     }
 
