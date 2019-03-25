@@ -200,8 +200,8 @@ class BudgetController extends Controller
 
         //$data = BudgetAccount::where('unique_id', $request->unique_id)->with('detail')->get();
 
-        $data_ganjil = BudgetDetail::where('head', $request->head_unique_id)->where('semester', 1)->with('parameter_code')->get();
-        $data_genap = BudgetDetail::where('head', $request->head_unique_id)->where('semester', 2)->with('parameter_code')->get();
+        $data_pendapatan = BudgetDetail::where('head', $request->head_unique_id)->where('code_of_account','like','4%')->with('parameter_code')->get();
+        $data_pengeluaran = BudgetDetail::where('head', $request->head_unique_id)->where('code_of_account','like','5%')->with('parameter_code')->get();
 
         $total_pendapatan = BudgetDetail::where('head',$request->head_unique_id)->where('code_of_account','like','4%')->sum('total');
         $total_pengeluaran = BudgetDetail::where('head',$request->head_unique_id)->where('code_of_account','like','5%')->sum('total');
@@ -218,8 +218,8 @@ class BudgetController extends Controller
         }
 
         $data = array(
-            'ganjil' => $data_ganjil,
-            'genap' => $data_genap,
+            'pengeluaran' => $data_pengeluaran,
+            'pendapatan' => $data_pendapatan,
             'total_pendapatan' => $total_pendapatan,
             'total_pengeluaran' => $total_pengeluaran,
             'status_surplus_defisit' => $status_surplus_defisit,
