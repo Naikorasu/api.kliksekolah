@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -65,8 +66,28 @@ Route::group([
             Route::post('edit','BudgetController@edit_detail');
             Route::post('delete','BudgetController@delete_detail');
         });
-    });
 
+        Route::group([
+          'prefix' => 'request'
+        ], function() {
+          Route::post('list', 'FundRequestController@list');
+          Route::post('get', 'FundRequestController@get');
+          Route::post('add', 'FundRequestController@add');
+          Route::post('edit', 'FundRequestController@edit');
+          Route::post('cancel', 'FundRequestController@cancel');
+          Route::post('submit', 'FundRequestController@updateStatus');
+        });
+    });
+    Route::group([
+        'prefix' => 'non-budget'
+    ], function() {
+      Route::post('list', 'NonBudgetController@list');
+      Route::post('get', 'NonBudgetController@get');
+      Route::post('add', 'NonBudgetController@add');
+      Route::post('edit', 'NonBudgetController@edit');
+      Route::post('submit', 'NonBudgetController@submit');
+      Route::post('update-status', 'NonBudgetController@updateStatus');
+    });
     //param
     Route::group([
         'prefix' => 'param'
@@ -80,6 +101,3 @@ Route::group([
     });
 
 });
-
-
-

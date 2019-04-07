@@ -23,7 +23,7 @@ class BudgetController extends Controller
             'periode' => 'required|integer',
         ]);
 
-        $data = Budget::where('periode', $request->periode)->where('create_by', $user_email)->orderBy('created_at', 'DESC')->with('account')->paginate(5);
+        $data = Budget::where('periode', $request->periode)->orderBy('created_at', 'DESC')->with('account')->paginate(5);
 
         $result = array(
             'data' => $data,
@@ -169,14 +169,26 @@ class BudgetController extends Controller
             'account_unique_id' => 'required'
         ]);
 
-        //$data = BudgetAccount::where('unique_id', $request->unique_id)->with('detail')->get();
+        $code_of_account = $request->code_of_account;
+        $with_remains = $request->with_remains;
 
-        $data_ganjil = BudgetDetail::where('account', $request->account_unique_id)->where('semester', 1)->with('parameter_code')->get();
-        $data_genap = BudgetDetail::where('account', $request->account_unique_id)->where('semester', 2)->with('parameter_code')->get();
+        //$data = BudgetAccount::where('unique_id', $request->unique_id)->with('detail')->get();
+        $data_ganjil = BudgetDetail::where('account', $request->account_unique_id)->where('semester', 1)->with('parameter_code');
+        $data_genap = BudgetDetail::where('account', $request->account_unique_id)->where('semester', 2)->with('parameter_code');
+
+        if($code_of_account) {
+          $data_ganjil = $data_ganjil->where('code_of_account', $code_of_account);
+          $data_genap = $data_genap->where('code_of_account', $code_of_account);
+        }
+
+        if($with_remains) {
+          $data_ganjil = $data_ganjil->withRemains();
+          $data_genap = $data_genap->withRemains();
+        }
 
         $data = array(
-            'ganjil' => $data_ganjil,
-            'genap' => $data_genap,
+            'ganjil' => $data_ganjil->get(),
+            'genap' => $data_genap->get(),
         );
 
         $result = array(
@@ -188,6 +200,8 @@ class BudgetController extends Controller
             'result' => $result,
         ], 200);
     }
+
+
 
     public function list_detail_rapbu(Request $request)
     {

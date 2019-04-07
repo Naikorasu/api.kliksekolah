@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\BudgetDetail;
 
 class CodeAccount extends Model
 {
@@ -31,6 +32,10 @@ class CodeAccount extends Model
      */
     protected $casts = [
     ];
+
+    public function budgetDetail() {
+        return $this->belongsTo(BudgetDetail::Class,'code_of_account','code');
+    }
 
     public function group()
     {
