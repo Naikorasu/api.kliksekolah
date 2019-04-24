@@ -13,7 +13,7 @@ class UpdateBudgetDetailRelocationTable extends Migration
      */
     public function up()
     {
-        Schema::table('budget_detail_relocation', function(Blueprint $table) {
+        Schema::table('budget_relocation', function(Blueprint $table) {
           $table->dropColumn(['revised_amount', 'original_amount']);
           $table->decimal('source_original_amount',20,2)->default(0);
           $table->decimal('source_revised_amount',20,2)->default(0);

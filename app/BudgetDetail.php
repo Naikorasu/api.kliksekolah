@@ -54,5 +54,9 @@ class BudgetDetail extends Model
       return $this->hasMany(FundRequest::class, 'budget_detail_unique_id', 'unique_id');
     }
 
+    public function revisions() {
+      return $this->hasMany(BudgetRevisions::class, 'budget_detail_unique_id', 'unique_id');
+    }
+
 
 }

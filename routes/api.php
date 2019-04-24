@@ -100,4 +100,10 @@ Route::group([
 
     });
 
+    Route::group([
+      'prefix' => 'file'
+    ], function() {
+      Route::post('upload', 'FileUploadController@upload');
+    });
+
 });
