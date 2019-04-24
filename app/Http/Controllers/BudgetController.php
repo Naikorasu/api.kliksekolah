@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use App\Budget;
 use App\BudgetAccount;
 use App\BudgetDetail;
+use App\User;
 use App\Classes\FunctionHelper;
 use App\CodeAccount;
 use Illuminate\Http\Request;
@@ -16,8 +18,9 @@ class BudgetController extends Controller
     //BUDGET HEADER
     public function list_head(Request $request)
     {
-        $user = $request->user();
+        $user = User::find(Auth::user()->id);
         $user_email = $user->email;
+
 
         $request->validate([
             'periode' => 'required|integer',
@@ -173,8 +176,8 @@ class BudgetController extends Controller
         $with_remains = $request->with_remains;
 
         //$data = BudgetAccount::where('unique_id', $request->unique_id)->with('detail')->get();
-        $data_ganjil = BudgetDetail::where('account', $request->account_unique_id)->where('semester', 1)->with('parameter_code');
-        $data_genap = BudgetDetail::where('account', $request->account_unique_id)->where('semester', 2)->with('parameter_code');
+        $data_ganjil = BudgetDetail::where('account', $request->account_unique_id)->where('semester', 1)->with('parameter_code')->with('revisions');
+        $data_genap = BudgetDetail::where('account', $request->account_unique_id)->where('semester', 2)->with('parameter_code')->with('revisions');
 
         if($code_of_account) {
           $data_ganjil = $data_ganjil->where('code_of_account', $code_of_account);
@@ -323,9 +326,6 @@ class BudgetController extends Controller
 
     public function edit_detail(Request $request)
     {
-        $user = $request->user();
-        $user_email = $user->email;
-
         $request->validate([
             'head_unique_id' => 'required',
             'account_unique_id' => 'required',
@@ -335,64 +335,56 @@ class BudgetController extends Controller
 
         $process_data = json_decode($request->data, true);
 
-        $unique_id_head = $request->head_unique_id;
-        $unique_id_account = $request->account_unique_id;
-        $account_type = $request->account_type;
+        $budgetHead = Budget::find($unique_id_head);
+
+        $workflowResult = $this->runWorkflow('SAVE', $budgetHead);
 
         foreach ($process_data as $key => $val) {
 
             $unique_id_detail = $val['unique_id'];
 
-            $code_of_account = $val['coa'];
-            $title = $val['title'];
-            $quantity = $val['quantity'];
-            $price = $val['price'];
-            $term = $val['term'];
-            $ypl = $val['ypl'];
-            $committee = $val['committee'];
-            $intern = $val['intern'];
-            $bos = $val['bos'];
-            $total = $val['total'];
-            $desc = $val['desc'];
-
             $update_data = array(
-                'code_of_account' => $code_of_account,
-                'title' => $title,
-                'quantity' => $quantity,
-                'price' => $price,
-                'term' => $term,
-                'ypl' => $ypl,
-                'committee' => $committee,
-                'intern' => $intern,
-                'bos' => $bos,
-                'total' => $total,
-                'desc' => $desc,
+                'code_of_account' => $val['coa'],
+                'title' => $val['title'],
+                'quantity' => $val['quantity'],
+                'price' => $val['price'],
+                'term' => $val['term'],
+                'ypl' => $val['ypl'],
+                'committee' => $val['committee'],
+                'intern' => $val['intern'],
+                'bos' => $val['bos'],
+                'total' => $val['total'],
+                'desc' => $val['desc'],
                 'updated_at' => date('Y-m-d H:i:s'),
             );
 
-            $update = BudgetDetail::where('unique_id', $unique_id_detail)->update($update_data);
+            $budgetDetail = BudgetDetail::where('unique_id', $unique_id_detail)->first();
 
-            //$update = BudgetDetail::find($unique_id_detail);
-            //$update->update($update_data);
-            //$update->touch();
+            if($workflowResult->createRevision){
+              $budgetRevision = new BudgetRevisions();
+              $budgetRevision->budget_detail_unique_id = $unique_id_detail;
+              $budgetRevision->original_values = json_encode($budgetDetail);
+              $budgetRevision->revised_values = json_encode($update_data);
+              $budgetRevision->user_id = Auth::user()->id;
+              $budgetRevision->save();
+            } else {
+              $budgetRevision = $budgetDetail->update($update_data);
+            }
 
-
-            if ($update) {
+            if ($budgetRevision) {
                 return response()->json([
                     'message' => 'Successfully Update Budget Row Detail',
-                    'result' => $update,
+                    'result' => $budgetRevision,
                 ], 200);
 
             } else {
 
                 return response()->json([
                     'message' => 'Failed Update Budget Row Detail',
-                    'error' => $update,
+                    'error' => $budgetRevision,
                 ], 401);
             }
         }
-
-
     }
 
     public function delete_detail(Request $request)
@@ -420,6 +412,70 @@ class BudgetController extends Controller
             ], 401);
         }
 
+    }
+
+    private function runWorkflow($type, $budgetHead) {
+      $currentUser = User::with('userGroup')->find(Auth::user()->id);
+      $currentUserGroup = $currentUser->user_group;
+      $lastUser = User::with('userGroup')->find($budgetHead->user_id);
+      $lastUserGroup = $lastUser->user_group;
+
+      $workflow = [
+        'result' => [
+          'submitted' => $budgetHead->submitted,
+          'approved' => $budgetHead->approved,
+          'user_id' => $currentUser->id
+        ],
+        'createRevision' => false
+      ];
+
+      if($budget->approved) {
+        return false;
+      }
+
+      switch($type) {
+        case 'SAVE':
+          if($budgetHead->approved == false) {
+            if($budgetHead->submitted) {
+              if($currentUserGroup->priority < $lastUserGroup->priority) {
+                $workflow->createRevision = true;
+                $workflow->result->submitted = false;
+              } else if($lastUserGroup->priority == 1 && $currentUserGroup->priority == 5) {
+                $workflow->createRevision = true;
+              } else {
+                $workflow->$result->user_id = $lastUser->id;
+              }
+            } else {
+              if($currentUserGroup->priority == $lastUserGroup->priority) {
+                $result->submitted = false;
+              } else {
+                $result->user_id = $lastUser->id;
+              }
+            }
+          }
+          break;
+        case 'SUBMIT':
+          if($currentUserGroup->priority > 1) {
+            $result->submitted = true;
+          }
+          break;
+        case 'APPROVE':
+          if($currentUserGroup->priority == 1) {
+            $result->submitted = true;
+            $result->approved = true;
+          }
+          break;
+        case 'REJECT':
+          if($currentUserGroup->priority == 1) {
+            $result->submitted = false;
+            $result->approved = false;
+          }
+          break;
+        default:
+          break;
+      }
+
+      return $result;
     }
 
 

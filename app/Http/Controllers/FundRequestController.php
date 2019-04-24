@@ -47,13 +47,13 @@ class FundRequestController extends Controller
       ]);
 
       //validate against remains
-      $budgetDetail = BudgetDetail::where('unique_id', $request->budget_detail_unique_id)->withRemains()->get();
+      $budgetDetail = BudgetDetail::withRemains()->find('unique_id',$request->budget_detail_unique_id);
 
-      if($budgetDetail[0]->remains !== null && $budgetDetail[0]->remains < $request->amount) {
+      if($budgetDetail->remains !== null && $budgetDetail->remains < $request->amount) {
         return response()->json([
           'message' => 'Failed to save fund request. Requested amount is bigger than available amount.'
         ], 400);
-      } else if($budgetDetail[0]->total < $request->amount) {
+      } else if($budgetDetail->total < $request->amount) {
         return response()->json([
           'message' => 'Failed to save fund request. Requested amount is bigger than total.'
         ], 400);
@@ -67,7 +67,7 @@ class FundRequestController extends Controller
         return response()->json([
             'message' => 'Successfully Add Fund Request',
             'data' => $fundRequest,
-            'remains' => $budgetDetail[0]->remains
+            'remains' => $budgetDetail->remains
         ], 201);
       }
     }

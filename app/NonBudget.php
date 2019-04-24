@@ -4,6 +4,8 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 class NonBudget extends Model {
+  protected $table = 'non_budget';
+  
   protected $fillable = [
     'file_number',
     'date',

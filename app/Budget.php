@@ -3,7 +3,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Database\Eloquent\Builder;
 
 class Budget extends Model
 {
@@ -42,6 +43,11 @@ class Budget extends Model
     protected $casts = [
     ];
 
+    public function scopeWithRevisionCount(Builder $query) {
+      return $query->addSelect(
+          DB::raw('(select count(id) from budget_revisions where budget_revisions.budget_detail_unique_id in (select unique_id from budgets_detail where budgets_detail.head = budgets.unique_id)) as revision_count')
+        );
+    }
 
     public function account()
     {

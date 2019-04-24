@@ -8,7 +8,7 @@ use App\NonBudget;
 class NonBudgetController extends Controller
 {
     public function list(Request $request) {
-      $nonBudgets = NonBudget::get()->paginate(5);
+      $nonBudgets = NonBudget::paginate(5);
       return response()->json([
           'data' => $nonBudgets
       ],200);
@@ -35,16 +35,19 @@ class NonBudgetController extends Controller
         'activity' => 'required'
       ]);
 
-      $nonBudget = new NonBudget($request);
-      if($nonBudget->date == null) {
-        $nonBudget->date = date('d-m-Y');
-      }
-
+      $date = ($request->date) ? date('Y-m-d', strtotime($request->date)) : date('Y-m-d');
+      $nonBudget = new NonBudget();
+      $nonBudget->file_number = $request->file_number;
+      $nonBudget->code_of_account = $request->code_of_account;
+      $nonBudget->activity = $request->activity;
+      $nonBudget->description = $request->description;
+      $nonBudget->amount = $request->amount;
+      $nonBudget->date = $date;
       $nonBudget->save();
 
       return response()->json([
         'message' => 'Successfully saved non budget request.',
-        'data' => $nonBudget
+        'data' => $nonBudget,
       ],200);
     }
 
