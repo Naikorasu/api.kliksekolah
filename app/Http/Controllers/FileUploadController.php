@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-<<<<<<< HEAD
-=======
 use Auth;
->>>>>>> permintaan-dana
 use Illuminate\Http\Request;
 
 class FileUploadController extends Controller
@@ -14,17 +11,6 @@ class FileUploadController extends Controller
       $request->validate([
         'file' => 'required|file'
       ]);
-<<<<<<< HEAD
-      $uploadedFile = $request->file;
-      $filename = $uploadedFile->getClientOriginalName();
-      $extension = $uploadedFile->getClientOriginalExtensions();
-      $path = $uploadedFile->storeAs('temp', 'temp_'.time().'_'.$filename.'.'.$extension);
-      return response()->json([
-        'message' => 'File has been successfully uploaded.',
-        'data' => [
-          'path' => $uploadedFile
-        ]
-=======
 
       $uploadedFile = $request->file('file');
       $filename = $uploadedFile->getClientOriginalName();
@@ -34,7 +20,6 @@ class FileUploadController extends Controller
         'message' => 'File has been successfully uploaded.',
         'data' => [
           'path' => $path        ]
->>>>>>> permintaan-dana
       ]);
     }
 }
