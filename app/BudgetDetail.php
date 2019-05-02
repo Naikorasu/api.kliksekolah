@@ -4,7 +4,6 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use App\BudgetRelocationSources;
 
 class BudgetDetail extends Model
 {
@@ -57,14 +56,6 @@ class BudgetDetail extends Model
 
     public function revisions() {
       return $this->hasMany(BudgetRevisions::class, 'budget_detail_unique_id', 'unique_id');
-    }
-
-    public function budgetRelocationSources() {
-      return $this->hasMany(BudgetRelocationSources::class,'budget_detail_unique_id','unique_id');
-    }
-
-    public function budgetRelocationRecipients() {
-      return $this->hasMany(BudgetRelocationRecipients::class,'budget_detail_unique_id','unique_id');
     }
 
 

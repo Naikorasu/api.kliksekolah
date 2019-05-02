@@ -77,13 +77,6 @@ Route::group([
           Route::post('cancel', 'FundRequestController@cancel');
           Route::post('submit', 'FundRequestController@updateStatus');
         });
-        Route::group([
-            'prefix' => 'realization'
-        ], function() {
-          Route::post('list', 'BudgetRealizationController@list');
-          Route::post('get', 'BudgetRealizationController@get');
-          Route::post('add', 'BudgetRealizationController@add');
-        });
     });
     Route::group([
         'prefix' => 'non-budget'

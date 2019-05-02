@@ -7,9 +7,7 @@ use App\BudgetDetail;
 
 class BudgetRealization extends Model
 {
-    protected $table = 'budget_realization';
-
-    protected $fillable = [
+    private $fillable = [
       'budget_detail_unique_id',
       'filename',
       'amount',

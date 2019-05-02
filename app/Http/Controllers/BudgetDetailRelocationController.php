@@ -4,18 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\BudgetDetail;
-use App\BudgetRelocation;
-use App\BudgetRelocationSources;
-use App\BudgetRelocationRecipients;
-use Auth;
+use App\BudgetDetailRelocation;
 
-class BudgetRelocationController extends Controller
+class BudgetDetailRelocationController extends Controller
 {
   public function list(Request $request) {
-    $budgetRelocation = BudgetRelocation::where(budget_detail_unique_id, $request->budget_detail_unique_id)->get();
-    if($budgetRelocation) {
+    $budgetDetailRelocation = BudgetDetailRelocation::where(budget_detail_unique_id, $request->budget_detail_unique_id)->get();
+    if($budgetDetailRelocation) {
       return response()->json([
-        data => $budgetRelocation
+        data => $budgetDetailRelocation
       ], 200);
     } else {
       return response()->json([
@@ -23,63 +20,71 @@ class BudgetRelocationController extends Controller
       ],400);
     }
   }
-  /** Add budget relocation
-    * @source typeof Array
-    * @destination typeof Array
-  **/
+
   public function add(Request $request) {
-    $budgetRelocation = $this->save($request);
+    $request->validate([
+      'source.unique_id' => 'required',
+      'destination' => 'required'
+    ]);
+
+    $source = $request->source;
+    $destination = $request->destination;
+
+    $sourceBudgetDetail = BudgetDetail::where('unique_id', $source->unique_id)->withRemains()->first();
+
+    if($sourceBudgetDetail->remains < $request->amount){
+      return response()->json([
+        'message' => 'Failed to relocate fund. Relocated amount is bigger than available amount'
+      ],400);
+    }
+
+    if($destination->unique_id) {
+      $destinationBudgetDetail = BudgetDetail::where('unique_id', $destination->unique_id)->first();
+    } else {
+      $destinationBudgetDetail = new BudgetDetail();
+      $destinationBudgetDetail->unique_id = $request->unique_id_detail;
+      $destinationBudgetDetail->head = $request->unique_id_head;
+      $destinationBudgetDetail->account = $request->unique_id_account;
+      $destinationBudgetDetail->semester = $request->semester;
+      $destinationBudgetDetail->code_of_account = $request->code_of_account;
+      $destinationBudgetDetail->title = $request->title || 0;
+      $destinationBudgetDetail->quantity = $request->quantity || 0;
+      $destinationBudgetDetail->price = $request->price || 0;
+      $destinationBudgetDetail->term = $request->term || 0;
+      $destinationBudgetDetail->ypl = $request->ypl || 0;
+      $destinationBudgetDetail->committee = $request->committee || 0;
+      $destinationBudgetDetail->intern = $request->intern || 0;
+      $destinationBudgetDetail->bos = $request->bos || 0;
+      $destinationBudgetDetail->total = $request->total;
+      $destinationBudgetDetail->desc = $request->desc || '';
+      $destinationBudgetDetail->save();
+    }
+
+    $budgetDetailRelocation = new BudgetDetailRelocation();
+    $budgetDetailRelocation->source_unique_id = $source->unique_id;
+    $budgetDetailRelocation->destination_unique_id = $destinationBudgetDetail->id;
+    $budgetDetailRelocation->source_original_amount = $sourceBudgetDetail->total;
+    $budgetDetailRelocation->source_revised_amount = $source->total;
+    $budgetDetailRelocation->destination_original_amount = $destinationBudgetDetail->total || 0;
+    $budgetDetailRelocation->destination_revised_amount = $destination->total;
+
+    $budgetDetailRelocation->save();
 
     return response()->json([
-      'message' => 'Successfully saved budget relocation',
-      'data' => $budgetRelocation
+      'message' => 'Successfully requested relocation of' . ($sourceBudgetDetail->total - $source->total). 'from' .$request->source_unique_id. to .$request->destination_unique_id
     ],200);
   }
 
-  public function submit(Request $request) {
-      $request->validate([
-        'id' => 'required'
-      ]);
-
-      $budgetRelocation = BudgetRelocation::with('budgetRelocationSources', 'budgetRelocationRecipients')->find($request->id);
-
-      $totalAllocation = 0;
-      $totalRelocation = 0;
-
-      $sources = [];
-      $recipients = [];
-      foreach($budgetRelocation->budgetRelocationSources as $source) {
-          $budgetDetail = BudgetDetail::withRemains()->where('unique_id',$source->budget_detail_unique_id)->first();
-
-          if($source->relocated_amount > $budgetDetail->remains) {
-            return response()->json([
-              'message' => 'Failed submitting budget relocation. One of the relocated amount is bigger than available amount.',
-              'data' => $budgetDetail
-            ],400);
-          }
-
-          $totalRelocation += $budgetDetail->remains;
-      }
-
-      foreach($budgetRelocation->budgetRelocationRecipients as $recipients) {
-        if($recipient->is_draft) {
-
-        }
-      }
-      //validate $amount
-
-  }
-
   public function updateApproval(Request $request) {
-    $budgetRelocation = BudgetRelocation::where('id', $request->id)->get();
-    if($budgetRelocation) {
-      $sourceBudgetDetail = BudgetDetail::where('budget_detail_unique_id', $budgetRelocation->source_unique_id)->get();
-      $destinationBudgetDetail = BudgetDetail::where('budget_detail_unique_id', $budgetRelocation->destination_unique_id)->get();
+    $budgetDetailRelocation = BudgetDetailRelocation::where('id', $request->id)->get();
+    if($budgetDetailRelocation) {
+      $sourceBudgetDetail = BudgetDetail::where('budget_detail_unique_id', $budgetDetailRelocation->source_unique_id)->get();
+      $destinationBudgetDetail = BudgetDetail::where('budget_detail_unique_id', $budgetDetailRelocation->destination_unique_id)->get();
 
-      $sourceBudgetDetail->update([total => $sourceBudgetDetail->total - $budgetRelocation->amount]);
-      $destinationBudgetDetail->update([total => $destinationBudgetDetail->total + $budgetRelocation->amount]);
+      $sourceBudgetDetail->update([total => $sourceBudgetDetail->total - $budgetDetailRelocation->amount]);
+      $destinationBudgetDetail->update([total => $destinationBudgetDetail->total + $budgetDetailRelocation->amount]);
 
-      $budgetRelocation->update([status => true]);
+      $budgetDetailRelocation->update([status => true]);
 
       return response()->json([
         'message' => 'Successfully relocated' . $request->amount. 'from' .$request->source_unique_id. 'to' .$request->destination_unique_id
@@ -90,59 +95,6 @@ class BudgetRelocationController extends Controller
         'message' => 'Failed to update status. Requested resource is not found.'
       ], 400);
     }
+
   }
-
-  private function save(Request $request) {
-    $request->validate([
-      'sources' => 'required|array|min:1',
-      'sources.*.unique_id' => 'required',
-      'recipients' => 'required|array|min:1',
-      'head' => 'required',
-      'account' => 'required'
-    ]);
-
-    $sources = $request->sources;
-    $recipients = $request->recipients;
-
-    $budgetRelocation = new BudgetRelocation();
-    $budgetRelocation->head = $request->head;
-    $budgetRelocation->account = $request->account;
-    $budgetRelocation->save();
-
-    foreach($sources as $source) {
-      $sourceBudgetDetail = BudgetDetail::withRemains()->select('remains','unique_id')->find('unique_id',$source->unique_id);
-
-      $budgetRelocationSource = new BudgetRelocationSources();
-      $budgetRelocationSource->budget_relocation_id = $budgetRelocation->id;
-      $budgetRelocationSource->budget_detail_unique_id = $source->budget_detail_unique_id;
-      $budgetRelocationSource->relocated_amount = $source->relocated_amount;
-      $budgetRelocationSource->description = $source->description;
-      $budgetRelocationSource->save();
-    }
-
-    foreach($recipients as $recipient) {
-      $is_draft = false;
-      if($recipient->unique_id) {
-        $recipientBudgetDetail = BudgetDetail::select('unique_id')->find('unique_id', $recipient->unique_id);
-      } else {
-        $recipientBudgetDetail = new BudgetDetailDraft($recipient);
-        $recipientBudgetDetail->head = $request->head;
-        $recipientBudgetDetail->account = $request->$account;
-        $recipientBudgetDetail->save();
-        $is_draft = true;
-      }
-
-      $budgetRelocationRecipient = new BudgetRelocationRecipients();
-      $budgetRelocationRecipient->budget_relocation_id = $budgetRelocation->id;
-      $budgetRelocationRecipient->budget_detail_id = $recipientBudgetDetail->unique_id;
-      $budgetRelocationRecipient->allocated_amount = $recipient->allocated_amount;
-      $budgetRelocationRecipient->save();
-    }
-
-    $budgetRelocation->load('budgetRelocationSources','budgetRelocationRecipients');
-
-    return $budgetRelocation;
-  }
-
-
 }
