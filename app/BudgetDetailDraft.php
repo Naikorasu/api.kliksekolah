@@ -10,7 +10,7 @@ class BudgetDetail extends Model
 {
     //
 
-    protected $table = 'budgets_detail';
+    protected $table = 'budget_detail_drafts';
 
     //protected $primaryKey = 'unique_id';
 
@@ -30,6 +30,7 @@ class BudgetDetail extends Model
         'bos',
         'total',
         'desc',
+        'user_id'
     ];
 
     /*
