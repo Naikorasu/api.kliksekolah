@@ -38,6 +38,6 @@ class CodeGroup extends Model
 
     public function category()
     {
-        return $this->belongsTo(CodeCategory::Class,'code');
+        return $this->belongsTo(CodeCategory::Class, 'category', 'code');
     }
 }

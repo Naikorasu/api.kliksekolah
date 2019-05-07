@@ -23,8 +23,6 @@ class BudgetDetailController extends Controller
       ], 200);
   }
 
-
-
   public function list_detail_rapbu(Request $request)
   {
       $request->validate([
@@ -51,7 +49,7 @@ class BudgetDetailController extends Controller
           'account_type' => 'required|integer'
       ]);
 
-      $data = $this->budgetDetailService->save(json_decode($request->data, true), $request->head, $request->account, $request->account_type);
+      $data = $this->budgetDetailService->save($request->all(), $request->head, $request->account, $request->account_type);
 
       // $process_data = json_decode($request->data, true);
       //

@@ -9,6 +9,7 @@ use App\BudgetDetail;
 use App\Classes\FunctionHelper;
 
 class BudgetDetailService extends BaseService {
+
   /**
   * Get Budget Detail List
   * @param $filters
@@ -18,14 +19,25 @@ class BudgetDetailService extends BaseService {
   *   semester: integer
   */
   public function getList($filters=[]) {
+    $codeOfAccountValue = null;
+    $codeOfAccountType = null;
+    if(array_key_exists('code_of_account', $filters)) {
+
+      $codeOfAccountValue = $filters['code_of_account'];
+      $codeOfAccountType = array_key_exists('type', $filters) ? $filters['type'] : null;
+
+      unset($filters['code_of_account']);
+      unset($filters['type']);
+    }
+
     $conditions = $this->buildFilters($filters);
 
     try {
-      $results = BudgetDetail::where($conditions)->with('parameter_code')->remains()->get();
+      $results = BudgetDetail::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->remains()->get();
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
-
+    //return dd(BudgetDetail::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->remains()->toSql());
     $data = [
       'ganjil' => [],
       'genap' => []

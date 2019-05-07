@@ -38,7 +38,7 @@ class CodeCategory extends Model
 
     public function class()
     {
-        return $this->belongsTo(CodeClass::Class,'code');
+        return $this->belongsTo(CodeClass::Class, 'class', 'code');
     }
 
     /*

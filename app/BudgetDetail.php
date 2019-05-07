@@ -34,12 +34,43 @@ class BudgetDetail extends Model
         'desc',
     ];
 
-    /*
-    public function account()
-    {
-        return $this->belongsTo(BudgetAccount::Class,'unique_id','account');
+    public function scopeParameterCode($query, $value=null, $class=null) {
+      if(isset($value)) {
+        switch($class) {
+          case 'group':
+            return $query->whereHas(
+              'parameter_code.group', function($q) use($value) {
+                $q->where('code',$value);
+              }
+            );
+            break;
+          case 'category':
+            return $query->whereHas(
+              'parameter_code.group.category', function($q) use($value) {
+                  $q->where('code', $value);
+              }
+            );
+            break;
+          case 'class':
+            return $query->whereHas(
+              'parameter_code.group.category.class', function($q) use($value) {
+                $q->where('code', $value);
+              }
+            );
+            break;
+          default:
+            return $query->whereHas(
+              'parameter_code', function($q) use($value) {
+                $q->where('code', $value);
+              }
+            );
+            break;
+
+        }
+      }  else {
+        return $query->with('parameter_code');
+      }
     }
-    */
 
     public function scopeRAPBU($query) {
       return $query->where(function($q) {

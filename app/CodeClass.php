@@ -34,7 +34,7 @@ class CodeClass extends Model
 
     public function category()
     {
-        return $this->hasMany(CodeCategory::Class, 'class', 'code');;
+        return $this->hasMany(CodeCategory::Class, 'code');
     }
 
 }
