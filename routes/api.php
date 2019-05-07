@@ -45,6 +45,17 @@ Route::group([
         Route::get('profile', 'AuthController@profile');
     });
 
+    Route::group([
+      'prefix' => 'options'
+    ], function() {
+
+      Route::post('code-of-account/realization','OptionsController@code_of_account_realization');
+      Route::post('periode/realization','OptionsController@periode_realization');
+
+      Route::post('code-of-account','OptionsController@code_of_account');
+      Route::post('periode','OptionsController@periode');
+
+    });
     //budget
     Route::group([
         'prefix' => 'budget'
@@ -60,11 +71,11 @@ Route::group([
         Route::group([
             'prefix' => 'detail'
         ],function () {
-            Route::post('list','BudgetController@list_detail');
-            Route::post('rapbu','BudgetController@list_detail_rapbu');
-            Route::post('add','BudgetController@add_detail');
-            Route::post('edit','BudgetController@edit_detail');
-            Route::post('delete','BudgetController@delete_detail');
+            Route::post('list','BudgetDetailController@list_detail');
+            Route::post('rapbu','BudgetDetailController@list_detail_rapbu');
+            Route::post('add','BudgetDetailController@add_detail');
+            Route::post('edit','BudgetDetailController@edit_detail');
+            Route::post('delete','BudgetDetailController@delete_detail');
         });
 
         Route::group([

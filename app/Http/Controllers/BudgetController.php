@@ -9,28 +9,31 @@ use App\BudgetDetail;
 use App\User;
 use App\Classes\FunctionHelper;
 use App\CodeAccount;
+use App\Exceptions\DataNotFoundException;
 use Illuminate\Http\Request;
+use App\Services\BudgetService;
+use App\Services\BudgetDetailService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class BudgetController extends Controller
 {
-    //
+
+    private $budgetService;
+    private $budgetDetailService;
+
+    public function __construct(BudgetService $budgetService, BudgetDetailService $budgetDetailService) {
+      $this->budgetService = $budgetService;
+      $this->budgetDetailService = $budgetDetailService;
+    }
 
     //BUDGET HEADER
     public function list_head(Request $request)
     {
-        $user = User::find(Auth::user()->id);
-        $user_email = $user->email;
+        $budgetDetail = BudgetDetail::remains()->get();
 
+        $filters = $request->filters;
 
-        $request->validate([
-            'periode' => 'required|integer',
-        ]);
-
-        $data = Budget::where('periode', $request->periode)->orderBy('created_at', 'DESC')->with('account')->paginate(5);
-
-        $result = array(
-            'data' => $data,
-        );
+        $result = $this->budgetService->getList($request->filters);
 
         return response()->json([
             'message' => 'Load Data Budget Success',
@@ -158,261 +161,6 @@ class BudgetController extends Controller
 
     }
     */
-
-
-    //BUDGET DETAIL
-
-
-    public function list_detail(Request $request)
-    {
-        $user = $request->user();
-        $user_email = $user->email;
-
-        $request->validate([
-            'account_unique_id' => 'required'
-        ]);
-
-        $code_of_account = $request->code_of_account;
-        $with_remains = $request->with_remains;
-
-        //$data = BudgetAccount::where('unique_id', $request->unique_id)->with('detail')->get();
-        $data_ganjil = BudgetDetail::where('account', $request->account_unique_id)->where('semester', 1)->with('parameter_code')->with('revisions');
-        $data_genap = BudgetDetail::where('account', $request->account_unique_id)->where('semester', 2)->with('parameter_code')->with('revisions');
-
-        if($code_of_account) {
-          $data_ganjil = $data_ganjil->where('code_of_account', $code_of_account);
-          $data_genap = $data_genap->where('code_of_account', $code_of_account);
-        }
-
-        if($with_remains) {
-          $data_ganjil = $data_ganjil->withRemains();
-          $data_genap = $data_genap->withRemains();
-        }
-
-        $data = array(
-            'ganjil' => $data_ganjil->get(),
-            'genap' => $data_genap->get(),
-        );
-
-        $result = array(
-            'data' => $data,
-        );
-
-        return response()->json([
-            'message' => 'Load Data Detail Success',
-            'result' => $result,
-        ], 200);
-    }
-
-
-
-    public function list_detail_rapbu(Request $request)
-    {
-        $user = $request->user();
-        $user_email = $user->email;
-
-        $request->validate([
-            'head_unique_id' => 'required'
-        ]);
-
-        //$data = BudgetAccount::where('unique_id', $request->unique_id)->with('detail')->get();
-
-        $data_pendapatan = BudgetDetail::where('head', $request->head_unique_id)->where('code_of_account','like','4%')->with('parameter_code')->get();
-        $data_pengeluaran = BudgetDetail::where('head', $request->head_unique_id)->where('code_of_account','like','5%')->with('parameter_code')->get();
-
-        $total_pendapatan = BudgetDetail::where('head',$request->head_unique_id)->where('code_of_account','like','4%')->sum('total');
-        $total_pengeluaran = BudgetDetail::where('head',$request->head_unique_id)->where('code_of_account','like','5%')->sum('total');
-
-        $estimasi_surplus_defisit = $total_pendapatan - $total_pengeluaran;
-
-        if($total_pendapatan >= $total_pengeluaran) {
-            $status_surplus_defisit = "SURPLUS";
-            $saldo = $total_pendapatan - $total_pengeluaran;
-        }
-        else {
-            $status_surplus_defisit = "DEFISIT";
-            $saldo = 0;
-        }
-
-        $data = array(
-            'pengeluaran' => $data_pengeluaran,
-            'pendapatan' => $data_pendapatan,
-            'total_pendapatan' => $total_pendapatan,
-            'total_pengeluaran' => $total_pengeluaran,
-            'status_surplus_defisit' => $status_surplus_defisit,
-            'estimasi_surplus_defisit' => $estimasi_surplus_defisit,
-            'saldo' => $saldo,
-        );
-
-        $result = array(
-            'data' => $data,
-        );
-
-        return response()->json([
-            'message' => 'Load Data Detail All Success',
-            'result' => $result,
-        ], 200);
-    }
-
-    public function add_detail(Request $request)
-    {
-        $user = $request->user();
-        $user_email = $user->email;
-
-        $request->validate([
-            'head_unique_id' => 'required',
-            'account_unique_id' => 'required',
-            'account_type' => 'required|integer',
-            'data' => 'required',
-        ]);
-
-        $process_data = json_decode($request->data, true);
-
-        $unique_id_head = $request->head_unique_id;
-        $unique_id_account = $request->account_unique_id;
-        $account_type = $request->account_type;
-
-        foreach ($process_data as $key => $val) {
-
-            $semester = $val['semester'];
-            $code_of_account = $val['coa'];
-            $title = $val['title'];
-            $quantity = $val['quantity'];
-            $price = $val['price'];
-            $term = $val['term'];
-            $ypl = $val['ypl'];
-            $committee = $val['committee'];
-            $intern = $val['intern'];
-            $bos = $val['bos'];
-            $total = $val['total'];
-            $desc = $val['desc'];
-
-            $fh = New FunctionHelper();
-            $unique_id_detail = $fh::generate_unique_key($user_email . ";" . "DETAIL" . ";" . $account_type . ";" . $code_of_account . ";");
-
-            $data = array(
-                'unique_id' => $unique_id_detail,
-                'head' => $unique_id_head,
-                'account' => $unique_id_account,
-                'semester' => $semester,
-                'code_of_account' => $code_of_account,
-                'title' => $title,
-                'quantity' => $quantity,
-                'price' => $price,
-                'term' => $term,
-                'ypl' => $ypl,
-                'committee' => $committee,
-                'intern' => $intern,
-                'bos' => $bos,
-                'total' => $total,
-                'desc' => $desc,
-            );
-
-            $budget_detail = New BudgetDetail($data);
-            $budget_detail->save();
-        }
-
-        if ($budget_detail) {
-            return response()->json([
-                'message' => 'Successfully Add Budget Row Detail',
-            ], 200);
-        } else {
-            return response()->json([
-                'message' => 'Failed Add Budget Row Detail',
-                'error' => $budget_detail,
-            ], 200);
-        }
-    }
-
-    public function edit_detail(Request $request)
-    {
-        $request->validate([
-            'head_unique_id' => 'required',
-            'account_unique_id' => 'required',
-            'account_type' => 'required|integer',
-            'data' => 'required',
-        ]);
-
-        $process_data = json_decode($request->data, true);
-
-        $budgetHead = Budget::find($unique_id_head);
-
-        $workflowResult = $this->runWorkflow('SAVE', $budgetHead);
-
-        foreach ($process_data as $key => $val) {
-
-            $unique_id_detail = $val['unique_id'];
-
-            $update_data = array(
-                'code_of_account' => $val['coa'],
-                'title' => $val['title'],
-                'quantity' => $val['quantity'],
-                'price' => $val['price'],
-                'term' => $val['term'],
-                'ypl' => $val['ypl'],
-                'committee' => $val['committee'],
-                'intern' => $val['intern'],
-                'bos' => $val['bos'],
-                'total' => $val['total'],
-                'desc' => $val['desc'],
-                'updated_at' => date('Y-m-d H:i:s'),
-            );
-
-            $budgetDetail = BudgetDetail::where('unique_id', $unique_id_detail)->first();
-
-            if($workflowResult->createRevision){
-              $budgetRevision = new BudgetRevisions();
-              $budgetRevision->budget_detail_unique_id = $unique_id_detail;
-              $budgetRevision->original_values = json_encode($budgetDetail);
-              $budgetRevision->revised_values = json_encode($update_data);
-              $budgetRevision->user_id = Auth::user()->id;
-              $budgetRevision->save();
-            } else {
-              $budgetRevision = $budgetDetail->update($update_data);
-            }
-
-            if ($budgetRevision) {
-                return response()->json([
-                    'message' => 'Successfully Update Budget Row Detail',
-                    'result' => $budgetRevision,
-                ], 200);
-
-            } else {
-
-                return response()->json([
-                    'message' => 'Failed Update Budget Row Detail',
-                    'error' => $budgetRevision,
-                ], 401);
-            }
-        }
-    }
-
-    public function delete_detail(Request $request)
-    {
-        $user = $request->user();
-        $user_email = $user->email;
-
-        $request->validate([
-            'detail_unique_id' => 'required',
-        ]);
-
-        $delete = BudgetDetail::where('unique_id', $request->detail_unique_id)->delete();
-
-        if ($delete) {
-            return response()->json([
-                'message' => 'Successfully Delete Budget Row Detail',
-                'result' => $delete,
-            ], 200);
-
-        } else {
-
-            return response()->json([
-                'message' => 'Failed Delete Budget Row Detail',
-                'error' => $delete,
-            ], 401);
-        }
-
-    }
 
     private function runWorkflow($type, $budgetHead) {
       $currentUser = User::with('userGroup')->find(Auth::user()->id);
