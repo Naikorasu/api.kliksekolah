@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/kliksekolah/public_html/api.kliksekolah
+    - /bin/cp -R images $DEPLOYPATH
