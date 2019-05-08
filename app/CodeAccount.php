@@ -34,7 +34,7 @@ class CodeAccount extends Model
     ];
 
     public function budgetDetail() {
-        return $this->belongsTo(BudgetDetail::Class,'code_of_account','code');
+        return $this->belongsTo(BudgetDetail::Class,'code','code_of_account');
     }
 
     public function group()

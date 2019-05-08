@@ -32,8 +32,9 @@ class CodeClass extends Model
     protected $casts = [
     ];
 
-    public function scopeOptions($query, $code=null) {
+    public function scopeOptions($query) {
       return $query->with('category','category.group', 'category.group.account');
+
     }
 
     public function category()

@@ -48,12 +48,9 @@ Route::group([
     Route::group([
       'prefix' => 'options'
     ], function() {
-
-      Route::post('code-of-account/realization','OptionsController@code_of_account_realization');
-      Route::post('periode/realization','OptionsController@periode_realization');
-
-      Route::post('code-of-account','OptionsController@code_of_account');
-      Route::post('periode','OptionsController@periode');
+      
+      Route::post('code-of-account/{type?}','OptionsController@code_of_account');
+      Route::post('periode/{type?}','OptionsController@periode');
 
     });
     //budget
@@ -71,7 +68,7 @@ Route::group([
         Route::group([
             'prefix' => 'detail'
         ],function () {
-            Route::post('list/{type}?','BudgetDetailController@list_detail');
+            Route::post('list/{type?}','BudgetDetailController@list_detail');
             Route::post('rapbu','BudgetDetailController@list_detail_rapbu');
             Route::post('add','BudgetDetailController@add_detail');
             Route::post('edit','BudgetDetailController@edit_detail');

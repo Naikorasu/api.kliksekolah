@@ -20,11 +20,16 @@ class OptionsService extends BaseService {
 
     try {
       if($withRealization == true) {
-        $collection = BudgetDetail::codeOfAccountOptions()->whereHas('budget_request')->get();
+        $collection = CodeClass::options()->whereHas(
+          'category.group.account.budgetDetail', function($q) {
+              $q->whereHas('fundRequest', function($q) {
+                $q->where('is_approved',true);
+              });
+          });
       } else {
-        $collection = CodeClass::options()->get();
+        $collection = CodeClass::options();
       }
-      return $collection;
+      return $collection->where($conditions)->get();
 
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());

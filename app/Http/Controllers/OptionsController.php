@@ -21,23 +21,13 @@ class OptionsController extends Controller
       $this->optionsService = $optionsService;
     }
 
-    public function code_of_account(Request $request) {
-      $data = $this->optionsService->getCodeOfAccounts($request->filters);
+    public function code_of_account(Request $request, $type=null) {
+      $data = $this->optionsService->getCodeOfAccounts($request->filters, isset($type));
       return $this->returnOption($request, $data);
     }
 
-    public function periode(Request $request) {
-      $data = $this->optionsService->getPeriodes($request->filters);
-      return $this->returnOption($request, $data);
-    }
-
-    public function code_of_account_realization(Request $request) {
-      $data = $this->optionsService->getCodeOfAccounts($request->filters, true);
-      return $this->returnOption($request, $data);
-    }
-
-    public function periode_realization(Request $request) {
-      $data = $this->optionsService->getPeriodes($request->filters, true);
+    public function periode(Request $request, $type=null) {
+      $data = $this->optionsService->getPeriodes($request->filters, isset($type));
       return $this->returnOption($request, $data);
     }
 }
