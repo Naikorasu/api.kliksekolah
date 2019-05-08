@@ -11,8 +11,8 @@ class BudgetRealizationController extends Controller
 {
     public function list(Request $request) {
       $budgetRealizations = BudgetRealization::paginate(5);
-      return response()-json([
-        'data' => $budgetRealization
+      return response()->json([
+        'data' => $budgetRealizations
       ]);
     }
 
