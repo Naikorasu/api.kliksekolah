@@ -5,6 +5,7 @@ namespace App\Services;
 use Auth;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Exceptions\DataNotFoundException;
+use App\CodeClass;
 
 use App\BudgetDetail;
 use App\Budget;
@@ -21,20 +22,13 @@ class OptionsService extends BaseService {
       if($withRealization == true) {
         $collection = BudgetDetail::codeOfAccountOptions()->whereHas('budget_request')->get();
       } else {
-        $collection = BudgetDetail::codeOfAccountOptions()->where($conditions)->get();
+        $collection = CodeClass::options()->get();
       }
-      $options = [];
-      foreach($collection as $option) {
-        array_push($options, [
-          "id" => $option->code_of_account,
-          "title" => $option->parameter_code->title
-        ]);
-      }
-      return $options;
+      return $collection;
+
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
-    return $code_of_accounts;
   }
 
   public function getPeriodes($filters, $withRealization = false) {
@@ -42,7 +36,7 @@ class OptionsService extends BaseService {
 
     try {
       $collection = Budget::periodeOptions()->where($conditions)->get();
-      
+
       $options = [];
       foreach($collection as $option) {
         array_push($options, [

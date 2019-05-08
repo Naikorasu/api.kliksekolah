@@ -71,7 +71,7 @@ Route::group([
         Route::group([
             'prefix' => 'detail'
         ],function () {
-            Route::post('list','BudgetDetailController@list_detail');
+            Route::post('list/{type}?','BudgetDetailController@list_detail');
             Route::post('rapbu','BudgetDetailController@list_detail_rapbu');
             Route::post('add','BudgetDetailController@add_detail');
             Route::post('edit','BudgetDetailController@edit_detail');

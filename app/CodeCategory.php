@@ -33,12 +33,12 @@ class CodeCategory extends Model
 
     public function group()
     {
-        return $this->hasMany(CodeGroup::Class, 'category', 'code');;
+        return $this->hasMany(CodeGroup::class, 'category', 'code');;
     }
 
     public function class()
     {
-        return $this->belongsTo(CodeClass::Class, 'class', 'code');
+        return $this->belongsTo(CodeClass::class, 'class', 'code');
     }
 
     /*

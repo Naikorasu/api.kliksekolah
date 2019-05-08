@@ -18,7 +18,7 @@ class BudgetDetailService extends BaseService {
   *   code_of_account: string|code_of_account
   *   semester: integer
   */
-  public function getList($filters=[]) {
+  public function getList($filters=[], $type) {
     $codeOfAccountValue = null;
     $codeOfAccountType = null;
     if(array_key_exists('code_of_account', $filters)) {
@@ -33,7 +33,11 @@ class BudgetDetailService extends BaseService {
     $conditions = $this->buildFilters($filters);
 
     try {
-      $results = BudgetDetail::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->remains()->get();
+      if($type == 'realization') {
+        $results = BudgetDetail::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->remains()->has('fundRequest')->get();
+      } else {
+        $results = BudgetDetail::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->remains()->get();
+      }
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }

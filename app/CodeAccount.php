@@ -39,6 +39,6 @@ class CodeAccount extends Model
 
     public function group()
     {
-        return $this->belongsTo(CodeGroup::Class,'group', 'code');
+      return $this->belongsTo(CodeGroup::Class,'group', 'code');
     }
 }

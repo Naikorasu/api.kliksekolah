@@ -33,11 +33,11 @@ class CodeGroup extends Model
 
     public function account()
     {
-        return $this->hasMany(CodeAccount::Class, 'group', 'code');;
+        return $this->hasMany(CodeAccount::class, 'group', 'code');;
     }
 
     public function category()
     {
-        return $this->belongsTo(CodeCategory::Class, 'category', 'code');
+        return $this->belongsTo(CodeCategory::class, 'category', 'code');
     }
 }

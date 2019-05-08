@@ -68,7 +68,7 @@ class BudgetDetail extends Model
             break;
         }
       }
-      
+
       return $query;
     }
 
@@ -83,7 +83,7 @@ class BudgetDetail extends Model
     }
 
     public function scopeCodeOfAccountOptions($query) {
-      return $query->with(['parameter_code:code,title'])->select(
+      return $query->with('parameter_code:code,title,group', 'parameter_code.group', 'parameter_code.group.category', 'parameter_code.group.category.class:code,title')->select(
                   DB::raw('distinct(code_of_account) as code_of_account')
             );
     }

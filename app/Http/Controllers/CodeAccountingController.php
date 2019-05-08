@@ -38,6 +38,7 @@ class CodeAccountingController extends Controller
                 $data_group_account = CodeGroup::where('category', $category_code)->with('account')->get();
                 $data_category[$categories]['group'] = $data_group_account;
             }
+            $data_class[$classes]['category'] = $data_category;
         }
 
         $result = array(

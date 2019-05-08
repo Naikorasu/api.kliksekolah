@@ -14,12 +14,12 @@ class BudgetDetailController extends Controller
     $this->budgetDetailService = $budgetDetailService;
   }
 
-  public function list_detail(Request $request)
+  public function list_detail(Request $request, $type)
   {
-      $results = $this->budgetDetailService->getList($request->filters);
+      $results = $this->budgetDetailService->getList($request->filters, $type);
       return response()->json([
           'message' => 'Load Data Detail Success',
-          'data' => $results,
+          'data' => $results
       ], 200);
   }
 
