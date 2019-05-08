@@ -34,9 +34,10 @@ class BudgetDetail extends Model
         'desc',
     ];
 
-    public function scopeParameterCode($query, $value=null, $class=null) {
+    public function scopeParameterCode($query, $value=null, $type=null) {
+      $query->with('parameter_code');
       if(isset($value)) {
-        switch($class) {
+        switch($type) {
           case 'group':
             return $query->whereHas(
               'parameter_code.group', function($q) use($value) {
@@ -65,11 +66,10 @@ class BudgetDetail extends Model
               }
             );
             break;
-
         }
-      }  else {
-        return $query->with('parameter_code');
       }
+      
+      return $query;
     }
 
     public function scopeRAPBU($query) {
