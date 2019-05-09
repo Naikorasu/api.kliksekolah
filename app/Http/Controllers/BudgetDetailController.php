@@ -14,7 +14,7 @@ class BudgetDetailController extends Controller
     $this->budgetDetailService = $budgetDetailService;
   }
 
-  public function list_detail(Request $request, $type)
+  public function list_detail(Request $request, $type=null)
   {
       $results = $this->budgetDetailService->getList($request->filters, $type);
       return response()->json([

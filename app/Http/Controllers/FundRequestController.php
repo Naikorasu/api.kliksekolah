@@ -5,11 +5,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\BudgetDetail;
 use App\FundRequest;
+use App\Services\FundRequestService;
 
 
 
 class FundRequestController extends Controller
 {
+    private $fundRequestService;
+
+    public function __construct(FundRequestService $fundRequestService) {
+        $this->fundRequestService = $fundRequestService;
+    }
+
     public function list(Request $request) {
       $fundRequest = FundRequest::where('budget_detail_unique_id', $request->budget_detail_unique_id)->get();
       if($fundRequest) {
@@ -22,6 +29,7 @@ class FundRequestController extends Controller
         ],400);
       }
     }
+
     public function get(Request $request) {
       $request->validate([
         'id' => 'required'
@@ -46,56 +54,28 @@ class FundRequestController extends Controller
         'amount' => 'required'
       ]);
 
-      //validate against remains
-      $budgetDetail = BudgetDetail::withRemains()->find('unique_id',$request->budget_detail_unique_id);
+      $data = $this->fundRequestService->add($request->budget_detail_unique_id, $request->amount);
 
-      if($budgetDetail->remains !== null && $budgetDetail->remains < $request->amount) {
-        return response()->json([
-          'message' => 'Failed to save fund request. Requested amount is bigger than available amount.'
-        ], 400);
-      } else if($budgetDetail->total < $request->amount) {
-        return response()->json([
-          'message' => 'Failed to save fund request. Requested amount is bigger than total.'
-        ], 400);
-      }
-      else {
-        $fundRequest = new FundRequest();
-        $fundRequest->budget_detail_unique_id = $request->budget_detail_unique_id;
-        $fundRequest->amount = $request->amount;
-        $fundRequest->save();
+      return response()->json([
+          'message' => 'Successfully Add Fund Request',
+          'data' => $data
+      ], 201);
 
-        return response()->json([
-            'message' => 'Successfully Add Fund Request',
-            'data' => $fundRequest,
-            'remains' => $budgetDetail->remains
-        ], 201);
-      }
     }
 
     public function edit(Request $request) {
       $request->validate([
           'id' => 'required|integer',
+          'budget_detail_unique_id' => 'required',
           'amount' => 'required'
       ]);
 
-      $fundRequest = FundRequest::where([
-        ['id', '=', $request->id],
-        ['is_approved', '=', false],
-        ['submitted', '=', false]
-      ])->first();
+      $data = $this->fundRequestService->edit($request->id, $request->budget_detail_unique_id, $request->amount);
 
-      if($this->isValidAmount($fundRequest->budget_detail_unique_id, $request->amount)) {
-        $fundRequest->amount = $request->amount;
-        $fundRequest->save();
-
-        return response()->json([
-            'message' => 'Successfully Updated Fund Request'
-        ], 201);
-      } else {
-        return response()->json([
-          'message' => 'Failed to save fund request. Requested amount is bigger than available amount.'
-        ], 400);
-      }
+      return response()->json([
+          'message' => 'Successfully Updated Fund Request',
+          'data' => $data
+      ], 201);
     }
 
     public function cancel(Request $request) {
@@ -103,55 +83,37 @@ class FundRequestController extends Controller
           'id' => 'required|integer'
       ]);
 
-      $fundRequest = FundRequest::where([
-        ['id', '=', $request->id],
-        ['submitted', '=', true],
-        ['is_approved', '=', false]
-      ])->first();
-
-      $fundRequest->submitted = false;
-
-      $fundRequest->save();
+      $data = $this->fundRequestService->cancel($request->id);
 
       return response()->json([
-        'message' => 'Successfully cancelled the fund request'
+        'message' => 'Successfully cancelled the fund request',
+        'data' => $data
       ], 200);
     }
 
-    public function updateStatus(Request $request) {
+    public function submit(Request $request) {
       $request->validate([
-          'id' => 'required|integer',
-          'is_approved' => 'required|boolean'
+        'id' => 'required|integer'
       ]);
 
-      $fundRequest = FundRequest::where([
-        ['id', '=', $request->id]
-      ])->first();
+      $data = $this->fundRequestService->submit($request->id);
 
-      if($this->isValidAmount($fundRequest->budget_detail_unique_id, $fundRequest->amount)) {
-        $fundRequest->is_approved = $request->is_approved;
-
-        if($fundRequest->save()){
-          return response()->json([
-            'message' => 'Successfully update approval status'
-          ], 200);
-        } else {
-          return response()->json([
-            'message' => 'Failed updating approval status'
-          ], 400);
-        }
-      } else {
-        return response()->json([
-          'message' => 'Failed updating approval status. Requested amount is bigger than available amount.'
-        ], 400);
-      }
+      return response()->json([
+        'message' => 'Successfully submitted the fund request',
+        'data' => $data
+      ], 200);
     }
 
-    private function isValidAmount($budgetDetailUniqueId, $amount) {
-      $budgetDetail = BudgetDetail::where('unique_id', $budgetDetailUniqueId)->withRemains()->first();
-      if($budgetDetail->total < $amount || $budgetDetail->remains) {
-        return false;
-      }
-      else return true;
+    public function updateStatus(Request $request, $status) {
+      $request->validate([
+          'id' => 'required|integer'
+      ]);
+
+      $data = $this->fundRequestService->updateStatus($request->id, $status);
+
+      return response()->json([
+        'message' => 'Successfully submitted the fund request',
+        'data' => $data
+      ], 200);
     }
 }

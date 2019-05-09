@@ -48,7 +48,7 @@ Route::group([
     Route::group([
       'prefix' => 'options'
     ], function() {
-      
+
       Route::post('code-of-account/{type?}','OptionsController@code_of_account');
       Route::post('periode/{type?}','OptionsController@periode');
 
@@ -83,7 +83,8 @@ Route::group([
           Route::post('add', 'FundRequestController@add');
           Route::post('edit', 'FundRequestController@edit');
           Route::post('cancel', 'FundRequestController@cancel');
-          Route::post('submit', 'FundRequestController@updateStatus');
+          Route::post('submit', 'FundRequestController@submit');
+          Route::post('{status}', 'FundRequestController@updateStatus')->where('status', '(approve|reject)');
         });
         Route::group([
             'prefix' => 'realization'

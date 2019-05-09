@@ -88,11 +88,11 @@ class BudgetDetail extends Model
             );
     }
 
-    public function scopeRemains(Builder $query) {
+    public function scopeRemains($query) {
       return $query
-              ->addSelect(array('*',
+              ->select(['*',
                 DB::raw('total - (select SUM(amount) from fund_request where fund_request.budget_detail_unique_id = budgets_detail.unique_id and fund_request.is_approved=true group by budget_detail_unique_id) as remains')
-              ));
+              ]);
     }
 
     public function parameter_code()

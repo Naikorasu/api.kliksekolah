@@ -21,13 +21,17 @@ class BudgetDetailService extends BaseService {
   public function getList($filters=[], $type) {
     $codeOfAccountValue = null;
     $codeOfAccountType = null;
-    if(array_key_exists('code_of_account', $filters)) {
 
-      $codeOfAccountValue = $filters['code_of_account'];
-      $codeOfAccountType = array_key_exists('type', $filters) ? $filters['type'] : null;
+    if(isset($filters)) {
 
-      unset($filters['code_of_account']);
-      unset($filters['type']);
+      if(array_key_exists('code_of_account', $filters)) {
+
+        $codeOfAccountValue = $filters['code_of_account'];
+        $codeOfAccountType = array_key_exists('type', $filters) ? $filters['type'] : null;
+
+        unset($filters['code_of_account']);
+        unset($filters['type']);
+      }
     }
 
     $conditions = $this->buildFilters($filters);
@@ -124,5 +128,17 @@ class BudgetDetailService extends BaseService {
     }
 
     return $budgetDetail;
+  }
+
+  public function get($unique_id, $withRemains = false) {
+    try {
+      if($withRemains) {
+        return BudgetDetail::remains()->where('unique_id', $unique_id)->first();
+      } else {
+        return BudgetDetail::remains()->where('unique_id', $unique_id)->first();
+      }
+    } catch (ModelNotFoundException $exception) {
+      throw new DataNotFoundException($exception->getMessage());
+    }
   }
 }
