@@ -86,8 +86,12 @@ class FundRequestService extends BaseService {
    * @param  boolean $status the status TRUE|FALSE
    * @return FundRequest          returns the updated model
    */
-  public function updateStatus($id, $status=false) {
-
+  public function updateStatus($id, $status=null) {
+    if($status == 'approve') {
+      $status = true;
+    } else {
+      $status = false;
+    }
     try {
       $fundRequest = FundRequest::status(false,true)->with(['budgetDetail' => function($query) {
         $query->remains();
