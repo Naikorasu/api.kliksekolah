@@ -105,7 +105,7 @@ class BudgetDetailService extends BaseService {
     return $data;
   }
 
-  public function save($data, $head, $account, $account_type, $id=null) {
+  public function save($data, $head, $account, $accountType, $id=null) {
     $user = Auth::user();
     $user_email = $user->email;
 
@@ -120,7 +120,7 @@ class BudgetDetailService extends BaseService {
       $fh = New FunctionHelper();
 
       $budgetDetail = new BudgetDetail($data);
-      $budgetDetail->unique_id = $fh::generate_unique_key($user_email . ";" . "DETAIL" . ";" . $account_type . ";" . $budgetDetail->code_of_account . ";");
+      $budgetDetail->unique_id = $fh::generate_unique_key($user_email . ";" . "DETAIL" . ";" . $accountType . ";" . $budgetDetail->code_of_account . ";");
 
       $budgetDetail->head = $head;
       $budgetDetail->account = $account;
@@ -128,6 +128,23 @@ class BudgetDetailService extends BaseService {
     }
 
     return $budgetDetail;
+  }
+
+  public function saveBatch($data = [], $head, $account, $accountType){
+    $budgetDetails = [];
+    forEach($data as $index => $budgetDetail) {
+      $id = array_key_exists('id', $budgetDetail) ? $budgetDetail['id'] : null;
+      array_push($budgetDetails, $this->save($budgetDetail, $head, $account, $accountType, $id));
+    }
+
+    $result = [
+      'head' => $head,
+      'account' => $account,
+      'account_type' => $accountType,
+      'data' => $budgetDetails
+    ];
+
+    return $result;
   }
 
   public function get($unique_id, $withRemains = false) {
