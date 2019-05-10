@@ -95,6 +95,15 @@ class BudgetsTableSeeder extends Seeder
                             'total' => $faker->randomFloat(0, 10000),
                             'desc' => $faker->sentence,
                         ]);
+
+                    DB::table('fund_request')
+                        ->insert([
+                            'budget_detail_unique_id' => $unique_id_detail,
+                            'amount' => $faker->randomFloat(0,10000),
+                            'is_approved' => true,
+                            'submitted' => true,
+                            'user_id' => 1
+                  ]);
                 }
             }
 
