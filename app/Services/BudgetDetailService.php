@@ -132,6 +132,7 @@ class BudgetDetailService extends BaseService {
 
   public function saveBatch($data = [], $head, $account, $accountType){
     $budgetDetails = [];
+    
     forEach($data as $index => $budgetDetail) {
       $id = array_key_exists('id', $budgetDetail) ? $budgetDetail['id'] : null;
       array_push($budgetDetails, $this->save($budgetDetail, $head, $account, $accountType, $id));

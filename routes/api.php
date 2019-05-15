@@ -67,12 +67,18 @@ Route::group([
 
         Route::group([
             'prefix' => 'detail'
-        ],function () {
+        ],function() {
             Route::post('list/{type?}','BudgetDetailController@list_detail');
             Route::post('rapbu','BudgetDetailController@list_detail_rapbu');
             Route::post('add','BudgetDetailController@add_detail');
             Route::post('edit','BudgetDetailController@edit_detail');
             Route::post('delete','BudgetDetailController@delete_detail');
+        });
+
+        Route::group([
+            'prefix' => 'relocation'
+        ],function() {
+          Route::post('save','BudgetDetailRelocationController@save');
         });
 
         Route::group([

@@ -8,9 +8,17 @@ use App\BudgetRelocation;
 use App\BudgetRelocationSources;
 use App\BudgetRelocationRecipients;
 use Auth;
+use App\Services\BudgetDetailRelocationService;
 
-class BudgetRelocationController extends Controller
+class BudgetDetailRelocationController extends Controller
 {
+
+  private $budgetbudgetDetailRelocationService;
+
+  public function __construct(BudgetDetailRelocationService $budgetDetailRelocationService) {
+      $this->budgetDetailRelocationService = $budgetDetailRelocationService;
+  }
+
   public function list(Request $request) {
     $budgetRelocation = BudgetRelocation::where(budget_detail_unique_id, $request->budget_detail_unique_id)->get();
     if($budgetRelocation) {
@@ -23,16 +31,26 @@ class BudgetRelocationController extends Controller
       ],400);
     }
   }
+
   /** Add budget relocation
     * @source typeof Array
     * @destination typeof Array
   **/
-  public function add(Request $request) {
-    $budgetRelocation = $this->save($request);
+  public function save(Request $request) {
+    $request->validate([
+        'head' => 'required',
+        'account' => 'required',
+        'sources' => 'required|array',
+        'sources.*.budget_detail_unique_id' => 'required',
+        'sources.*.relocated_amount' => 'required',
+        'recipients' => 'required|array'
+    ]);
+
+    $data = $this->budgetDetailRelocationService->save($request->sources, $request->recipients, $request->head, $request->account, $request->id);
 
     return response()->json([
       'message' => 'Successfully saved budget relocation',
-      'data' => $budgetRelocation
+      'data' => $data
     ],200);
   }
 
@@ -92,57 +110,57 @@ class BudgetRelocationController extends Controller
     }
   }
 
-  private function save(Request $request) {
-    $request->validate([
-      'sources' => 'required|array|min:1',
-      'sources.*.unique_id' => 'required',
-      'recipients' => 'required|array|min:1',
-      'head' => 'required',
-      'account' => 'required'
-    ]);
-
-    $sources = $request->sources;
-    $recipients = $request->recipients;
-
-    $budgetRelocation = new BudgetRelocation();
-    $budgetRelocation->head = $request->head;
-    $budgetRelocation->account = $request->account;
-    $budgetRelocation->save();
-
-    foreach($sources as $source) {
-      $sourceBudgetDetail = BudgetDetail::withRemains()->select('remains','unique_id')->find('unique_id',$source->unique_id);
-
-      $budgetRelocationSource = new BudgetRelocationSources();
-      $budgetRelocationSource->budget_relocation_id = $budgetRelocation->id;
-      $budgetRelocationSource->budget_detail_unique_id = $source->budget_detail_unique_id;
-      $budgetRelocationSource->relocated_amount = $source->relocated_amount;
-      $budgetRelocationSource->description = $source->description;
-      $budgetRelocationSource->save();
-    }
-
-    foreach($recipients as $recipient) {
-      $is_draft = false;
-      if($recipient->unique_id) {
-        $recipientBudgetDetail = BudgetDetail::select('unique_id')->find('unique_id', $recipient->unique_id);
-      } else {
-        $recipientBudgetDetail = new BudgetDetailDraft($recipient);
-        $recipientBudgetDetail->head = $request->head;
-        $recipientBudgetDetail->account = $request->$account;
-        $recipientBudgetDetail->save();
-        $is_draft = true;
-      }
-
-      $budgetRelocationRecipient = new BudgetRelocationRecipients();
-      $budgetRelocationRecipient->budget_relocation_id = $budgetRelocation->id;
-      $budgetRelocationRecipient->budget_detail_id = $recipientBudgetDetail->unique_id;
-      $budgetRelocationRecipient->allocated_amount = $recipient->allocated_amount;
-      $budgetRelocationRecipient->save();
-    }
-
-    $budgetRelocation->load('budgetRelocationSources','budgetRelocationRecipients');
-
-    return $budgetRelocation;
-  }
+  // private function save(Request $request) {
+  //   $request->validate([
+  //     'sources' => 'required|array|min:1',
+  //     'sources.*.unique_id' => 'required',
+  //     'recipients' => 'required|array|min:1',
+  //     'head' => 'required',
+  //     'account' => 'required'
+  //   ]);
+  //
+  //   $sources = $request->sources;
+  //   $recipients = $request->recipients;
+  //
+  //   $budgetRelocation = new BudgetRelocation();
+  //   $budgetRelocation->head = $request->head;
+  //   $budgetRelocation->account = $request->account;
+  //   $budgetRelocation->save();
+  //
+  //   foreach($sources as $source) {
+  //     $sourceBudgetDetail = BudgetDetail::withRemains()->select('remains','unique_id')->find('unique_id',$source->unique_id);
+  //
+  //     $budgetRelocationSource = new BudgetRelocationSources();
+  //     $budgetRelocationSource->budget_relocation_id = $budgetRelocation->id;
+  //     $budgetRelocationSource->budget_detail_unique_id = $source->budget_detail_unique_id;
+  //     $budgetRelocationSource->relocated_amount = $source->relocated_amount;
+  //     $budgetRelocationSource->description = $source->description;
+  //     $budgetRelocationSource->save();
+  //   }
+  //
+  //   foreach($recipients as $recipient) {
+  //     $is_draft = false;
+  //     if($recipient->unique_id) {
+  //       $recipientBudgetDetail = BudgetDetail::select('unique_id')->find('unique_id', $recipient->unique_id);
+  //     } else {
+  //       $recipientBudgetDetail = new BudgetDetailDraft($recipient);
+  //       $recipientBudgetDetail->head = $request->head;
+  //       $recipientBudgetDetail->account = $request->$account;
+  //       $recipientBudgetDetail->save();
+  //       $is_draft = true;
+  //     }
+  //
+  //     $budgetRelocationRecipient = new BudgetRelocationRecipients();
+  //     $budgetRelocationRecipient->budget_relocation_id = $budgetRelocation->id;
+  //     $budgetRelocationRecipient->budget_detail_id = $recipientBudgetDetail->unique_id;
+  //     $budgetRelocationRecipient->allocated_amount = $recipient->allocated_amount;
+  //     $budgetRelocationRecipient->save();
+  //   }
+  //
+  //   $budgetRelocation->load('budgetRelocationSources','budgetRelocationRecipients');
+  //
+  //   return $budgetRelocation;
+  // }
 
 
 }

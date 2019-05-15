@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class BudgetRelocation extends Model
 {
+    protected $table = 'budget_relocation';
+    
     protected $fillable = [
       'user_id',
       'approved',
