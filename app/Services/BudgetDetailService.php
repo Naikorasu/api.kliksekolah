@@ -6,7 +6,6 @@ use Auth;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Exceptions\DataNotFoundException;
 use App\BudgetDetail;
-use App\Classes\FunctionHelper;
 
 class BudgetDetailService extends BaseService {
 
@@ -116,9 +115,6 @@ class BudgetDetailService extends BaseService {
   }
 
   public function save($data, $head, $account, $accountType, $id=null) {
-    $user = Auth::user();
-    $user_email = $user->email;
-
     if($id) {
       try {
         $budgetDetail = BudgetDetail::findOrFail($id);
@@ -127,11 +123,9 @@ class BudgetDetailService extends BaseService {
         throw new DataNotFoundException($exception->getMessage());
       }
     } else {
-      $fh = New FunctionHelper();
 
       $budgetDetail = new BudgetDetail($data);
-      $budgetDetail->unique_id = $fh::generate_unique_key($user_email . ";" . "DETAIL" . ";" . $accountType . ";" . $budgetDetail->code_of_account . ";");
-
+      $budgetDetail->unique_id = $this->generateUniqueId($accountType, $budgetDetail->code_of_account);
       $budgetDetail->head = $head;
       $budgetDetail->account = $account;
       $budgetDetail->save();

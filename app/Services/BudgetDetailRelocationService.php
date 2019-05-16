@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Services\WorkflowService;
 use App\Services\BudgetDetailService;
 use App\BudgetDetailDraft;
+use App\Exceptions\ApprovalException;
 use App\Exceptions\DataNotFoundException;
 use App\Exceptions\DataSaveFailureException;
 use App\Exceptions\FundRequestExceedRemainsException;
+use App\BudgetDetail;
 use App\BudgetRelocation;
 use App\BudgetRelocationRecipients;
 use App\BudgetRelocationSources;
@@ -39,7 +41,7 @@ class BudgetDetailRelocationService extends BaseService {
   }
 
   public function save($sources, $recipients, $head, $account, $id=null) {
-    $budgetRelocation = BudgetRelocation::updateOrCreate(['user_id' => Auth::user()->id, 'id' => $id]);
+    $budgetRelocation = BudgetRelocation::updateOrCreate(['user_id' => Auth::user()->id, 'head' => $head, 'account' => $account, 'id' => $id]);
 
     if(isset($id)) {
       try {
@@ -86,13 +88,28 @@ class BudgetDetailRelocationService extends BaseService {
     return $budgetRelocation;
   }
 
-  public function updateStatus($id, $status=false) {
+  public function updateStatus($id, $type=false) {
     try {
-      $budgetRelocation = BudgetRelocation::findOrFail($id);
+      $budgetRelocation = BudgetRelocation::where('approved',false)->findOrFail($id);
     } catch (ModelNotFoundException $exception) {
-      throw new DataNotFoundException($exception->getMessage());
+      throw new ApprovalException($exception->getMessage(), $type, $id);
     }
-    $budgetRelocation->update(['approved'=>$status]);
+
+    $budgetRelocation->update(['approved' => ($type == 'approve') ? true : false]);
+    if($type == 'approve') {
+      $budgetRelocationSources = BudgetRelocationSources::where('budget_relocation_id', $budgetRelocation->id);
+      foreach($budgetRelocationSources as $source) {
+        $this->validateAmount($source->budget_detail_unique_id, $source->relocated_amount);
+      }
+
+      $budgetDetailRelocationRecipients = BudgetRelocationRecipients::where('budget_relocation_id',$budgetRelocation->id)->get();
+      foreach($budgetDetailRelocationRecipients as $recipient) {
+        $budgetDetailDraft = BudgetDetailDraft::find($recipient->budget_detail_id);
+        $budgetDetail = $this->budgetDetailService->save($budgetDetailDraft->toArray(), $budgetRelocation->head, $budgetRelocation->account, $budgetDetailDraft->accountType);
+        $recipient->update(['budget_detail_id' => $budgetDetail->unique_id, 'is_draft' => false]);
+        dd($recipient);
+      }
+    }
     return $budgetRelocation;
   }
 

@@ -73,7 +73,7 @@ class BudgetDetailRelocationController extends Controller
         'id' => 'required'
       ]);
 
-      $this->budgetDetailRelocationService->submit($request->id);
+      $data = $this->budgetDetailRelocationService->submit($request->id);
 
       return response()->json([
         'message' => 'Successfully saved budget relocation',

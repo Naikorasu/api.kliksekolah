@@ -3,11 +3,17 @@
 namespace App\Services;
 
 use Auth;
+use App\Classes\FunctionHelper;
 use App\User;
 
 class BaseService{
 
   protected $filterable = [];
+  protected $fh;
+
+  public function __construct(FunctionHelper $fh) {
+    $this->fh = $fh;
+  }
 
   protected function getCurrentUser() {
     $user = User::with('userGroup')->find(Auth::user()->id);
@@ -30,5 +36,11 @@ class BaseService{
       }
     }
     return $conditions;
+  }
+
+  protected function generateUniqueId($accountType, $code_of_account) {
+    $user = Auth::user();
+    $user_email = $user->email;
+    return $this->fh::generate_unique_key($user_email . ";" . "DETAIL" . ";" . $accountType . ";" . $code_of_account . ";");
   }
 }
