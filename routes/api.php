@@ -101,7 +101,9 @@ Route::group([
         ], function() {
           Route::post('list', 'BudgetRealizationController@list');
           Route::post('get', 'BudgetRealizationController@get');
-          Route::post('add', 'BudgetRealizationController@add');
+          Route::post('delete', 'BudgetRealizationController@delete');
+          Route::post('save', 'BudgetRealizationController@save');
+
         });
     });
     Route::group([

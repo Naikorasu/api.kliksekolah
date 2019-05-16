@@ -6,13 +6,23 @@ use Illuminate\Http\Request;
 use App\BudgetDetail;
 use App\BudgetRealization;
 use Auth;
+use App\Services\BudgetRealizationService;
 
 class BudgetRealizationController extends Controller
 {
+    protected $budgetRealizationService;
+
+    public function __construct(BudgetRealizationService $budgetRealizationService) {
+        $this->budgetRealizationService = $budgetRealizationService;
+    }
+
     public function list(Request $request) {
-      $budgetRealizations = BudgetRealization::paginate(5);
+      $filters = (isset($request->filters)) ? $request->filters : null;
+
+      $data = $this->budgetRealizationService->list($filters);
+
       return response()->json([
-        'data' => $budgetRealizations
+        'data' => $data
       ]);
     }
 
@@ -21,36 +31,37 @@ class BudgetRealizationController extends Controller
         'id' => 'required'
       ]);
 
-      $budgetRealization = BudgetRealization::find($request->id);
-      $budgetRealization->filename = '/storage/files/budget_realization_'.$budgetRealization->id.'_'.$budgetRealization->filename;
+      $data = $this->budgetRealizationService->get($request->id);
+
       return response()->json([
-        'data' => $budgetRealization
+        'data' => $data
       ]);
     }
 
-    public function add(Request $request) {
+    public function delete(Request $request) {
+      $request->validate([
+        'id' => 'required'
+      ]);
+
+      $data = $this->budgetRealizationService->delete($request->id);
+
+      return response()->json([
+        'message' => 'Successfully deleted budget realization'
+      ]);
+    }
+
+    public function save(Request $request) {
         $request->validate([
           'budget_detail_unique_id' => 'required',
           'amount' => 'required',
           'file' => 'required|file|mimes:jpeg,jpg,bmp,png,pdf'
         ]);
 
-        $file = $request->file('file');
-        $fileName = $file->getClientOriginalName();
-
-        $budgetRealization = new BudgetRealization();
-        $budgetRealization->budget_detail_unique_id = $request->budget_detail_unique_id;
-        $budgetRealization->filename = $fileName;
-        $budgetRealization->amount = $request->amount;
-        $budgetRealization->description = $request->description;
-        $budgetRealization->user_id = Auth::user()->id;
-        $budgetRealization->save();
-
-        $file->storeAs('public/files', 'budget_realization_'.$budgetRealization->id.'_'.$fileName);
+        $data = $this->budgetRealizationService->save($request->budget_detail_unique_id, $request->amount, $request->file , $request->description, $request->id);
 
         return response()->json([
           'message' => 'Successfully saved budget realization.',
-          'data' => $budgetRealization
+          'data' => $data
         ]);
     }
 }
