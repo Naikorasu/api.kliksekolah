@@ -78,7 +78,11 @@ Route::group([
         Route::group([
             'prefix' => 'relocation'
         ],function() {
+          Route::post('get', 'BudgetDetailRelocationController@get');
+          Route::post('list', 'BudgetDetailRelocationController@list');
+          Route::post('submit', 'BudgetDetailRelocationController@submit');
           Route::post('save','BudgetDetailRelocationController@save');
+          Route::post('{status}', 'BudgetDetailRelocationController@updateStatus')->where('status', '(approve|reject)');
         });
 
         Route::group([

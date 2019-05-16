@@ -24,8 +24,9 @@ class BudgetDetailRelocationService extends BaseService {
     $this->budgetDetailService = $budgetDetailService;
   }
 
-  public function list($filters) {
-    return BudgetRelocation::get();
+  public function list($filters=[]) {
+    $conditions = $this->buildFilters($filters);
+    return BudgetRelocation::where($conditions)->get();
   }
 
   public function get($id) {
@@ -73,6 +74,26 @@ class BudgetDetailRelocationService extends BaseService {
     $budgetRelocation->budgetRelocationRecipients()->saveMany($recipients);
 
     return $budgetRelocation->load('budgetRelocationSources','budgetRelocationRecipients');
+  }
+
+  public function submit($id) {
+    try {
+      $budgetRelocation = BudgetRelocation::findOrFail($id);
+    } catch (ModelNotFoundException $exception) {
+      throw new DataNotFoundException($exception->getMessage());
+    }
+    $budgetRelocation->update(['submitted'=>true]);
+    return $budgetRelocation;
+  }
+
+  public function updateStatus($id, $status=false) {
+    try {
+      $budgetRelocation = BudgetRelocation::findOrFail($id);
+    } catch (ModelNotFoundException $exception) {
+      throw new DataNotFoundException($exception->getMessage());
+    }
+    $budgetRelocation->update(['approved'=>$status]);
+    return $budgetRelocation;
   }
 
   private function validateAmount($budgetDetailId, $allocation) {

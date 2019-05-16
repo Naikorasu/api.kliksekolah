@@ -18,29 +18,39 @@ class BudgetDetailService extends BaseService {
   *   code_of_account: string|code_of_account
   *   semester: integer
   */
+
+  protected $filterable = [
+    'unique_id',
+    'head',
+    'account',
+    'semester',
+    'title'
+  ];
+
   public function getList($filters=[], $type) {
     $codeOfAccountValue = null;
     $codeOfAccountType = null;
 
-    if(isset($filters)) {
-
-      if(array_key_exists('code_of_account', $filters)) {
-
-        $codeOfAccountValue = $filters['code_of_account'];
-        $codeOfAccountType = array_key_exists('type', $filters) ? $filters['type'] : null;
-
-        unset($filters['code_of_account']);
-        unset($filters['type']);
-      }
+    if(array_key_exists('code_of_account', $filters)) {
+      $codeOfAccountValue = $filters['code_of_account'];
+      $codeOfAccountType = array_key_exists('type', $filters) ? $filters['type'] : null;
     }
 
+
     $conditions = $this->buildFilters($filters);
+    $query = BudgetDetail::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->remains();
+
+    if(array_key_exists('periode', $filters)) {
+      $query->whereHas('head', function($q) use($filters) {
+        $q->where('periode',$filters['periode']);
+      });
+    }
 
     try {
       if($type == 'realization') {
-        $results = BudgetDetail::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->remains()->has('fundRequest')->get();
+        $results = $query->has('fundRequest')->get();
       } else {
-        $results = BudgetDetail::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->remains()->get();
+        $results = $query->get();
       }
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
@@ -132,7 +142,7 @@ class BudgetDetailService extends BaseService {
 
   public function saveBatch($data = [], $head, $account, $accountType){
     $budgetDetails = [];
-    
+
     forEach($data as $index => $budgetDetail) {
       $id = array_key_exists('id', $budgetDetail) ? $budgetDetail['id'] : null;
       array_push($budgetDetails, $this->save($budgetDetail, $head, $account, $accountType, $id));

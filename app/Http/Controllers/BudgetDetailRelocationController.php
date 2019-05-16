@@ -13,17 +13,31 @@ use App\Services\BudgetDetailRelocationService;
 class BudgetDetailRelocationController extends Controller
 {
 
-  private $budgetbudgetDetailRelocationService;
+  private $budgetDetailRelocationService;
 
   public function __construct(BudgetDetailRelocationService $budgetDetailRelocationService) {
       $this->budgetDetailRelocationService = $budgetDetailRelocationService;
   }
 
+  public function get(Request $request) {
+    $request->validate([
+      'id' => 'required'
+    ]);
+
+    $budgetRelocation = $this->budgetDetailRelocationService->get($request->id);
+    return response()->json([
+      'data' => $budgetRelocation
+    ]);
+  }
+
   public function list(Request $request) {
-    $budgetRelocation = BudgetRelocation::where(budget_detail_unique_id, $request->budget_detail_unique_id)->get();
+    $filters = (isset($request->filters)) ? $request->filters : [];
+
+    $budgetRelocation = $this->budgetDetailRelocationService->list($filters);
+
     if($budgetRelocation) {
       return response()->json([
-        data => $budgetRelocation
+        'data' => $budgetRelocation
       ], 200);
     } else {
       return response()->json([
@@ -59,55 +73,23 @@ class BudgetDetailRelocationController extends Controller
         'id' => 'required'
       ]);
 
-      $budgetRelocation = BudgetRelocation::with('budgetRelocationSources', 'budgetRelocationRecipients')->find($request->id);
+      $this->budgetDetailRelocationService->submit($request->id);
 
-      $totalAllocation = 0;
-      $totalRelocation = 0;
-
-      $sources = [];
-      $recipients = [];
-      foreach($budgetRelocation->budgetRelocationSources as $source) {
-          $budgetDetail = BudgetDetail::withRemains()->where('unique_id',$source->budget_detail_unique_id)->first();
-
-          if($source->relocated_amount > $budgetDetail->remains) {
-            return response()->json([
-              'message' => 'Failed submitting budget relocation. One of the relocated amount is bigger than available amount.',
-              'data' => $budgetDetail
-            ],400);
-          }
-
-          $totalRelocation += $budgetDetail->remains;
-      }
-
-      foreach($budgetRelocation->budgetRelocationRecipients as $recipients) {
-        if($recipient->is_draft) {
-
-        }
-      }
-      //validate $amount
-
+      return response()->json([
+        'message' => 'Successfully saved budget relocation',
+        'data' => $data
+      ],200);
   }
 
-  public function updateApproval(Request $request) {
-    $budgetRelocation = BudgetRelocation::where('id', $request->id)->get();
-    if($budgetRelocation) {
-      $sourceBudgetDetail = BudgetDetail::where('budget_detail_unique_id', $budgetRelocation->source_unique_id)->get();
-      $destinationBudgetDetail = BudgetDetail::where('budget_detail_unique_id', $budgetRelocation->destination_unique_id)->get();
+  public function updateStatus(Request $request, $status) {
+    $request->validate([
+      'id' => 'required'
+    ]);
 
-      $sourceBudgetDetail->update([total => $sourceBudgetDetail->total - $budgetRelocation->amount]);
-      $destinationBudgetDetail->update([total => $destinationBudgetDetail->total + $budgetRelocation->amount]);
-
-      $budgetRelocation->update([status => true]);
-
-      return response()->json([
-        'message' => 'Successfully relocated' . $request->amount. 'from' .$request->source_unique_id. 'to' .$request->destination_unique_id
-      ],200);
-
-    } else {
-      return response()->json([
-        'message' => 'Failed to update status. Requested resource is not found.'
-      ], 400);
-    }
+    $this->budgetDetailRelocationService->updateStatus($request->id, $status);
+    return response()->json([
+      'message' => 'Successfully relocated budget'
+    ],200);
   }
 
   // private function save(Request $request) {

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use App\BudgetDetail;
 
 
 class Budget extends Model
@@ -59,5 +60,9 @@ class Budget extends Model
     public function account()
     {
         return $this->hasMany(BudgetAccount::Class,'head','unique_id');
+    }
+
+    public function budgetDetails() {
+        return $this->hasMany(BudgetDetail::class, 'head', 'unique_id');
     }
 }

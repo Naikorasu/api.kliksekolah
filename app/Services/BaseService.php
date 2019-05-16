@@ -7,16 +7,26 @@ use App\User;
 
 class BaseService{
 
-  public function getCurrentUser() {
+  protected $filterable = [];
+
+  protected function getCurrentUser() {
     $user = User::with('userGroup')->find(Auth::user()->id);
     return $user;
   }
 
-  public function buildFilters($filters) {
+  protected function buildFilters($filters) {
     $conditions = [];
     if(isset($filters)) {
-      foreach($filters as $key => $value) {
-        array_push($conditions, [$key, '=', $value]);
+      if(isset($this->filterable)) {
+        foreach($filters as $key => $value) {
+          if(array_key_exists($key, $this->filterable)) {
+            array_push($conditions, [$key, '=', $value]);
+          }
+        }
+      } else {
+        foreach($filters as $key => $value) {
+          array_push($conditions, [$key, '=', $value]);
+        }
       }
     }
     return $conditions;

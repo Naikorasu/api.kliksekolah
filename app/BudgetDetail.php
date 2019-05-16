@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Budget;
 use App\BudgetDraftRevisions;
 use App\BudgetRelocationSources;
 use Illuminate\Database\Eloquent\Builder;
@@ -98,6 +99,10 @@ class BudgetDetail extends Model
     public function parameter_code()
     {
         return $this->hasOne(CodeAccount::class,'code','code_of_account');
+    }
+
+    public function head() {
+      return $this->belongsTo(Budget::class, 'head', 'unique_id');
     }
 
     public function fundRequest() {
