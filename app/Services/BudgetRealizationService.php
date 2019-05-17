@@ -22,7 +22,7 @@ class BudgetRealizationService extends BaseService {
   public function list($filters) {
     $conditions = $this->buildFilters($filters);
 
-    $budgetRealizations = BudgetRealization::with('budgetDetail.code_of_account')->where($conditions)->paginate(5);
+    $budgetRealizations = BudgetRealization::with('budgetDetail')->where($conditions)->paginate(5);
 
     return $budgetRealizations;
   }
