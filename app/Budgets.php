@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use App\BudgetDetail;
+use App\BudgetDetails;
 
 
-class Budget extends Model
+class Budgets extends Model
 {
     //
 
@@ -18,9 +18,6 @@ class Budget extends Model
      *
      * @var array
      */
-
-    protected $table = 'budgets';
-
     //protected $primaryKey = 'unique_id';
 
     protected $fillable = [
@@ -59,10 +56,10 @@ class Budget extends Model
 
     public function account()
     {
-        return $this->hasMany(BudgetAccount::Class,'head','unique_id');
+        return $this->hasMany(BudgetAccounts::Class,'head','unique_id');
     }
 
     public function budgetDetails() {
-        return $this->hasMany(BudgetDetail::class, 'head', 'unique_id');
+        return $this->hasMany(BudgetDetails::class, 'head', 'unique_id');
     }
 }

@@ -3,24 +3,25 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\BudgetDetailService;
+use App\Services\BudgetDetailsService;
 
-class BudgetDetailController extends Controller
+class BudgetDetailsController extends Controller
 {
 
   private $budgetDetailService;
 
-  public function __construct(BudgetDetailService $budgetDetailService) {
+  public function __construct(BudgetDetailsService $budgetDetailService) {
     $this->budgetDetailService = $budgetDetailService;
   }
 
   public function list_detail(Request $request, $type=null)
   {
       $results = $this->budgetDetailService->getList($request->filters, $type);
-      return response()->json([
-          'message' => 'Load Data Detail Success',
-          'data' => $results
-      ], 200);
+      $response = [
+        'message' => 'Load data detail success'
+      ];
+
+      return response()->json(array_merge($response, $results), 200);
   }
 
   public function list_detail_rapbu(Request $request)
@@ -84,18 +85,18 @@ class BudgetDetailController extends Controller
           'detail_unique_id' => 'required',
       ]);
 
-      $delete = BudgetDetail::where('unique_id', $request->detail_unique_id)->delete();
+      $delete = BudgetDetails::where('unique_id', $request->detail_unique_id)->delete();
 
       if ($delete) {
           return response()->json([
-              'message' => 'Successfully Delete Budget Row Detail',
+              'message' => 'Successfully Delete Budgets Row Detail',
               'result' => $delete,
           ], 200);
 
       } else {
 
           return response()->json([
-              'message' => 'Failed Delete Budget Row Detail',
+              'message' => 'Failed Delete Budgets Row Detail',
               'error' => $delete,
           ], 401);
       }

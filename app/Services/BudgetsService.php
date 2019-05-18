@@ -5,9 +5,9 @@ namespace App\Services;
 use App\Exceptions\DataNotFoundException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-use App\Budget;
+use App\Budgets;
 
-class BudgetService extends BaseService {
+class BudgetsService extends BaseService {
 
   /**
    * Report or log an exception.
@@ -20,7 +20,7 @@ class BudgetService extends BaseService {
     $conditions = $this->buildFilters($filters);
 
     try {
-      return Budget::where($conditions)->orderBy('created_at', 'DESC')->with('account')->paginate(5);;
+      return Budgets::where($conditions)->orderBy('created_at', 'DESC')->with('account')->paginate(5);
     } catch(ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
@@ -55,7 +55,7 @@ class BudgetService extends BaseService {
   public function getPeriodes($filters=[]) {
     $conditions = $this->buildFilters($filters);
 
-    $result = Budget::where($conditions)->select(DB::raw('distinct(periode) as periodes'));
+    $result = Budgets::where($conditions)->select(DB::raw('distinct(periode) as periodes'));
 
     return $result;
   }

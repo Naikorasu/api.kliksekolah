@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddColumnUserIdToBudgetRealizations extends Migration
+class DropColumnGroupId extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddColumnUserIdToBudgetRealizations extends Migration
      */
     public function up()
     {
-        Schema::table('budget_realization', function (Blueprint $table) {
-            $table->bigInteger('user_id');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('group_id');
         });
     }
 
@@ -25,7 +25,7 @@ class AddColumnUserIdToBudgetRealizations extends Migration
      */
     public function down()
     {
-        Schema::table('budget_realization', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             //
         });
     }

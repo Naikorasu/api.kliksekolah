@@ -3,22 +3,22 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\BudgetDetail;
-use App\FundRequest;
-use App\Services\FundRequestService;
+use App\BudgetDetails;
+use App\FundRequests;
+use App\Services\FundRequestsService;
 
 
 
-class FundRequestController extends Controller
+class FundRequestsController extends Controller
 {
     private $fundRequestService;
 
-    public function __construct(FundRequestService $fundRequestService) {
+    public function __construct(FundRequestsService $fundRequestService) {
         $this->fundRequestService = $fundRequestService;
     }
 
     public function list(Request $request) {
-      $fundRequest = FundRequest::where('budget_detail_unique_id', $request->budget_detail_unique_id)->get();
+      $fundRequest = FundRequests::where('budget_detail_unique_id', $request->budget_detail_unique_id)->get();
       if($fundRequest) {
         return response()->json([
           'data' => $fundRequest
@@ -35,7 +35,7 @@ class FundRequestController extends Controller
         'id' => 'required'
       ]);
 
-      $fundRequest = FundRequest::with('budgetDetail')->find($request->id);
+      $fundRequest = FundRequests::with('budgetDetail')->find($request->id);
 
       return response()->json([
         'data' => $fundRequest

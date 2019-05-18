@@ -6,34 +6,34 @@ use Auth;
 use GuzzleHttp\MessageFormatter;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Services\WorkflowService;
-use App\Services\BudgetDetailService;
-use App\BudgetDetailDraft;
+use App\Services\BudgetDetailsService;
+use App\BudgetDetailDrafts;
 use App\Exceptions\ApprovalException;
 use App\Exceptions\DataNotFoundException;
 use App\Exceptions\DataSaveFailureException;
-use App\Exceptions\FundRequestExceedRemainsException;
-use App\BudgetDetail;
-use App\BudgetRelocation;
+use App\Exceptions\FundRequestsExceedRemainsException;
+use App\BudgetDetails;
+use App\BudgetRelocations;
 use App\BudgetRelocationRecipients;
 use App\BudgetRelocationSources;
 
 
-class BudgetDetailRelocationService extends BaseService {
+class BudgetDetailRelocationsService extends BaseService {
 
   private $budgetDetailService;
 
-  public function __construct(BudgetDetailService $budgetDetailService) {
+  public function __construct(BudgetDetailsService $budgetDetailService) {
     $this->budgetDetailService = $budgetDetailService;
   }
 
   public function list($filters=[]) {
     $conditions = $this->buildFilters($filters);
-    return BudgetRelocation::where($conditions)->get();
+    return BudgetRelocations::where($conditions)->get();
   }
 
   public function get($id) {
     try {
-      $budgetRelocation = BudgetRelocation::with('budgetRelocationSources', 'budgetRelocationRecipients')->findOrFail($id);
+      $budgetRelocation = BudgetRelocations::with('budgetRelocationSources', 'budgetRelocationRecipients')->findOrFail($id);
       return $budgetRelocation;
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
@@ -41,7 +41,7 @@ class BudgetDetailRelocationService extends BaseService {
   }
 
   public function save($sources, $recipients, $head, $account, $id=null) {
-    $budgetRelocation = BudgetRelocation::updateOrCreate(['user_id' => Auth::user()->id, 'head' => $head, 'account' => $account, 'id' => $id]);
+    $budgetRelocation = BudgetRelocations::updateOrCreate(['user_id' => Auth::user()->id, 'head' => $head, 'account' => $account, 'id' => $id]);
 
     if(isset($id)) {
       try {
@@ -64,7 +64,7 @@ class BudgetDetailRelocationService extends BaseService {
     foreach ($recipients as $index => $recipient) {
       $recipient = array_merge(['head'=>$head, 'user_id'=>Auth::user()->id, 'account'=>$account], (array) $recipient);
 
-      $budgetDetailDraft = BudgetDetailDraft::updateOrCreate($recipient);
+      $budgetDetailDraft = BudgetDetailDrafts::updateOrCreate($recipient);
       $recipients[$index] =  new BudgetRelocationRecipients([
         'allocated_amount' => $budgetDetailDraft->total,
         'budget_detail_id' => $budgetDetailDraft->id,
@@ -80,7 +80,7 @@ class BudgetDetailRelocationService extends BaseService {
 
   public function submit($id) {
     try {
-      $budgetRelocation = BudgetRelocation::findOrFail($id);
+      $budgetRelocation = BudgetRelocations::findOrFail($id);
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
@@ -90,7 +90,7 @@ class BudgetDetailRelocationService extends BaseService {
 
   public function updateStatus($id, $type=false) {
     try {
-      $budgetRelocation = BudgetRelocation::where('approved',false)->findOrFail($id);
+      $budgetRelocation = BudgetRelocations::where('approved',false)->findOrFail($id);
     } catch (ModelNotFoundException $exception) {
       throw new ApprovalException($exception->getMessage(), $type, $id);
     }
@@ -104,7 +104,7 @@ class BudgetDetailRelocationService extends BaseService {
 
       $budgetDetailRelocationRecipients = BudgetRelocationRecipients::where('budget_relocation_id',$budgetRelocation->id)->get();
       foreach($budgetDetailRelocationRecipients as $recipient) {
-        $budgetDetailDraft = BudgetDetailDraft::find($recipient->budget_detail_id);
+        $budgetDetailDraft = BudgetDetailDrafts::find($recipient->budget_detail_id);
         $budgetDetail = $this->budgetDetailService->save($budgetDetailDraft->toArray(), $budgetRelocation->head, $budgetRelocation->account, $budgetDetailDraft->accountType);
         $recipient->update(['budget_detail_id' => $budgetDetail->unique_id, 'is_draft' => false]);
         dd($recipient);
@@ -121,7 +121,7 @@ class BudgetDetailRelocationService extends BaseService {
     }
 
     if(isset($budgetDetail->remains) && $budgetDetail->remains < $allocation) {
-      throw new FundRequestExceedRemainsException($budgetDetail->remains, $allocation);
+      throw new FundRequestsExceedRemainsException($budgetDetail->remains, $allocation);
     }
   }
 }

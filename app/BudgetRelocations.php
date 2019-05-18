@@ -3,12 +3,10 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Budget;
+use App\Budgets;
 
-class BudgetRelocation extends Model
+class BudgetRelocations extends Model
 {
-    protected $table = 'budget_relocation';
-
     protected $fillable = [
       'user_id',
       'approved',
@@ -26,6 +24,6 @@ class BudgetRelocation extends Model
     }
 
     public function head() {
-      return $this->belongsTo(Budget::class, 'head', 'unique_id');
+      return $this->belongsTo(Budgets::class, 'head', 'unique_id');
     }
 }

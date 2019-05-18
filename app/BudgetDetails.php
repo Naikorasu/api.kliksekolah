@@ -4,19 +4,17 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use App\Budget;
+use App\Budgets;
 use App\BudgetDraftRevisions;
 use App\BudgetRelocationSources;
 use Illuminate\Database\Eloquent\Builder;
 
-class BudgetDetail extends Model
+class BudgetDetails extends Model
 {
-    //
-
-    protected $table = 'budgets_detail';
 
     //protected $primaryKey = 'unique_id';
-
+    protected $table = 'budget_details';
+    
     protected $fillable = [
         'unique_id',
         'head',
@@ -92,7 +90,7 @@ class BudgetDetail extends Model
     public function scopeRemains($query) {
       return $query
               ->select(['*',
-                DB::raw('total - (select SUM(amount) from fund_request where fund_request.budget_detail_unique_id = budgets_detail.unique_id and fund_request.is_approved=true group by budget_detail_unique_id) as remains')
+                DB::raw('total - (select SUM(amount) from fund_requests where fund_requests.budget_detail_unique_id = budget_details.unique_id and fund_requests.is_approved=true group by budget_detail_unique_id) as remains')
               ]);
     }
 
@@ -102,11 +100,11 @@ class BudgetDetail extends Model
     }
 
     public function head() {
-      return $this->belongsTo(Budget::class, 'head', 'unique_id');
+      return $this->belongsTo(Budgets::class, 'head', 'unique_id');
     }
 
     public function fundRequest() {
-      return $this->hasMany(FundRequest::class, 'budget_detail_unique_id', 'unique_id');
+      return $this->hasMany(FundRequests::class, 'budget_detail_unique_id', 'unique_id');
     }
 
     public function budgetRelocationSources() {

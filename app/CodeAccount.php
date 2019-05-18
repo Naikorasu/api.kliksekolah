@@ -3,7 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use App\BudgetDetail;
+use App\BudgetDetails;
 
 class CodeAccount extends Model
 {
@@ -34,7 +34,7 @@ class CodeAccount extends Model
     ];
 
     public function budgetDetail() {
-        return $this->belongsTo(BudgetDetail::Class,'code','code_of_account');
+        return $this->belongsTo(BudgetDetails::Class,'code','code_of_account');
     }
 
     public function group()

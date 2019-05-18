@@ -5,12 +5,12 @@ namespace App\Services;
 use Auth;
 use Illuminate\Database\QueryException;
 use App\Services\WorkflowService;
-use App\BudgetDetailDraft;
+use App\BudgetDetailDrafts;
 use App\Exceptions\DataNotFoundException;
 use App\Exceptions\DataSaveFailureException;
 
 
-class BudgetDetailDraftService extends BaseService {
+class BudgetDetailDraftsService extends BaseService {
 
   public function saveBatch(array $budgetDetailDrafts, $head, $account) {
       foreach($budgetDetailDrafts as $draft) {
@@ -20,7 +20,7 @@ class BudgetDetailDraftService extends BaseService {
 
   public function save($budgetDetailDraft, $head, $account) {
     try {
-      $budgetDetailDraft = BudgetDetailDraft::updateOrCreate(array_merge(
+      $budgetDetailDraft = BudgetDetailDrafts::updateOrCreate(array_merge(
         $budgetDetailDraft,
         [
             'user_id' => Auth::user()->id,
@@ -35,7 +35,7 @@ class BudgetDetailDraftService extends BaseService {
 
   public function edit(array $budgetDetailDrafts, $head) {
     try {
-      $budget = Budget::where('unique_id', $head)->first();
+      $budget = Budgets::where('unique_id', $head)->first();
     } catch (DataNotFoundException $exception) {
       return back()->withError($exception->getMessage(), $exception->getCode());
     }

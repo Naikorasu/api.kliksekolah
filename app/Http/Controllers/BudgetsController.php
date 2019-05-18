@@ -3,25 +3,25 @@
 namespace App\Http\Controllers;
 
 use Auth;
-use App\Budget;
-use App\BudgetAccount;
-use App\BudgetDetail;
+use App\Budgets;
+use App\BudgetAccounts;
+use App\BudgetDetails;
 use App\User;
 use App\Classes\FunctionHelper;
 use App\CodeAccount;
 use App\Exceptions\DataNotFoundException;
 use Illuminate\Http\Request;
-use App\Services\BudgetService;
-use App\Services\BudgetDetailService;
+use App\Services\BudgetsService;
+use App\Services\BudgetDetailsService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class BudgetController extends Controller
+class BudgetsController extends Controller
 {
 
     private $budgetService;
     private $budgetDetailService;
 
-    public function __construct(BudgetService $budgetService, BudgetDetailService $budgetDetailService) {
+    public function __construct(BudgetsService $budgetService, BudgetDetailsService $budgetDetailService) {
       $this->budgetService = $budgetService;
       $this->budgetDetailService = $budgetDetailService;
     }
@@ -29,16 +29,11 @@ class BudgetController extends Controller
     //BUDGET HEADER
     public function list_head(Request $request)
     {
-        $budgetDetail = BudgetDetail::remains()->get();
-
         $filters = $request->filters;
 
         $result = $this->budgetService->getList($request->filters);
 
-        return response()->json([
-            'message' => 'Load Data Budget Success',
-            'result' => $result,
-        ], 200);
+        return response()->json($result, 200);
     }
 
     public function add_head(Request $request)
@@ -62,7 +57,7 @@ class BudgetController extends Controller
             'create_by' => $request->create_by,
             'desc' => $request->desc,
         );
-        $budget_head = New Budget($data_head);
+        $budget_head = New Budgets($data_head);
         $budget_head->save();
 
         for ($y = 0; $y <= 4; $y++) {
@@ -104,12 +99,12 @@ class BudgetController extends Controller
                 'account_type' => $account_type,
                 'account_info' => $account_info,
             );
-            $budget_account = New BudgetAccount($data_account);
+            $budget_account = New BudgetAccounts($data_account);
             $budget_account->save();
         }
 
         return response()->json([
-            'message' => 'Successfully Add Budget Head Data'
+            'message' => 'Successfully Add Budgets Head Data'
         ], 201);
     }
 
@@ -122,9 +117,9 @@ class BudgetController extends Controller
             'head_unique_id' => 'required',
         ]);
 
-        $deleted_budget = Budget::where('unique_id', $request->head_unique_id)->delete();
-        $deleted_account = BudgetAccount::where('head', $request->head_unique_id)->delete();
-        $deleted_detail = BudgetDetail::where('head', $request->head_unique_id)->delete();
+        $deleted_budget = Budgets::where('unique_id', $request->head_unique_id)->delete();
+        $deleted_account = BudgetAccounts::where('head', $request->head_unique_id)->delete();
+        $deleted_detail = BudgetDetails::where('head', $request->head_unique_id)->delete();
 
         if ($deleted_budget > 0 || $deleted_account > 0 || $deleted_detail > 0) {
             $message = "Successfuly Delete Data with Unique ID $request->head_unique_id";
@@ -164,9 +159,9 @@ class BudgetController extends Controller
 
     private function runWorkflow($type, $budgetHead) {
       $currentUser = User::with('userGroup')->find(Auth::user()->id);
-      $currentUserGroup = $currentUser->user_group;
+      $currentUserGroups = $currentUser->user_group;
       $lastUser = User::with('userGroup')->find($budgetHead->user_id);
-      $lastUserGroup = $lastUser->user_group;
+      $lastUserGroups = $lastUser->user_group;
 
       $workflow = [
         'result' => [
@@ -185,16 +180,16 @@ class BudgetController extends Controller
         case 'SAVE':
           if($budgetHead->approved == false) {
             if($budgetHead->submitted) {
-              if($currentUserGroup->priority < $lastUserGroup->priority) {
+              if($currentUserGroups->priority < $lastUserGroups->priority) {
                 $workflow->createRevision = true;
                 $workflow->result->submitted = false;
-              } else if($lastUserGroup->priority == 1 && $currentUserGroup->priority == 5) {
+              } else if($lastUserGroups->priority == 1 && $currentUserGroups->priority == 5) {
                 $workflow->createRevision = true;
               } else {
                 $workflow->$result->user_id = $lastUser->id;
               }
             } else {
-              if($currentUserGroup->priority == $lastUserGroup->priority) {
+              if($currentUserGroups->priority == $lastUserGroups->priority) {
                 $result->submitted = false;
               } else {
                 $result->user_id = $lastUser->id;
@@ -203,18 +198,18 @@ class BudgetController extends Controller
           }
           break;
         case 'SUBMIT':
-          if($currentUserGroup->priority > 1) {
+          if($currentUserGroups->priority > 1) {
             $result->submitted = true;
           }
           break;
         case 'APPROVE':
-          if($currentUserGroup->priority == 1) {
+          if($currentUserGroups->priority == 1) {
             $result->submitted = true;
             $result->approved = true;
           }
           break;
         case 'REJECT':
-          if($currentUserGroup->priority == 1) {
+          if($currentUserGroups->priority == 1) {
             $result->submitted = false;
             $result->approved = false;
           }

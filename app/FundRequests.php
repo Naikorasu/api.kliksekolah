@@ -4,12 +4,10 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class FundRequest extends Model
+class FundRequests extends Model
 {
-    //
-
-    protected $table = 'fund_request';
-
+    protected $table = 'fund_requests';
+    
     protected $fillable = [
       'budget_detail_unique_id',
       'amount',
@@ -37,6 +35,6 @@ class FundRequest extends Model
  * @return [type] [description]
  */
     public function budgetDetail() {
-      return $this->belongsTo(BudgetDetail::Class,'budget_detail_unique_id','unique_id');
+      return $this->belongsTo(BudgetDetails::Class,'budget_detail_unique_id','unique_id');
     }
 }

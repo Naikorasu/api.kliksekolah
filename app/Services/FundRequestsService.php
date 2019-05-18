@@ -3,19 +3,19 @@
 namespace App\Services;
 
 use App\Exceptions\DataNotFoundException;
-use App\Exceptions\FundRequestExceedTotalException;
-use App\Exceptions\FundRequestExceedRemainsException;
+use App\Exceptions\FundRequestsExceedTotalException;
+use App\Exceptions\FundRequestsExceedRemainsException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Auth;
-use App\FundRequest;
-use App\BudgetDetail;
-use App\Services\BudgetDetailService;
+use App\FundRequests;
+use App\BudgetDetails;
+use App\Services\BudgetDetailsService;
 
-class FundRequestService extends BaseService {
+class FundRequestsService extends BaseService {
 
   private $budgetDetailService;
 
-  public function __construct(BudgetDetailService $budgetDetailService) {
+  public function __construct(BudgetDetailsService $budgetDetailService) {
       $this->budgetDetailService = $budgetDetailService;
   }
 
@@ -28,9 +28,9 @@ class FundRequestService extends BaseService {
    */
   private function validateAmount($remains, $total, $amount) {
     if(isset($remains) && $remains < $amount) {
-      throw new FundRequestExceedRemainsException($remains, $amount);
+      throw new FundRequestsExceedRemainsException($remains, $amount);
     } else if($total < $amount) {
-      throw new FundRequestExceedTotalException($total, $amount);
+      throw new FundRequestsExceedTotalException($total, $amount);
     }
   }
 
@@ -39,7 +39,7 @@ class FundRequestService extends BaseService {
 
     $this->validateAmount($budgetDetail->remains, $budgetDetail->total, $amount);
 
-    $fundRequest = new FundRequest();
+    $fundRequest = new FundRequests();
     $fundRequest->budget_detail_unique_id = $budget_detail_unique_id;
     $fundRequest->amount = $amount;
     $fundRequest->user_id = Auth::user()->id;
@@ -55,7 +55,7 @@ class FundRequestService extends BaseService {
     $this->validateAmount($budgetDetail->remains, $budgetDetail->total, $amount);
 
     try{
-      $fundRequest = FundRequest::status(false, false)->findOrFail($id);
+      $fundRequest = FundRequests::status(false, false)->findOrFail($id);
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
@@ -70,7 +70,7 @@ class FundRequestService extends BaseService {
 
   public function cancel($id) {
     try {
-      $fundRequest = FundRequest::status(false, true)->findOrFail($id);
+      $fundRequest = FundRequests::status(false, true)->findOrFail($id);
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
@@ -84,7 +84,7 @@ class FundRequestService extends BaseService {
    * fn:updateStatus update the request status
    * @param  int  $id     the request ID
    * @param  boolean $status the status TRUE|FALSE
-   * @return FundRequest          returns the updated model
+   * @return FundRequests          returns the updated model
    */
   public function updateStatus($id, $status=null) {
     if($status == 'approve') {
@@ -93,7 +93,7 @@ class FundRequestService extends BaseService {
       $status = false;
     }
     try {
-      $fundRequest = FundRequest::status(false,true)->with(['budgetDetail' => function($query) {
+      $fundRequest = FundRequests::status(false,true)->with(['budgetDetail' => function($query) {
         $query->remains();
       }])->findOrFail($id);
     } catch (ModelNotFoundException $exception) {
@@ -110,7 +110,7 @@ class FundRequestService extends BaseService {
 
   public function submit($id) {
     try {
-      $fundRequest = FundRequest::status(false,false)->findOrFail($id);
+      $fundRequest = FundRequests::status(false,false)->findOrFail($id);
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }

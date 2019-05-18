@@ -6,8 +6,8 @@ class WorkflowService extends BaseService {
 
   public function run($lastUser, $isApproved = false, $isSubmitted = false) {
     $currentUser = $this->getCurrentUser();
-    $currentUserGroup = $currentUser->user_group;
-    $lastUserGroup = $lastUser->user_group;
+    $currentUserGroups = $currentUser->user_group;
+    $lastUserGroups = $lastUser->user_group;
 
     $workflow = [
       'result' => [
@@ -26,16 +26,16 @@ class WorkflowService extends BaseService {
       case 'SAVE':
         if($isApproved == false) {
           if($isSubmitted) {
-            if($currentUserGroup->priority < $lastUserGroup->priority) {
+            if($currentUserGroups->priority < $lastUserGroups->priority) {
               $workflow->createRevision = true;
               $workflow->result->submitted = false;
-            } else if($lastUserGroup->priority == 1 && $currentUserGroup->priority == 5) {
+            } else if($lastUserGroups->priority == 1 && $currentUserGroups->priority == 5) {
               $workflow->createRevision = true;
             } else {
               $workflow->$result->user_id = $lastUser->id;
             }
           } else {
-            if($currentUserGroup->priority == $lastUserGroup->priority) {
+            if($currentUserGroups->priority == $lastUserGroups->priority) {
               $result->submitted = false;
             } else {
               $result->user_id = $lastUser->id;
@@ -44,18 +44,18 @@ class WorkflowService extends BaseService {
         }
         break;
       case 'SUBMIT':
-        if($currentUserGroup->priority > 1) {
+        if($currentUserGroups->priority > 1) {
           $result->submitted = true;
         }
         break;
       case 'APPROVE':
-        if($currentUserGroup->priority == 1) {
+        if($currentUserGroups->priority == 1) {
           $result->submitted = true;
           $result->approved = true;
         }
         break;
       case 'REJECT':
-        if($currentUserGroup->priority == 1) {
+        if($currentUserGroups->priority == 1) {
           $result->submitted = false;
           $result->approved = false;
         }

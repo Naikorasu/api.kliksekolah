@@ -15,14 +15,14 @@ class BudgetRelocationRecipients extends Model
   ];
 
   public function budgetDetailDraft() {
-    return $this->belongsTo(BudgetDetailDraft::class, 'budget_detail_id', 'id');
+    return $this->belongsTo(BudgetDetailDrafts::class, 'budget_detail_id', 'id');
   }
 
   public function budgetDetail() {
-    return $this->belongsTo(BudgetDetail::class, 'budget_detail_id','unique_id');
+    return $this->belongsTo(BudgetDetails::class, 'budget_detail_id','unique_id');
   }
 
   public function budgetRelocation() {
-    return $this->belongsTo(BudgetRelocation::class, 'id', 'budget_relocation_id');
+    return $this->belongsTo(BudgetRelocations::class, 'id', 'budget_relocation_id');
   }
 }

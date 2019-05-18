@@ -60,61 +60,61 @@ Route::group([
         Route::group([
             'prefix' => 'head'
         ],function () {
-            Route::post('list','BudgetController@list_head');
-            Route::post('add','BudgetController@add_head');
-            Route::post('delete','BudgetController@delete_head');
+            Route::post('list','BudgetsController@list_head');
+            Route::post('add','BudgetsController@add_head');
+            Route::post('delete','BudgetsController@delete_head');
         });
 
         Route::group([
             'prefix' => 'detail'
         ],function() {
-            Route::post('list/{type?}','BudgetDetailController@list_detail');
-            Route::post('rapbu','BudgetDetailController@list_detail_rapbu');
-            Route::post('add','BudgetDetailController@add_detail');
-            Route::post('edit','BudgetDetailController@edit_detail');
-            Route::post('delete','BudgetDetailController@delete_detail');
+            Route::post('list/{type?}','BudgetDetailsController@list_detail');
+            Route::post('rapbu','BudgetDetailsController@list_detail_rapbu');
+            Route::post('add','BudgetDetailsController@add_detail');
+            Route::post('edit','BudgetDetailsController@edit_detail');
+            Route::post('delete','BudgetDetailsController@delete_detail');
         });
 
         Route::group([
             'prefix' => 'relocation'
         ],function() {
-          Route::post('get', 'BudgetDetailRelocationController@get');
-          Route::post('list', 'BudgetDetailRelocationController@list');
-          Route::post('submit', 'BudgetDetailRelocationController@submit');
-          Route::post('save','BudgetDetailRelocationController@save');
-          Route::post('{status}', 'BudgetDetailRelocationController@updateStatus')->where('status', '(approve|reject)');
+          Route::post('get', 'BudgetDetailRelocationsController@get');
+          Route::post('list', 'BudgetDetailRelocationsController@list');
+          Route::post('submit', 'BudgetDetailRelocationsController@submit');
+          Route::post('save','BudgetDetailRelocationsController@save');
+          Route::post('{status}', 'BudgetDetailRelocationsController@updateStatus')->where('status', '(approve|reject)');
         });
 
         Route::group([
           'prefix' => 'request'
         ], function() {
-          Route::post('list', 'FundRequestController@list');
-          Route::post('get', 'FundRequestController@get');
-          Route::post('add', 'FundRequestController@add');
-          Route::post('edit', 'FundRequestController@edit');
-          Route::post('cancel', 'FundRequestController@cancel');
-          Route::post('submit', 'FundRequestController@submit');
-          Route::post('{status}', 'FundRequestController@updateStatus')->where('status', '(approve|reject)');
+          Route::post('list', 'FundRequestsController@list');
+          Route::post('get', 'FundRequestsController@get');
+          Route::post('add', 'FundRequestsController@add');
+          Route::post('edit', 'FundRequestsController@edit');
+          Route::post('cancel', 'FundRequestsController@cancel');
+          Route::post('submit', 'FundRequestsController@submit');
+          Route::post('{status}', 'FundRequestsController@updateStatus')->where('status', '(approve|reject)');
         });
         Route::group([
             'prefix' => 'realization'
         ], function() {
-          Route::post('list', 'BudgetRealizationController@list');
-          Route::post('get', 'BudgetRealizationController@get');
-          Route::post('delete', 'BudgetRealizationController@delete');
-          Route::post('save', 'BudgetRealizationController@save');
+          Route::post('list', 'BudgetRealizationsController@list');
+          Route::post('get', 'BudgetRealizationsController@get');
+          Route::post('delete', 'BudgetRealizationsController@delete');
+          Route::post('save', 'BudgetRealizationsController@save');
 
         });
     });
     Route::group([
         'prefix' => 'non-budget'
     ], function() {
-      Route::post('list', 'NonBudgetController@list');
-      Route::post('get', 'NonBudgetController@get');
-      Route::post('add', 'NonBudgetController@add');
-      Route::post('edit', 'NonBudgetController@edit');
-      Route::post('submit', 'NonBudgetController@submit');
-      Route::post('update-status', 'NonBudgetController@updateStatus');
+      Route::post('list', 'NonBudgetsController@list');
+      Route::post('get', 'NonBudgetsController@get');
+      Route::post('add', 'NonBudgetsController@add');
+      Route::post('edit', 'NonBudgetsController@edit');
+      Route::post('submit', 'NonBudgetsController@submit');
+      Route::post('update-status', 'NonBudgetsController@updateStatus');
     });
     //param
     Route::group([

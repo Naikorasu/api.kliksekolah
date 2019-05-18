@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddColumnUserIdToBudgetRealizations extends Migration
+class RenameTableUserUserGroupsSchoolUnit extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddColumnUserIdToBudgetRealizations extends Migration
      */
     public function up()
     {
-        Schema::table('budget_realization', function (Blueprint $table) {
-            $table->bigInteger('user_id');
+        Schema::table('user_user_group_school_unit', function (Blueprint $table) {
+            $table->rename('users_relationship');
         });
     }
 
@@ -25,8 +25,6 @@ class AddColumnUserIdToBudgetRealizations extends Migration
      */
     public function down()
     {
-        Schema::table('budget_realization', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('users_relationship');
     }
 }

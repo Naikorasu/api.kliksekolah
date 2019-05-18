@@ -3,16 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\BudgetDetail;
-use App\BudgetRealization;
+use App\BudgetDetails;
+use App\BudgetRealizations;
 use Auth;
-use App\Services\BudgetRealizationService;
+use App\Services\BudgetRealizationsService;
 
-class BudgetRealizationController extends Controller
+class BudgetRealizationsController extends Controller
 {
     protected $budgetRealizationService;
 
-    public function __construct(BudgetRealizationService $budgetRealizationService) {
+    public function __construct(BudgetRealizationsService $budgetRealizationService) {
         $this->budgetRealizationService = $budgetRealizationService;
     }
 
@@ -21,9 +21,7 @@ class BudgetRealizationController extends Controller
 
       $data = $this->budgetRealizationService->list($filters);
 
-      return response()->json([
-        'data' => $data
-      ]);
+      return response()->json($data);
     }
 
     public function get(Request $request) {
@@ -57,7 +55,7 @@ class BudgetRealizationController extends Controller
           'file' => 'required|file|mimes:jpeg,jpg,bmp,png,pdf'
         ]);
 
-        $data = $this->budgetRealizationService->save($request->budget_detail_unique_id, $request->amount, $request->file , $request->description, $request->id);
+        $data = $this->budgetRealizationService->save($request->budget_detail_unique_id, $request->amount, $request->file('file') , $request->description, $request->id);
 
         return response()->json([
           'message' => 'Successfully saved budget realization.',

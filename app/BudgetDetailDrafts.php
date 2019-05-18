@@ -6,12 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\BudgetDraftRevisions;
 
-class BudgetDetailDraft extends Model
+class BudgetDetailDrafts extends Model
 {
-    //
-
-    protected $table = 'budget_detail_drafts';
-
     //protected $primaryKey = 'unique_id';
 
     protected $fillable = [

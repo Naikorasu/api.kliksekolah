@@ -5,13 +5,13 @@ namespace App\Services;
 use Auth;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Services\WorkflowService;
-use App\BudgetDetailDraft;
-use App\BudgetRealization;
+use App\BudgetDetailDrafts;
+use App\BudgetRealizations;
 use App\Exceptions\DataNotFoundException;
 use App\Exceptions\DataSaveFailureException;
 
 
-class BudgetRealizationService extends BaseService {
+class BudgetRealizationsService extends BaseService {
 
   protected $filterable = [
     'head',
@@ -22,14 +22,14 @@ class BudgetRealizationService extends BaseService {
   public function list($filters) {
     $conditions = $this->buildFilters($filters);
 
-    $budgetRealizations = BudgetRealization::with('budgetDetail')->where($conditions)->paginate(5);
+    $budgetRealizations = BudgetRealizations::with('budgetDetail')->where($conditions)->paginate(5);
 
     return $budgetRealizations;
   }
 
   public function get($id) {
     try {
-      $budgetRealization = BudgetRealization::find($request->id);
+      $budgetRealization = BudgetRealizations::find($request->id);
       $budgetRealization->filename = '/storage/files/budget_realization_'.$budgetRealization->id.'_'.$budgetRealization->filename;
       return $budgetRealization;
     } catch (ModelNotFoundException $exception) {
@@ -39,7 +39,7 @@ class BudgetRealizationService extends BaseService {
 
   public function delete($id) {
     try{
-      $budgetRealization = BudgetRealization::findOrFail($id);
+      $budgetRealization = BudgetRealizations::findOrFail($id);
       $budgetRealization->forceDelete();
       return true;
     } catch (ModelNotFoundException $exception) {
@@ -48,13 +48,12 @@ class BudgetRealizationService extends BaseService {
   }
 
   public function save($budgetDetailUniqueId, $amount, $file, $description='', $id=null) {
-      $file = $request->file('file');
       $fileName = $file->getClientOriginalName();
 
-      $budgetRealization = BudgetRealization::updateOrCreate([
+      $budgetRealization = BudgetRealizations::updateOrCreate([
         'id' => $id,
         'budget_detail_unique_id' => $budgetDetailUniqueId,
-        'filename' => $filename,
+        'filename' => $fileName,
         'amount' => $amount,
         'description' => $description,
         'user_id' => Auth::user()->id,

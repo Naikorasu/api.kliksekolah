@@ -5,12 +5,12 @@ namespace App\Services;
 use Auth;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Exceptions\DataNotFoundException;
-use App\BudgetDetail;
+use App\BudgetDetails;
 
-class BudgetDetailService extends BaseService {
+class BudgetDetailsService extends BaseService {
 
   /**
-  * Get Budget Detail List
+  * Get Budgets Detail List
   * @param $filters
   * Available filters:
   *   head: string|head_unique_id
@@ -29,32 +29,34 @@ class BudgetDetailService extends BaseService {
   public function getList($filters=[], $type) {
     $codeOfAccountValue = null;
     $codeOfAccountType = null;
-
-    if(array_key_exists('code_of_account', $filters)) {
-      $codeOfAccountValue = $filters['code_of_account'];
-      $codeOfAccountType = array_key_exists('type', $filters) ? $filters['type'] : null;
+    if(isset($filters)) {
+      if(array_key_exists('code_of_account', $filters)) {
+        $codeOfAccountValue = $filters['code_of_account'];
+        $codeOfAccountType = array_key_exists('type', $filters) ? $filters['type'] : null;
+      }
     }
-
-
     $conditions = $this->buildFilters($filters);
-    $query = BudgetDetail::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->remains();
 
-    if(array_key_exists('periode', $filters)) {
-      $query->whereHas('head', function($q) use($filters) {
-        $q->where('periode',$filters['periode']);
-      });
+    $query = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->remains();
+
+    if(isset($filters)) {
+      if(array_key_exists('periode', $filters)) {
+        $query->whereHas('head', function($q) use($filters) {
+          $q->where('periode',$filters['periode']);
+        });
+      }
     }
 
     try {
       if($type == 'realization') {
-        $results = $query->has('fundRequest')->get();
+        $results = $query->has('fundRequest')->paginate(5);
       } else {
-        $results = $query->get();
+        $results = $query->paginate(5);
       }
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
-    //return dd(BudgetDetail::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->remains()->toSql());
+    //return dd(BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->remains()->toSql());
     $data = [
       'ganjil' => [],
       'genap' => []
@@ -68,13 +70,16 @@ class BudgetDetailService extends BaseService {
       }
     }
 
-    return $data;
+    $return = [
+      'data' => $data
+    ];
+    return array_merge($return, $this->getPagination($results));
   }
 
   public function getRAPBUList($filters=[]) {
     $conditions = $this->buildFilters($filters);
 
-    $results = BudgetDetail::where($conditions)->rAPBU()->get();
+    $results = BudgetDetails::where($conditions)->rAPBU()->get();
 
     $incomes = [];
     $expenses = [];
@@ -117,14 +122,14 @@ class BudgetDetailService extends BaseService {
   public function save($data, $head, $account, $accountType, $id=null) {
     if($id) {
       try {
-        $budgetDetail = BudgetDetail::findOrFail($id);
+        $budgetDetail = BudgetDetails::findOrFail($id);
         $budgetDetail->update($data);
       } catch (ModelNotFoundException $exception) {
         throw new DataNotFoundException($exception->getMessage());
       }
     } else {
 
-      $budgetDetail = new BudgetDetail($data);
+      $budgetDetail = new BudgetDetails($data);
       $budgetDetail->unique_id = $this->generateUniqueId($accountType, $budgetDetail->code_of_account);
       $budgetDetail->head = $head;
       $budgetDetail->account = $account;
@@ -153,14 +158,19 @@ class BudgetDetailService extends BaseService {
   }
 
   public function get($unique_id, $withRemains = false) {
-    try {
-      if($withRemains) {
-        return BudgetDetail::remains()->where('unique_id', $unique_id)->first();
-      } else {
-        return BudgetDetail::remains()->where('unique_id', $unique_id)->first();
-      }
-    } catch (ModelNotFoundException $exception) {
-      throw new DataNotFoundException($exception->getMessage());
+    $budgetDetail;
+
+    if($withRemains) {
+      $budgetDetail = BudgetDetails::remains()->where('unique_id', $unique_id)->first();
+    } else {
+      $budgetDetail = BudgetDetails::remains()->where('unique_id', $unique_id)->first();
     }
+    
+    if(!isset($budgetDetail)) {
+      throw new DataNotFoundException('Budget Detail Not Found');
+    }
+
+    return $budgetDetail;
+
   }
 }

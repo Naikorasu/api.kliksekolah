@@ -4,12 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class BudgetAccount extends Model
+class BudgetAccounts extends Model
 {
-    //
-
-    protected $table = 'budgets_account';
-
     //protected $primaryKey = 'unique_id';
 
     protected $fillable = [
@@ -23,13 +19,13 @@ class BudgetAccount extends Model
     /*
     public function detail()
     {
-        return $this->hasMany(BudgetDetail::Class,'account','unique_id');
+        return $this->hasMany(BudgetDetails::Class,'account','unique_id');
     }
     */
 
     public function budget()
     {
-        return $this->belongsTo(Budget::Class,'unique_id','head');
+        return $this->belongsTo(Budgets::Class,'unique_id','head');
     }
 
 }

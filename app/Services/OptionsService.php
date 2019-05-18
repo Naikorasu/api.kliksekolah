@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Exceptions\DataNotFoundException;
 use App\CodeClass;
 
-use App\BudgetDetail;
-use App\Budget;
+use App\BudgetDetails;
+use App\Budgets;
 
 class OptionsService extends BaseService {
 
@@ -40,7 +40,7 @@ class OptionsService extends BaseService {
     $conditions = $this->buildFilters($filters);
 
     try {
-      $collection = Budget::periodeOptions()->where($conditions)->get();
+      $collection = Budgets::periodeOptions()->where($conditions)->get();
 
       $options = [];
       foreach($collection as $option) {

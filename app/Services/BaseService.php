@@ -43,4 +43,17 @@ class BaseService{
     $user_email = $user->email;
     return $this->fh::generate_unique_key($user_email . ";" . "DETAIL" . ";" . $accountType . ";" . $code_of_account . ";");
   }
+
+  protected function getPagination($result) {
+    return [
+      'count' => $result->count(),
+      'current_page' => $result->currentPage(),
+      'first_item' => $result->firstItem(),
+      'options' => $result->getOptions(),
+      'next_page_url' => $result->nextPageUrl(),
+      'per_page' => $result->perPage(),
+      'previous_page_url' => $result->previousPageUrl(),
+      'total' => $result->total()
+    ];
+  }
 }

@@ -4,7 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 
-class FundRequestExceedTotalException extends Exception
+class FundRequestsExceedTotalException extends Exception
 {
   private $status = 400;
   private $total, $amount;

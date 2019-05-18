@@ -3,12 +3,10 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use App\BudgetDetail;
+use App\BudgetDetails;
 
-class BudgetRealization extends Model
+class BudgetRealizations extends Model
 {
-    protected $table = 'budget_realization';
-
     protected $fillable = [
       'budget_detail_unique_id',
       'filename',
@@ -18,6 +16,6 @@ class BudgetRealization extends Model
     ];
 
     public function budgetDetail() {
-      return $this->belongsTo(BudgetDetail::class, 'budget_detail_unique_id', 'unique_id');
+      return $this->belongsTo(BudgetDetails::class, 'budget_detail_unique_id', 'unique_id');
     }
 }

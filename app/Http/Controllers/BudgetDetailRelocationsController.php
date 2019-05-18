@@ -3,19 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\BudgetDetail;
-use App\BudgetRelocation;
+use App\BudgetDetails;
+use App\BudgetRelocations;
 use App\BudgetRelocationSources;
 use App\BudgetRelocationRecipients;
 use Auth;
-use App\Services\BudgetDetailRelocationService;
+use App\Services\BudgetDetailRelocationsService;
 
-class BudgetDetailRelocationController extends Controller
+class BudgetDetailRelocationsController extends Controller
 {
 
   private $budgetDetailRelocationService;
 
-  public function __construct(BudgetDetailRelocationService $budgetDetailRelocationService) {
+  public function __construct(BudgetDetailRelocationsService $budgetDetailRelocationService) {
       $this->budgetDetailRelocationService = $budgetDetailRelocationService;
   }
 
@@ -104,13 +104,13 @@ class BudgetDetailRelocationController extends Controller
   //   $sources = $request->sources;
   //   $recipients = $request->recipients;
   //
-  //   $budgetRelocation = new BudgetRelocation();
+  //   $budgetRelocation = new BudgetRelocations();
   //   $budgetRelocation->head = $request->head;
   //   $budgetRelocation->account = $request->account;
   //   $budgetRelocation->save();
   //
   //   foreach($sources as $source) {
-  //     $sourceBudgetDetail = BudgetDetail::withRemains()->select('remains','unique_id')->find('unique_id',$source->unique_id);
+  //     $sourceBudgetDetails = BudgetDetails::withRemains()->select('remains','unique_id')->find('unique_id',$source->unique_id);
   //
   //     $budgetRelocationSource = new BudgetRelocationSources();
   //     $budgetRelocationSource->budget_relocation_id = $budgetRelocation->id;
@@ -123,18 +123,18 @@ class BudgetDetailRelocationController extends Controller
   //   foreach($recipients as $recipient) {
   //     $is_draft = false;
   //     if($recipient->unique_id) {
-  //       $recipientBudgetDetail = BudgetDetail::select('unique_id')->find('unique_id', $recipient->unique_id);
+  //       $recipientBudgetDetails = BudgetDetails::select('unique_id')->find('unique_id', $recipient->unique_id);
   //     } else {
-  //       $recipientBudgetDetail = new BudgetDetailDraft($recipient);
-  //       $recipientBudgetDetail->head = $request->head;
-  //       $recipientBudgetDetail->account = $request->$account;
-  //       $recipientBudgetDetail->save();
+  //       $recipientBudgetDetails = new BudgetDetailDrafts($recipient);
+  //       $recipientBudgetDetails->head = $request->head;
+  //       $recipientBudgetDetails->account = $request->$account;
+  //       $recipientBudgetDetails->save();
   //       $is_draft = true;
   //     }
   //
   //     $budgetRelocationRecipient = new BudgetRelocationRecipients();
   //     $budgetRelocationRecipient->budget_relocation_id = $budgetRelocation->id;
-  //     $budgetRelocationRecipient->budget_detail_id = $recipientBudgetDetail->unique_id;
+  //     $budgetRelocationRecipient->budget_detail_id = $recipientBudgetDetails->unique_id;
   //     $budgetRelocationRecipient->allocated_amount = $recipient->allocated_amount;
   //     $budgetRelocationRecipient->save();
   //   }

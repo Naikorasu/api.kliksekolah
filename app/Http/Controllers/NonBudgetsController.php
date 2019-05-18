@@ -3,15 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\NonBudget;
+use App\NonBudgets;
 
-class NonBudgetController extends Controller
+class NonBudgetsController extends Controller
 {
     public function list(Request $request) {
-      $nonBudgets = NonBudget::paginate(5);
-      return response()->json([
-          'data' => $nonBudgets
-      ],200);
+      $data = NonBudgets::paginate(5);
+      return response()->json($data,200);
     }
 
     public function get(Request $request) {
@@ -19,7 +17,7 @@ class NonBudgetController extends Controller
         'id' => 'required'
       ]);
 
-      $nonBudget = NonBudget::where([
+      $nonBudgets = NonBudgets::where([
         ['id', '=', $request->id]
       ]);
 
@@ -36,18 +34,18 @@ class NonBudgetController extends Controller
       ]);
 
       $date = ($request->date) ? date('Y-m-d', strtotime($request->date)) : date('Y-m-d');
-      $nonBudget = new NonBudget();
-      $nonBudget->file_number = $request->file_number;
-      $nonBudget->code_of_account = $request->code_of_account;
-      $nonBudget->activity = $request->activity;
-      $nonBudget->description = $request->description;
-      $nonBudget->amount = $request->amount;
-      $nonBudget->date = $date;
-      $nonBudget->save();
+      $nonBudgets = new NonBudgets();
+      $nonBudgets->file_number = $request->file_number;
+      $nonBudgets->code_of_account = $request->code_of_account;
+      $nonBudgets->activity = $request->activity;
+      $nonBudgets->description = $request->description;
+      $nonBudgets->amount = $request->amount;
+      $nonBudgets->date = $date;
+      $nonBudgets->save();
 
       return response()->json([
         'message' => 'Successfully saved non budget request.',
-        'data' => $nonBudget,
+        'data' => $nonBudgets,
       ],200);
     }
 
@@ -59,21 +57,21 @@ class NonBudgetController extends Controller
         'activity' => 'required'
       ]);
 
-      $nonBudget = NonBudget::where([
+      $nonBudgets = NonBudgets::where([
         ['id', '=', $request->id],
         ['submitted', '=', false]
       ])->first();
 
-      if($nonBudget) {
-        $nonBudget->file_number = $request->file_number;
-        $nonBudget->code_of_account = $request->code_of_account;
-        $nonBudget->activity = $request->activity;
-        $nonBudget->description = $request->description;
-        $nonBudget->amount = $request->amount;
-        $nonBudget->save();
+      if($nonBudgets) {
+        $nonBudgets->file_number = $request->file_number;
+        $nonBudgets->code_of_account = $request->code_of_account;
+        $nonBudgets->activity = $request->activity;
+        $nonBudgets->description = $request->description;
+        $nonBudgets->amount = $request->amount;
+        $nonBudgets->save();
         return response()->json([
           'message' => 'Successfully saved non budget request.',
-          'data' => $nonBudget
+          'data' => $nonBudgets
         ],200);
       } else {
         return response()->json([
@@ -87,19 +85,19 @@ class NonBudgetController extends Controller
         'id' => 'required'
       ]);
 
-      $nonBudget = NonBudget::where([
+      $nonBudgets = NonBudgets::where([
         ['id', '=', $request->id]
       ]);
 
-      if($nonBudget) {
-        if($nonBudget->submitted == true) {
+      if($nonBudgets) {
+        if($nonBudgets->submitted == true) {
           return response()->json([
             'message' => 'The request has been submitted.'
           ],200);
         }
         else {
-          $nonBudget->submitted = true;
-          $nonBudget->save();
+          $nonBudgets->submitted = true;
+          $nonBudgets->save();
           return response()->json([
             'message' => 'Succesfully saved the request.'
           ],200);
@@ -117,14 +115,14 @@ class NonBudgetController extends Controller
         'submitted' => 'required'
       ]);
 
-      $nonBudget = NonBudget::where([
+      $nonBudgets = NonBudgets::where([
         ['id', '=', $request->id],
         ['sumitted', '=', true]
       ]);
 
-      if($nonBudget) {
-        $nonBudget->submitted = $request->submitted;
-        $nonBudget->save();
+      if($nonBudgets) {
+        $nonBudgets->submitted = $request->submitted;
+        $nonBudgets->save();
         return response()->json([
           'message' => 'Succesfully saved the request.'
         ],200);

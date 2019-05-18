@@ -5,7 +5,7 @@ use App\BudgetDraftRevisions;
 use App\Exceptions\DataNotFoundException;
 use App\Exceptions\DataSaveFailureException;
 
-class BudgetDraftRevisionService extends BaseService {
+class BudgetDraftRevisionsService extends BaseService {
 
   public function save($revisedValue, $fieldName, $draftId, $revisionId=null) {
     if($revisionId !== null) {

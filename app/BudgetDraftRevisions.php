@@ -14,6 +14,6 @@ class BudgetDraftRevisions extends Model
     ];
 
     public function budgetDetailDraft() {
-      $this->belongsTo(BudgetDetailDraft::class,'budget_detail_draft_id','id');
+      $this->belongsTo(BudgetDetailDrafts::class,'budget_detail_draft_id','id');
     }
 }
