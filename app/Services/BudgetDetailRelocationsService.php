@@ -33,7 +33,7 @@ class BudgetDetailRelocationsService extends BaseService {
 
   public function get($id) {
     try {
-      $budgetRelocation = BudgetRelocations::with('budgetRelocationSources', 'budgetRelocationRecipients')->findOrFail($id);
+      $budgetRelocation = BudgetRelocations::with('budgetRelocationSources', 'budgetRelocationRecipients', 'budgetRelocationSources.budgetDetail', 'budgetRelocationRecipients.budgetDetailDraft')->findOrFail($id);
       return $budgetRelocation;
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
