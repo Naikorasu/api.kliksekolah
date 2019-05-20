@@ -13,7 +13,8 @@ class NonBudgets extends Model {
     'amount',
     'filepath',
     'submitted',
-    'is_approved'
+    'is_approved',
+    'user_id'
   ];
 
   public function parameter_code() {
