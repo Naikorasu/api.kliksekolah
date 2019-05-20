@@ -43,12 +43,12 @@ class NonBudgetsService extends BaseService {
   }
 
   public function cancel($id) {
-    $nonBudget = $this->get($id);
+    $nonBudget = $this->get($id,true,false);
     return $nonBudget->update(['submitted' => false]);
   }
 
   public function delete($id) {
-    $nonBudget = $this->get($id);
+    $nonBudget = $this->get($id,false,false);
     return $nonBudget->forceDelete();
   }
 

@@ -74,6 +74,32 @@ class NonBudgetsController extends Controller
       ],200);
     }
 
+    public function cancel(Request $request) {
+      $request->validate([
+        'id' => 'required'
+      ]);
+
+      $data = $this->nonBudgetService->cancel($request->id);
+
+      return response()->json([
+        'message' => 'The request has been cancelled.',
+        'data' => $data
+      ],200);
+    }
+
+    public function delete(Request $request) {
+      $request->validate([
+        'id' => 'required'
+      ]);
+
+      $data = $this->nonBudgetService->delete($request->id);
+
+      return response()->json([
+        'message' => 'The request has been deleted.',
+        'data' => $data
+      ],200);
+    }
+
     public function updateStatus(Request $request, $type=null) {
       $request->validate([
         'id' => 'required'
