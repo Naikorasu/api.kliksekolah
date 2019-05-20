@@ -165,7 +165,6 @@ class BudgetDetailsService extends BaseService {
     } else {
       $budgetDetail = BudgetDetails::remains()->where('unique_id', $unique_id)->first();
     }
-    
     if(!isset($budgetDetail)) {
       throw new DataNotFoundException('Budget Detail Not Found');
     }
