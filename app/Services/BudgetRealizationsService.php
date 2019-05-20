@@ -59,7 +59,7 @@ class BudgetRealizationsService extends BaseService {
         'user_id' => Auth::user()->id,
       ]);
 
-
+      dd($budgetRealization);
       $file->storeAs('public/files', 'budget_realization_'.$budgetRealization->id.'_'.$fileName);
 
       return $budgetRealization;

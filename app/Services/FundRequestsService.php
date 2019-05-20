@@ -34,6 +34,13 @@ class FundRequestsService extends BaseService {
     }
   }
 
+  public function list($filters=[]) {
+    $conditions = $this->buildFilters($filters);
+
+    $fundRequest = FundRequests::where($conditions)->get();
+    return $fundRequest;
+  }
+
   public function add($budget_detail_unique_id, $amount) {
     $budgetDetail = $this->budgetDetailService->get($budget_detail_unique_id, true);
 
