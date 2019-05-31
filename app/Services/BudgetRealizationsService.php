@@ -49,17 +49,18 @@ class BudgetRealizationsService extends BaseService {
 
   public function save($budgetDetailUniqueId, $amount, $file, $description='', $id=null) {
       $fileName = $file->getClientOriginalName();
-
-      $budgetRealization = BudgetRealizations::updateOrCreate([
-        'id' => $id,
-        'budget_detail_unique_id' => $budgetDetailUniqueId,
-        'filename' => $fileName,
-        'amount' => $amount,
-        'description' => $description,
-        'user_id' => Auth::user()->id,
+      
+      $budgetRealization = BudgetRealizations::updateOrCreate(
+        ['id' => $id],
+        [
+          'budget_detail_unique_id' => $budgetDetailUniqueId,
+          'filename' => $fileName,
+          'amount' => $amount,
+          'description' => $description,
+          'user_id' => Auth::user()->id
       ]);
 
-      dd($budgetRealization);
+
       $file->storeAs('public/files', 'budget_realization_'.$budgetRealization->id.'_'.$fileName);
 
       return $budgetRealization;
