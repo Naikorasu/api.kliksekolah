@@ -30,11 +30,7 @@ class BudgetDetailsController extends Controller
           'filters.head' => 'required'
       ]);
 
-      $filters = [
-        "head" => $request->head_unique_id
-      ];
-
-      $data = $this->budgetDetailService->getRAPBUList($filters);
+      $data = $this->budgetDetailService->getRAPBUList($request->filters);
 
       return response()->json([
           'message' => 'Load Data Detail All Success',

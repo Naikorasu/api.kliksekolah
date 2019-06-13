@@ -74,15 +74,15 @@ class BudgetDetails extends Model
     public function scopeRAPBU($query) {
       return $query->where(function($q) {
         $q->where([
-          ['code_of_account', 'like', '%4']
+          ['code_of_account', 'like', '4%']
         ])->orWhere([
-          ['code_of_account', 'like', '%5']
-        ])->with([
-          'head' => function($query) {
-              $query->where('approved', true);
-          }
+          ['code_of_account', 'like', '5%']
         ]);
-      });
+      })->with([
+        'head' => function($query) {
+            $query->where('approved', true);
+        }
+      ]);
     }
 
     public function scopeCodeOfAccountOptions($query) {

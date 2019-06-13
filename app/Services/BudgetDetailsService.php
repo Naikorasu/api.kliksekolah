@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Auth;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Exceptions\DataNotFoundException;
 use App\BudgetDetails;
@@ -88,7 +89,7 @@ class BudgetDetailsService extends BaseService {
     $totalExpense = 0;
 
     foreach($results as $result) {
-      if(startsWith($result->code_of_account,'4')) {
+      if(Str::startsWith($result->code_of_account,'4')) {
         array_push($incomes,$result);
         $totalIncome += $result->total;
       } else {
