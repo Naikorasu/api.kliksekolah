@@ -43,11 +43,13 @@ class BudgetDetailsService extends BaseService {
     if(isset($filters)) {
       if(array_key_exists('periode', $filters)) {
         $query->whereHas('head', function($q) use($filters) {
-          $q->where('periode',$filters['periode']);
+          if(isset($filters['periode'])) {
+            $q->where('periode',$filters['periode']);
+          }
         });
       }
     }
-
+    //dd($query->toSql());
     try {
       if($type == 'realization') {
         $results = $query->has('fundRequest')->paginate(5);
