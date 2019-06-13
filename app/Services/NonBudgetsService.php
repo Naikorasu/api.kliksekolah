@@ -28,7 +28,7 @@ class NonBudgetsService extends BaseService {
   }
 
   public function save($data) {
-    $data['date'] = ($data['date']) ? date('Y-m-d', (DateTime::createFromFormat('d/m/Y',$data['date']))->getTimestamp()) : date('Y-m-d');
+    $data['date'] = ($data['date']) ? date('Y-m-d', (DateTime::createFromFormat('Y-m-d',$data['date']))->getTimestamp()) : date('Y-m-d');
     $data['user_id'] = Auth::user()->id;
 
     if(isset($data['id'])){
