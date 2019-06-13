@@ -80,9 +80,17 @@ class BudgetDetailsService extends BaseService {
   }
 
   public function getRAPBUList($filters=[]) {
+    $codeOfAccountValue = null;
+    $codeOfAccountType = null;
+    if(isset($filters)) {
+      if(array_key_exists('code_of_account', $filters)) {
+        $codeOfAccountValue = $filters['code_of_account'];
+        $codeOfAccountType = array_key_exists('type', $filters) ? $filters['type'] : null;
+      }
+    }
     $conditions = $this->buildFilters($filters);
 
-    $results = BudgetDetails::where($conditions)->rAPBU()->get();
+    $results = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->rAPBU()->get();
 
     $incomes = [];
     $expenses = [];
