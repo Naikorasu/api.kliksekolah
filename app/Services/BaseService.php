@@ -25,7 +25,7 @@ class BaseService{
     if(isset($filters)) {
       if(isset($this->filterable)) {
         foreach($filters as $key => $value) {
-          if(array_key_exists($key, $this->filterable)) {
+          if(in_array($key, $this->filterable)) {
             array_push($conditions, [$key, '=', $value]);
           }
         }
@@ -35,6 +35,7 @@ class BaseService{
         }
       }
     }
+
     return $conditions;
   }
 
