@@ -14,7 +14,7 @@ class BudgetDetails extends Model
 
     //protected $primaryKey = 'unique_id';
     protected $table = 'budget_details';
-    
+
     protected $fillable = [
         'unique_id',
         'head',
@@ -77,7 +77,11 @@ class BudgetDetails extends Model
           ['code_of_account', 'like', '%4']
         ])->orWhere([
           ['code_of_account', 'like', '%5']
-        ])->where('approved', true);
+        ])->with([
+          'head' => function($query) {
+              $query->where('approved', true);
+          }
+        ]);
       });
     }
 
