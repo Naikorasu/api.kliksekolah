@@ -116,6 +116,16 @@ Route::group([
       Route::post('submit', 'NonBudgetsController@submit');
       Route::post('{status}', 'NonBudgetsController@updateStatus')->where('status', '(approve|reject)');
     });
+
+    Route::group([
+        'prefix' => 'journal'
+    ], function () {
+      Route::post('{journalType}/save', 'JournalsController@save');
+      Route::post('{journalType}/get', 'JournalsController@get');
+      Route::post('{journalType}/delete', 'JournalsController@save');
+      Route::post('{journalType}/list', 'JournalsController@list');
+    });
+
     //param
     Route::group([
         'prefix' => 'param'

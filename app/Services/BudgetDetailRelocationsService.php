@@ -26,7 +26,14 @@ class BudgetDetailRelocationsService extends BaseService {
     $this->budgetDetailService = $budgetDetailService;
   }
 
-  public function list($filters=[]) {
+  public function list($filters=[]) {$codeOfAccountValue = null;
+    $codeOfAccountType = null;
+    if(isset($filters)) {
+      if(array_key_exists('code_of_account', $filters)) {
+        $codeOfAccountValue = $filters['code_of_account'];
+        $codeOfAccountType = array_key_exists('type', $filters) ? $filters['type'] : null;
+      }
+    }
     $conditions = $this->buildFilters($filters);
     return BudgetRelocations::where($conditions)->get();
   }

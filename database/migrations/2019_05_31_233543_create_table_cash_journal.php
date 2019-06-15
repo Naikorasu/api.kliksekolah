@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -13,31 +14,36 @@ class CreateTableCashJournal extends Migration
      */
     public function up()
     {
-        Schema::create('cash_journals', function (Blueprint $table) {
+        Schema::create('journals', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->date('date')->default('NOW()');
-            $table->string('type')->default('');
-            $table->string('receipt_number')->default('');
-            $table->string('tax_number')->default('');
-            $table->decimal('tax_value',20,0)->default(0.0);
-            $table->string('submitted_by')->default('');
-            $table->string('accepted_by')->default('');
-            $table->decimal('gross_total',20,0)->default(0.0);
-            $table->decimal('tax_deduction',20,0)->default(0.0);
-            $table->decimal('nett_total',20,0)->default(0.0);
+            $table->string('journal_type')->default('KAS');
+            $table->date('date')->default(Carbon::now());
+            $table->string('journal_number',255)->default('');
             $table->bigInteger('user_id');
             $table->timestamps();
         });
 
-        Schema::create('cash_journal_details', function (Blueprint $table) {
+        Schema::create('journal_cash_bank_details', function(Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('reference_number');
+            $table->string('counterparty',255)->default('');
+            $table->string('tax_number',255)->default('');
+            $table->decimal('tax_value', 20,0)->default(0);
+            $table->decimal('gross_total', 20,0)->default(0);
+            $table->decimal('tax_deduction', 20,0)->default(0);
+            $table->decimal('nett_total', 20,0)->default(0);
+            $table->timestamps();
+        });
+
+        Schema::create('journal_details', function (Blueprint $table) {
           $table->bigIncrements('id');
           $table->bigInteger('cash_journal_id');
-          $table->string('code')->default('');
+          $table->bigInteger('code_of_account');
           $table->text('description');
-          $table->decimal('nominal', 20,0)->default(0.0);
-          $table->bigInteger('uuser_id');
+          $table->decimal('debit', 20,0)->default(0);
+          $table->decimal('credit', 20,0)->default(0);
           $table->timestamps();
-        }
+        });
     }
 
     /**
@@ -47,7 +53,8 @@ class CreateTableCashJournal extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cash_journals');
-        Schema::dropIfExists('cash_journal_details');
+        Schema::dropIfExists('journals');
+        Schema::dropIfExists('journal_cash_bank_details');
+        Schema::dropIfExists('journal_details');
     }
 }
