@@ -26,14 +26,7 @@ class BudgetDetailRelocationsService extends BaseService {
     $this->budgetDetailService = $budgetDetailService;
   }
 
-  public function list($filters=[]) {$codeOfAccountValue = null;
-    $codeOfAccountType = null;
-    if(isset($filters)) {
-      if(array_key_exists('code_of_account', $filters)) {
-        $codeOfAccountValue = $filters['code_of_account'];
-        $codeOfAccountType = array_key_exists('type', $filters) ? $filters['type'] : null;
-      }
-    }
+  public function list($filters=[]) {
     $conditions = $this->buildFilters($filters);
     return BudgetRelocations::where($conditions)->get();
   }
@@ -66,6 +59,7 @@ class BudgetDetailRelocationsService extends BaseService {
       $this->validateAmount($source->budget_detail_unique_id, $source->relocated_amount);
     }
 
+    $budgetRelocation->budgetRelocationSources()->forceDelete();
     $budgetRelocation->budgetRelocationSources()->saveMany($sources);
 
     foreach ($recipients as $index => $recipient) {
@@ -80,6 +74,7 @@ class BudgetDetailRelocationsService extends BaseService {
       ]);
     }
 
+    $budgetRelocation->budgetRelocationRecipients()->forceDelete();
     $budgetRelocation->budgetRelocationRecipients()->saveMany($recipients);
 
     return $budgetRelocation->load('budgetRelocationSources','budgetRelocationRecipients');
