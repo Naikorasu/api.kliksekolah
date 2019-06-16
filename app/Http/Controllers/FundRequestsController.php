@@ -18,16 +18,12 @@ class FundRequestsController extends Controller
     }
 
     public function list(Request $request) {
-      $fundRequest = FundRequests::where('budget_detail_unique_id', $request->budget_detail_unique_id)->get();
-      if($fundRequest) {
-        return response()->json([
-          'data' => $fundRequest
-        ], 200);
-      } else {
-        return response()->json([
-          'message' => 'Failed to find fund request with budget detail unique id:'.$request->budget_detail_unique_id
-        ],400);
-      }
+      $fundRequest = FundRequests::get();
+
+      return response()->json([
+        'data' => $fundRequest
+      ], 200);
+
     }
 
     public function get(Request $request) {
