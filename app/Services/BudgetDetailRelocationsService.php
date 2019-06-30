@@ -40,16 +40,21 @@ class BudgetDetailRelocationsService extends BaseService {
     }
   }
 
-  public function save($sources, $recipients, $head, $account, $id=null) {
-    $budgetRelocation = BudgetRelocations::updateOrCreate(['user_id' => Auth::user()->id, 'head' => $head, 'account' => $account, 'id' => $id]);
-
+  public function save($sources, $recipients, $head, $account, $description = '', $id=null) {
     if(isset($id)) {
       try {
-        $budgetRelocation = $budgetRelocation->findOrFail($id);
+        $budgetRelocation = BudgetRelocations::findOrFail($id);
       } catch (ModelNotFoundException $exception) {
         throw new DataNotFoundException($exception->getMessage());
       }
+    } else {
+      $budgetRelocation = new BudgetRelocations();
     }
+
+    $budgetRelocation->user_id = Auth::user()->id;
+    $budgetRelocation->account = $account;
+    $budgetRelocation->description = $description;
+    $budgetRelocation->head = $head;
 
     $budgetDetailRelocationSources = [];
     $budgetDetailRelocationRecipients = [];

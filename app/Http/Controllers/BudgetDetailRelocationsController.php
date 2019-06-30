@@ -60,7 +60,7 @@ class BudgetDetailRelocationsController extends Controller
         'recipients' => 'required|array'
     ]);
 
-    $data = $this->budgetDetailRelocationService->save($request->sources, $request->recipients, $request->head, $request->account, $request->id);
+    $data = $this->budgetDetailRelocationService->save($request->sources, $request->recipients, $request->head, $request->account, $request->description, $request->id);
 
     return response()->json([
       'message' => 'Successfully saved budget relocation',

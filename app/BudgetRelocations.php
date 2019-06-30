@@ -12,7 +12,8 @@ class BudgetRelocations extends Model
       'approved',
       'submitted',
       'head',
-      'account'
+      'account',
+      'description'
     ];
 
     public function budgetRelocationSources() {
