@@ -97,14 +97,30 @@ class BudgetDetailsService extends BaseService {
 
     $totalIncome = 0;
     $totalExpense = 0;
+    $totalIncomeYPL = 0;
+    $totalExpenseYPL = 0;
+    $totalIncomeCommittee = 0;
+    $totalExpenseCommittee = 0;
+    $totalIncomeIntern = 0;
+    $totalExpenseIntern = 0;
+    $totalIncomeBos = 0;
+    $totalExpenseBos = 0;
 
     foreach($results as $result) {
       if(Str::startsWith($result->code_of_account,'4')) {
         array_push($incomes,$result);
         $totalIncome += $result->total;
+        $totalIncomeYPL += $result->ypl;
+        $totalIncomeCommittee += $result->committee;
+        $totalIncomeBos += $result->bos;
+        $totalIncomeIntern += $result->intern;
       } else {
         array_push($expenses,$result);
         $totalExpense += $result->total;
+        $totalExpenseYPL += $result->ypl;
+        $totalExpenseCommittee += $result->committee;
+        $totalExpenseBos += $result->bos;
+        $totalExpenseIntern += $result->intern;
       }
     }
 
@@ -122,6 +138,14 @@ class BudgetDetailsService extends BaseService {
         'pendapatan' => $incomes,
         'total_pendapatan' => $totalIncome,
         'total_pengeluaran' => $totalExpense,
+        'total_pendapatan_ypl' => $totalIncomeYPL,
+        'total_pendapatan_komite' => $totalIncomeCommittee,
+        'total_pendapatan_bos' => $totalIncomeBos,
+        'total_pendapatan_internal' => $totalIncomeIntern,
+        'total_pengeluaran_ypl' => $totalExpenseYPL,
+        'total_pengeluaran_komite' => $totalExpenseCommittee,
+        'total_pengeluaran_bos' => $totalExpenseBos,
+        'total_pengeluaran_internal' => $totalExpenseIntern,
         'status_surplus_defisit' => $status,
         'estimasi_surplus_defisit' => $estimation,
         'saldo' => $balance,
