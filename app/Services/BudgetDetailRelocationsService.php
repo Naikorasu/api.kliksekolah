@@ -60,6 +60,7 @@ class BudgetDetailRelocationsService extends BaseService {
     $budgetDetailRelocationRecipients = [];
 
     foreach($sources as $index => $source) {
+      $source->budget_relocation_id = $budgetRelocation->id;
       $sources[$index] = $source =  new BudgetRelocationSources($source);
       $this->validateAmount($source->budget_detail_unique_id, $source->relocated_amount);
     }
