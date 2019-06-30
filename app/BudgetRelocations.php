@@ -17,7 +17,7 @@ class BudgetRelocations extends Model
       'description'
     ];
 
-    public function scopeTotalPengajuan() {
+    public function scopeTotalPengajuan($query) {
       return $query
             ->select(['*',
               DB::raw('total - (select IFNULL(SUM(relocated_amount),0) from budget_relocation_sources where budget_relocation_sources.budget_relocation_id = budget_relocations.id group by budget_relocation_id) as total')
