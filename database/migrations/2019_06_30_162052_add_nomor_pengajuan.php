@@ -15,7 +15,7 @@ class AddNomorPengajuan extends Migration
     {
       Schema::table('budget_relocations', function (Blueprint $table) {
           $table->string('nomor_pengajuan',255)->nullable();
-      })
+      });
     }
 
     /**
