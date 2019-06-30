@@ -146,7 +146,7 @@ class BudgetDetailsService extends BaseService {
       $budgetDetail->account = $account;
       $budgetDetail->save();
     }
-
+    $budgetDetail->load('parameter_code');
     return $budgetDetail;
   }
 
@@ -172,9 +172,9 @@ class BudgetDetailsService extends BaseService {
     $budgetDetail;
 
     if($withRemains) {
-      $budgetDetail = BudgetDetails::remains()->where('unique_id', $unique_id)->first();
+      $budgetDetail = BudgetDetails::with('parameter_code')->remains()->where('unique_id', $unique_id)->first();
     } else {
-      $budgetDetail = BudgetDetails::remains()->where('unique_id', $unique_id)->first();
+      $budgetDetail = BudgetDetails::with('parameter_code')->remains()->where('unique_id', $unique_id)->first();
     }
     if(!isset($budgetDetail)) {
       throw new DataNotFoundException('Budget Detail Not Found');

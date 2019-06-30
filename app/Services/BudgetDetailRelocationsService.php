@@ -65,7 +65,7 @@ class BudgetDetailRelocationsService extends BaseService {
     foreach ($recipients as $index => $recipient) {
       $recipient = array_merge(['head'=>$head, 'user_id'=>Auth::user()->id, 'account'=>$account], (array) $recipient);
 
-      $budgetDetailDraft = BudgetDetailDrafts::updateOrCreate($recipient);
+      $budgetDetailDraft = BudgetDetailDrafts::updateOrCreate($recipient,$recipient);
       $recipients[$index] =  new BudgetRelocationRecipients([
         'allocated_amount' => $budgetDetailDraft->total,
         'budget_detail_id' => $budgetDetailDraft->id,

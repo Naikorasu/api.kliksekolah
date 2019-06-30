@@ -94,7 +94,7 @@ class BudgetDetails extends Model
     public function scopeRemains($query) {
       return $query
               ->select(['*',
-                DB::raw('total - (select SUM(amount) from fund_requests where fund_requests.budget_detail_unique_id = budget_details.unique_id and fund_requests.is_approved=true group by budget_detail_unique_id) as remains')
+                DB::raw('total - (select IFNULL(SUM(amount),0) from fund_requests where fund_requests.budget_detail_unique_id = budget_details.unique_id and fund_requests.is_approved=true group by budget_detail_unique_id) as remains')
               ]);
     }
 
