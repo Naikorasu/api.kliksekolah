@@ -28,7 +28,7 @@ class BudgetDetailRelocationsService extends BaseService {
 
   public function list($filters=[]) {
     $conditions = $this->buildFilters($filters);
-    return BudgetRelocations::where($conditions)->get();
+    return BudgetRelocations::totalPengajuan()->where($conditions)->get();
   }
 
   public function get($id) {
