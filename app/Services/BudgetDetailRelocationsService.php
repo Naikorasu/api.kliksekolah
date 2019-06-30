@@ -49,7 +49,7 @@ class BudgetDetailRelocationsService extends BaseService {
       }
     } else {
       $budgetRelocation = new BudgetRelocations();
-      $budgetRelocation->nomor_pengajuan = 'PA'.date('m').date('Y').date('H').date('i').date('s')
+      $budgetRelocation->nomor_pengajuan = 'PA'.date('m').date('Y').date('H').date('i').date('s');
     }
 
     $budgetRelocation->user_id = Auth::user()->id;
