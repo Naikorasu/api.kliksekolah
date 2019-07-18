@@ -120,6 +120,7 @@ Route::group([
     Route::group([
         'prefix' => 'journal'
     ], function () {
+      Route::post('realization', 'JournalRealizationController@list');
       Route::post('{journalType}/save', 'JournalsController@save');
       Route::post('{journalType}/get', 'JournalsController@get');
       Route::post('{journalType}/delete', 'JournalsController@save');

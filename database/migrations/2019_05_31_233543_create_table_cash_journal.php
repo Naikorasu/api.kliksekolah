@@ -23,18 +23,6 @@ class CreateTableCashJournal extends Migration
             $table->timestamps();
         });
 
-        Schema::create('journal_cash_bank_details', function(Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('reference_number');
-            $table->string('counterparty',255)->default('');
-            $table->string('tax_number',255)->default('');
-            $table->decimal('tax_value', 20,0)->default(0);
-            $table->decimal('gross_total', 20,0)->default(0);
-            $table->decimal('tax_deduction', 20,0)->default(0);
-            $table->decimal('nett_total', 20,0)->default(0);
-            $table->timestamps();
-        });
-
         Schema::create('journal_details', function (Blueprint $table) {
           $table->bigIncrements('id');
           $table->bigInteger('cash_journal_id');

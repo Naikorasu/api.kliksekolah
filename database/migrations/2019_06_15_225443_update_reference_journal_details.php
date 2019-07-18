@@ -13,10 +13,6 @@ class UpdateReferenceJournalDetails extends Migration
      */
     public function up()
     {
-        Schema::table('journal_cash_bank_details', function(Blueprint $table) {
-          $table->bigInteger('journak_id')->default(0);
-        });
-
         Schema::table('journal_details', function(Blueprint $table) {
           $table->renameColumn('cash_journal_id', 'journal_id');
         });

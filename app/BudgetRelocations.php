@@ -39,4 +39,11 @@ class BudgetRelocations extends Model
       return $this->belongsTo(Budgets::class, 'head', 'unique_id');
     }
 
+    public function school_unit() {
+      return $this->morphOne('App\EntityUnits', 'entity');
+    }
+
+    public function workflow() {
+      return $this->morphOne('App\Workflows', 'entity');
+    }
 }

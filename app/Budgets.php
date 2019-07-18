@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use App\BudgetDetails;
-
 
 class Budgets extends Model
 {
@@ -19,30 +17,13 @@ class Budgets extends Model
      * @var array
      */
     //protected $primaryKey = 'unique_id';
-
+    //
     protected $fillable = [
         'unique_id',
         'periode',
         'create_by',
-        'desc',
+        'desc'
     ];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-    ];
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-    ];
-
 
     public function scopePeriodeOptions($query) {
       return $query->select(DB::raw('distinct(periode) as periode'));
@@ -54,12 +35,26 @@ class Budgets extends Model
         );
     }
 
+    public function scopeWithUnitId($query, $unit_id) {
+      return $query->whereHas('school_unit', function($q) use($unit_id) {
+        $q->where('prm_school_units_id', '=', $unit_id);
+      });
+    }
+
     public function account()
     {
-        return $this->hasMany(BudgetAccounts::Class,'head','unique_id');
+        return $this->hasMany('App\BudgetAccounts','head','unique_id');
     }
 
     public function budgetDetails() {
-        return $this->hasMany(BudgetDetails::class, 'head', 'unique_id');
+        return $this->hasMany('App\BudgetDetails', 'head', 'unique_id');
+    }
+
+    public function school_unit() {
+      return $this->morphMany('App\EntityUnits', 'entity');
+    }
+
+    public function workflow() {
+      return $this->morphOne('App\Workflows', 'entity');
     }
 }

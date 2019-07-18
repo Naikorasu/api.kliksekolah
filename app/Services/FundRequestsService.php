@@ -41,7 +41,7 @@ class FundRequestsService extends BaseService {
     return $fundRequest;
   }
 
-  public function add($budget_detail_unique_id, $amount) {
+  public function add($budget_detail_unique_id, $details) {
     $budgetDetail = $this->budgetDetailService->get($budget_detail_unique_id, true);
 
     $this->validateAmount($budgetDetail->remains, $budgetDetail->total, $amount);
@@ -51,11 +51,13 @@ class FundRequestsService extends BaseService {
     $fundRequest->amount = $amount;
     $fundRequest->user_id = Auth::user()->id;
     $fundRequest->save();
+    $fundRequest->fundRequestDetails()->createMany($details);
 
+    $this->updateEntityUnit($fundRequest);
     return $fundRequest;
   }
 
-  public function edit($id, $budget_detail_unique_id, $amount) {
+  public function edit($id, $budget_detail_unique_id, $details) {
 
     $budgetDetail = $this->budgetDetailService->get($budget_detail_unique_id, true);
 
@@ -71,6 +73,9 @@ class FundRequestsService extends BaseService {
     $fundRequest->amount = $amount;
     $fundRequest->user_id = Auth::user()->id;
     $fundRequest->save();
+    $fundRequest->fundRequestDetails()->createMany($details);
+
+    $this->updateEntityUnit($fundRequest);
 
     return $fundRequest;
   }

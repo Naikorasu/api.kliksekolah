@@ -8,20 +8,31 @@ use App\Journals;
 use App\JournalCashBankDetails;
 use App\JournalDetails;
 use App\Exceptions\DataNotFoundException;
+use App\JournalDetailAttributes;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class JournalsService extends BaseService {
 
   public function save($data, $type) {
     $isCashBank = $type == 'KAS' || $type == 'BANK';
+    $isPayment = $type = 'PEMBAYARAN';
+    $isCredit = false;
 
     if(isset($data->id)) {
       try {
+        $journal = Journals::with('journalDetails')->where('journal_type',$type);
         if($isCashBank) {
-          $journal = Journals::with('journalDetails')->with('journalCashBankDetails')->where('journal_type',$type)->findOrFail($data->id);
+          $journal = $journal->with('journalCashBankDetails')->findOrFail($data->id);
+          $journal->journalDetails()->journalCashBankDetails()->forceDelete();
+          $isCredit = $data->type == 'KAS_MASUK';
+        } else if ($isPayment) {
+          $journal = $journal->with('journalPaymentDetails')->findOrFail($data->id);
+          $journal->journalPaymentDetails()->forceDelete();
+          $isCredit = true;
         } else {
-          $journal = Journals::with('journalDetails')->where('journal_type',$type)->findOrFail($data->id);
+          $journal = $journal->findOrFail($data->id);
         }
+        $journal->journalDetails()->forceDelete();
       } catch (ModelNotFoundException $exception) {
         throw new DataNotFoundException($exception->message());
       }
@@ -35,39 +46,32 @@ class JournalsService extends BaseService {
     $journal->date = $data->date;
     $journal->journal_number = $data->journal_number;
     $journal->user_id = Auth::user()->id;
+    $journal->accepted_by = $data->accepted_by;
+    $journal->submitted_by = $data->submitted_by;
     $journal->save();
 
-    if($isCashBank) {
-      $journalCashBankDetails = JournalCashBankDetails::updateOrCreate([
-        'journals_id' => $journal->id
-      ], [
-        'reference_number' => $data->reference_number,
-        'counterparty' => $data->counterparty,
-        'tax_number' => $data->tax_number,
-        'tax_value' => $data->tax_value
-      ]);
-    }
 
     foreach($data->details as $index => $detail) {
       $fields = (object) $detail;
-      if($isCashBank) {
-        $fields->code_of_account = $data->code_of_account;
-        if($data->type == 'KAS_MASUK') {
-          $fields->credit = $fields->nominal;
-        } else {
-          $fields->debit = $fields->nominal;
-        }
+
+      $journalDetail = new JournalDetails([
+        'code_of_account' => $fields->code_of_account,
+        'description' => $fields->description,
+        'credit' => ($fields->credit) ? $fields->credit : ($isCredit) ? $fields->nominal : null,
+        'debit' => ($fields->debit) ? $fields->debit : (!$isCredit) ? $fields->nominal : null,
+        'journal_id' => $journal->id
+      ]);
+
+      $journalDetail->save();
+
+      if($type == 'KAS' || $type == 'BANK') {
+        $this->saveJournalCashBankDetails($data, $journalDetail);
+      } else if($type == 'PAYMENT') {
+        $this->saveJournalPaymentDetails($data, $journalDetail);
       }
-
-      $id = (isset($fields->id)) ? $fields->id : null;
-
-      $journalDetails = JournalDetails::updateOrCreate([
-        'id' => $id,
-        'journals_id' => $journal->id
-      ], (array) $fields);
     }
 
-    return $journal->load('journalCashBankDetails','journalDetails');
+    return $journal->load('journalCashBankDetails','journalDetails', 'journalDetails.journalDetailAttributes');
   }
 
   public function get($id, $type) {
@@ -80,8 +84,6 @@ class JournalsService extends BaseService {
     }
 
     try {
-
-
       return $journal->findOrFail($id);;
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->message());
@@ -91,5 +93,24 @@ class JournalsService extends BaseService {
   public function list($type) {
     $journal = Journals::where('journal_type', $type)->orderBy('date')->get();
     return $journal;
+  }
+
+  public function saveJournalCashBankDetails($data, $journalDetail) {
+    $journalCashBankDetails = new JournalCashBankDetails(
+      'unit_id' => $data->unit_id,
+      'fund_requests_id' => $data->fund_requests_id,
+      'tax_number' => $data->tax_number,
+      'tax_value' => $data->tax_value
+    );
+    $journalDetail->journalCashBankDetails()->save($journalCashBankDetails);
+  }
+
+  public function saveJournalPaymentDetails($data, $journal) {
+    $journalPaymentDetails = new JournalPaymentDetails([
+      'va_code' => $data->va_code,
+      'mmyy' => $data->mmyy
+    ]);
+
+    $journal->journalPaymentDetails()->save();
   }
 }

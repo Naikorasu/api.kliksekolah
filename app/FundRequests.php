@@ -3,11 +3,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\FundRequestDetails;
 
 class FundRequests extends Model
 {
     protected $table = 'fund_requests';
-    
+
     protected $fillable = [
       'budget_detail_unique_id',
       'amount',
@@ -36,5 +37,21 @@ class FundRequests extends Model
  */
     public function budgetDetail() {
       return $this->belongsTo(BudgetDetails::Class,'budget_detail_unique_id','unique_id');
+    }
+
+    public function fund_request_details() {
+      return $this->hasMany(FundRequestDetails::class, 'fund_request_id', 'id');
+    }
+
+    public function school_unit() {
+      return $this->morphOne('App\EntityUnits', 'entity');
+    }
+
+    public function workflow() {
+      return $this->morphOne('App\Workflows', 'entity');
+    }
+
+    public function journalCashBankDetails() {
+      return $this->belongsTo('App\JournalCashBankDetails', 'fund_requests_id', 'id');
     }
 }

@@ -22,6 +22,7 @@ class BudgetsController extends Controller
     private $budgetDetailService;
 
     public function __construct(BudgetsService $budgetService, BudgetDetailsService $budgetDetailService) {
+      $this->middleware('auth');
       $this->budgetService = $budgetService;
       $this->budgetDetailService = $budgetDetailService;
     }
@@ -39,72 +40,16 @@ class BudgetsController extends Controller
     public function add_head(Request $request)
     {
 
-        $user = $request->user();
-        $user_email = $user->email;
-
         $request->validate([
             'periode' => 'required|integer',
-            'create_by' => 'required',
             'desc' => 'string',
         ]);
 
-        $fh = New FunctionHelper();
-        $unique_id_head = $fh::generate_unique_key($user_email . ";" . "HEAD;");
-
-        $data_head = array(
-            'unique_id' => $unique_id_head,
-            'periode' => $request->periode,
-            'create_by' => $request->create_by,
-            'desc' => $request->desc,
-        );
-        $budget_head = New Budgets($data_head);
-        $budget_head->save();
-
-        for ($y = 0; $y <= 4; $y++) {
-
-            $prefix_code_of_account = $y + 1;
-            $account_type = $prefix_code_of_account . "0000";
-
-            $fh = New FunctionHelper();
-            $unique_id_account = $fh::generate_unique_key($user_email . ";" . "ACCOUNT;" . $account_type . ";");
-
-            switch ($account_type) {
-                case '10000' :
-                    $account_info = "AKTIVA";
-                    break;
-
-                case '20000' :
-                    $account_info = "PASIVA";
-                    break;
-
-                case '30000' :
-                    $account_info = "EKUITAS";
-                    break;
-
-                case '40000' :
-                    $account_info = "PENDAPATAN";
-                    break;
-
-                case '50000' :
-                    $account_info = "BEBAN";
-                    break;
-
-                default:
-                    break;
-            }
-
-            $data_account = array(
-                'unique_id' => $unique_id_account,
-                'head' => $unique_id_head,
-                'account_type' => $account_type,
-                'account_info' => $account_info,
-            );
-            $budget_account = New BudgetAccounts($data_account);
-            $budget_account->save();
-        }
+        $data = $this->budgetService->save($request);
 
         return response()->json([
-            'message' => 'Successfully Add Budgets Head Data'
+            'message' => 'Successfully Add Budgets Head Data',
+            'data' => $data
         ], 201);
     }
 

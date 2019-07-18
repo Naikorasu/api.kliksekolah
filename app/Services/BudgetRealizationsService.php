@@ -10,6 +10,14 @@ use App\BudgetRealizations;
 use App\Exceptions\DataNotFoundException;
 use App\Exceptions\DataSaveFailureException;
 
+/**
+ * [BudgetRealizationsService description]
+ * 1. Data:
+ *    a. APBU
+ *    b. Jurnal Kas
+ *    c. Jurnal Bank
+ * 2. Input Jurnal Kas & Bank -> Realisasi
+ */
 
 class BudgetRealizationsService extends BaseService {
 
@@ -49,7 +57,7 @@ class BudgetRealizationsService extends BaseService {
 
   public function save($budgetDetailUniqueId, $amount, $file, $description='', $id=null) {
       $fileName = $file->getClientOriginalName();
-      
+
       $budgetRealization = BudgetRealizations::updateOrCreate(
         ['id' => $id],
         [

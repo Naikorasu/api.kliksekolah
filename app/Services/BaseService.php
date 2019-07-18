@@ -5,6 +5,9 @@ namespace App\Services;
 use Auth;
 use App\Classes\FunctionHelper;
 use App\User;
+use App\Exceptions\SchoolUnitException;
+use App\SchoolUnits;
+use App\EntityUnits;
 
 class BaseService{
 
@@ -39,10 +42,14 @@ class BaseService{
     return $conditions;
   }
 
-  protected function generateUniqueId($accountType, $code_of_account) {
+  protected function generateUniqueId($accountType, $code_of_account = null) {
     $user = Auth::user();
     $user_email = $user->email;
-    return $this->fh::generate_unique_key($user_email . ";" . "DETAIL" . ";" . $accountType . ";" . $code_of_account . ";");
+    if(isset($code_of_account)) {
+      return $this->fh::generate_unique_key($user_email . ";" . "DETAIL" . ";" . $accountType . ";" . $code_of_account . ";");
+    } else {
+      return $this->fh::generate_unique_key($user_email . ";" . "DETAIL" . ";" . $accountType . ";");
+    }
   }
 
   protected function getPagination($result) {
@@ -56,5 +63,70 @@ class BaseService{
       'previous_page_url' => $result->previousPageUrl(),
       'total' => $result->total()
     ];
+  }
+
+  protected function validateSchoolUnit($school_unit_id) {
+    if(isset($school_unit_id)) {
+      if(Auth::user()->prm_school_units_id !== $school_unit_id) {
+        throw new SchoolUnitException();
+      }
+    }
+  }
+
+  protected function updateEntityUnit($model) {
+    $entityUnit = new EntityUnits([
+      'prm_school_units_id' => Auth::user()->prm_school_units_id
+    ]);
+    $model->school_unit()->save($entityUnit);
+  }
+
+  protected function updateWorkflow($model, $is_done = false, $is_rejected = false) {
+    $userRole = Auth::user()->userRoles()->first();
+
+    if($is_rejected == false) {
+      switch($userRole->name) {
+          case 'Keuangan Sekolah':
+            $nextRole = 'Kepala Sekolah';
+            break;
+          case 'Kepala Sekolah':
+            $nextRole = 'Perwakilan';
+            break;
+          case 'Perwakilan':
+            $nextRole = 'Manager Keuangan';
+            break;
+          case 'Manager Keuangan':
+            $nextRole = 'Bendahara';
+            break;
+          default:
+            $nextRole = 'Bendahara';
+      }
+      $prevRole = $userRole->name;
+    } else {
+      switch($userRole->name) {
+          case 'Kepala Sekolah':
+            $prevRole = 'Keuangan Sekolah';
+            break;
+          case 'Perwakilan':
+            $prevRole = 'Kepala Sekolah';
+            break;
+          case 'Manager Keuangan':
+            $prevRole = 'Perwakilan';
+            break;
+          case 'Bendahara':
+            $prevRole = 'Perwakilan';
+            break;
+          default:
+            $prevRole = 'Bendahara';
+      }
+      $nextRole = $userRole->name;
+    }
+
+    $workflow = new Workflow([
+      'prev_role' => $prevRole,
+      'next_role' => $nextRole,
+      'is_done' => $is_done
+    ]);
+
+    $model->workflow()->save($workflow);
   }
 }

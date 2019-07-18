@@ -50,7 +50,7 @@ class FundRequestsController extends Controller
         'amount' => 'required'
       ]);
 
-      $data = $this->fundRequestService->add($request->budget_detail_unique_id, $request->amount);
+      $data = $this->fundRequestService->add($request->budget_detail_unique_id, $request->details);
 
       return response()->json([
           'message' => 'Successfully Add Fund Request',
@@ -66,7 +66,7 @@ class FundRequestsController extends Controller
           'amount' => 'required'
       ]);
 
-      $data = $this->fundRequestService->edit($request->id, $request->budget_detail_unique_id, $request->amount);
+      $data = $this->fundRequestService->edit($request->id, $request->details);
 
       return response()->json([
           'message' => 'Successfully Updated Fund Request',

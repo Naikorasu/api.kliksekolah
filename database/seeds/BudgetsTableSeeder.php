@@ -61,7 +61,7 @@ class BudgetsTableSeeder extends Seeder
                         break;
                 }
 
-                DB::table('budgets_account')
+                DB::table('budget_accounts')
                     ->insert([
                         'unique_id' => $unique_id_account,
                         'head' => $unique_id_head,
@@ -77,7 +77,7 @@ class BudgetsTableSeeder extends Seeder
                     $fh = New FunctionHelper();
                     $unique_id_detail = $fh::generate_unique_key("system@kliksekolah.com;" . "DETAIL;" . $code_of_account . ";" . $z . ";");
 
-                    DB::table('budgets_detail')
+                    DB::table('budget_details')
                         ->insert([
                             'unique_id' => $unique_id_detail,
                             'head' => $unique_id_head,
@@ -96,7 +96,7 @@ class BudgetsTableSeeder extends Seeder
                             'desc' => $faker->sentence,
                         ]);
 
-                    DB::table('fund_request')
+                    DB::table('fund_requests')
                         ->insert([
                             'budget_detail_unique_id' => $unique_id_detail,
                             'amount' => $faker->randomFloat(0,10000),
