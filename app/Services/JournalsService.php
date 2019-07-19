@@ -14,18 +14,17 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class JournalsService extends BaseService {
 
   public function save($data, $type) {
-    $isCashBank = $type == 'KAS' || $type == 'BANK';
-    $isPayment = $type = 'PEMBAYARAN';
+
     $isCredit = false;
 
     if(isset($data->id)) {
       try {
         $journal = Journals::with('journalDetails')->where('journal_type',$type);
-        if($isCashBank) {
-          $journal = $journal->with('journalCashBankDetails')->findOrFail($data->id);
+        if($type == 'KAS' || $type == 'BANK') {
+          $journal = $journal->with('journalDetails.journalCashBankDetails')->findOrFail($data->id);
           $journal->journalDetails()->journalCashBankDetails()->forceDelete();
           $isCredit = $data->type == 'KAS_MASUK';
-        } else if ($isPayment) {
+        } else if ($type == 'PEMBAYARAN') {
           $journal = $journal->with('journalPaymentDetails')->findOrFail($data->id);
           $journal->journalPaymentDetails()->forceDelete();
           $isCredit = true;
@@ -50,6 +49,9 @@ class JournalsService extends BaseService {
     $journal->submitted_by = $data->submitted_by;
     $journal->save();
 
+    if($type == 'PEMBAYARAN') {
+      $this->saveJournalPaymentDetails($data, $journal);
+    }
 
     foreach($data->details as $index => $detail) {
       $fields = (object) $detail;
@@ -66,21 +68,19 @@ class JournalsService extends BaseService {
 
       if($type == 'KAS' || $type == 'BANK') {
         $this->saveJournalCashBankDetails($data, $journalDetail);
-      } else if($type == 'PAYMENT') {
-        $this->saveJournalPaymentDetails($data, $journalDetail);
       }
     }
 
-    return $journal->load('journalCashBankDetails','journalDetails', 'journalDetails.journalDetailAttributes');
+    return $journal->load('journalPaymentDetails','journalDetails', 'journalDetails.journalCashBankDetails');
   }
 
   public function get($id, $type) {
-    $isCashBank = $type == 'KAS' || $type == 'BANK';
-
     $journal = Journals::with('journalDetails');
 
-    if($isCashBank) {
-      $journal->with('journalCashBankDetails');
+    if($type == 'KAS' || $type == 'BANK') {
+      $journal->with('journalDetails.journalCashBankDetails');
+    } else if ($type == 'PEMBAYARAN') {
+      $journal->with('journalPaymentDetails');
     }
 
     try {
