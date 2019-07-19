@@ -54,10 +54,9 @@ class OptionsService extends BaseService {
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
-    return $code_of_accounts;
   }
 
-  public function getFundRequests($filters, $withRealization = false) {
+  public function getFundRequests($filters) {
     $conditions = $this->buildFilters($filters);
 
     try {
@@ -74,6 +73,24 @@ class OptionsService extends BaseService {
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
-    return $code_of_accounts;
+  }
+
+  public function getBudgets($filters, $keyword = '') {
+    $conditions = $this->buildFilters($filters);
+
+    try {
+      $collection = Budgets::options($keyword)->where($conditions)->get();
+
+      $options = [];
+      foreach($collection as $option) {
+        array_push($options, [
+          "id" => $option->id,
+          "title" => $option->desc
+        ]);
+      }
+      return $options;
+    } catch (ModelNotFoundException $exception) {
+      throw new DataNotFoundException($exception->getMessage());
+    }
   }
 }

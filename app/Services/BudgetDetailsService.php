@@ -38,7 +38,7 @@ class BudgetDetailsService extends BaseService {
     }
     $conditions = $this->buildFilters($filters);
 
-    $query = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->remains();
+    $query = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->orderBy('created_at')->remains();
 
     if(isset($filters)) {
       if(array_key_exists('periode', $filters)) {
@@ -52,9 +52,9 @@ class BudgetDetailsService extends BaseService {
     //dd($query->toSql());
     try {
       if($type == 'realization') {
-        $results = $query->has('fundRequest')->paginate(5);
+        $results = $query->has('fundRequest')->get();
       } else {
-        $results = $query->paginate(5);
+        $results = $query->get();
       }
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
@@ -76,7 +76,7 @@ class BudgetDetailsService extends BaseService {
     $return = [
       'data' => $data
     ];
-    return array_merge($return, $this->getPagination($results));
+    return $data;
   }
 
   public function getRAPBUList($filters=[]) {
@@ -90,7 +90,7 @@ class BudgetDetailsService extends BaseService {
     }
     $conditions = $this->buildFilters($filters);
 
-    $results = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->rAPBU()->get();
+    $results = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->rAPBU()->orderBy('created_at', 'DESC')->get();
 
     $incomes = [];
     $expenses = [];

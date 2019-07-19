@@ -41,6 +41,12 @@ class Budgets extends Model
       });
     }
 
+    public function scopeOptions($query, $keyword) {
+      return $query->select('id','desc')->where([
+        ['desc', 'like', '%'.$keyword.'%']
+      ]);
+    }
+
     public function account()
     {
         return $this->hasMany('App\BudgetAccounts','head','unique_id');

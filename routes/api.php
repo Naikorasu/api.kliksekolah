@@ -51,6 +51,9 @@ Route::group([
 
       Route::post('code-of-account/{type?}','OptionsController@code_of_account');
       Route::post('periode/{type?}','OptionsController@periode');
+      Route::post('fund-request','OptionsController@fundRequest');
+      Route::post('budget','OptionsController@budget');
+
 
     });
     //budget

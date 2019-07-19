@@ -53,21 +53,22 @@ class JournalsService extends BaseService {
       $this->saveJournalPaymentDetails($data, $journal);
     }
 
-    foreach($data->details as $index => $detail) {
-      $fields = (object) $detail;
-
-      $journalDetail = new JournalDetails([
-        'code_of_account' => $fields->code_of_account,
-        'description' => $fields->description,
-        'credit' => ($fields->credit) ? $fields->credit : ($isCredit) ? $fields->nominal : null,
-        'debit' => ($fields->debit) ? $fields->debit : (!$isCredit) ? $fields->nominal : null,
-        'journal_id' => $journal->id
-      ]);
-
-      $journalDetail->save();
-
-      if($type == 'KAS' || $type == 'BANK') {
+    if($type == 'KAS' || $type == 'BANK') {
+      foreach($data->details['standard'] as $index => $detail) {
+        $fields = (object) $detail;
+        $journalDetail = $this->saveJournalDetail($journal, $fields, $isCredit);
         $this->saveJournalCashBankDetails($data, $journalDetail);
+      }
+
+      foreach($data->details['reconciliation'] as $index => $detail) {
+        $fields = (object) $detail;
+        $journalDetail = $this->saveJournalDetail($journal, $fields, $isCredit);
+        $this->saveJournalCashBankDetails($data, $journalDetail);
+      }
+    } else {
+      foreach($data->details as $index => $detail) {
+        $fields = (object) $detail;
+        $this->saveJournalDetail($journal, $fields, $isCredit);
       }
     }
 
@@ -95,23 +96,38 @@ class JournalsService extends BaseService {
     return $journal;
   }
 
+  public function saveJournalDetail($journal, $fields, $isCredit) {
+    $journalDetail = new JournalDetails([
+      'code_of_account' => (isset($fields->code_of_account)) ? $fields->code_of_account : null,
+      'description' => (isset($fields->description)) ? $fields->description : '',
+      'credit' => (isset($fields->credit)) ? $fields->credit : ($isCredit) ? $fields->nominal : null,
+      'debit' => (isset($fields->debit)) ? $fields->debit : (!$isCredit) ? $fields->nominal : null,
+      'journals_id' => $journal->id
+    ]);
+
+    $journalDetail->save();
+    return $journalDetail;
+  }
+
   public function saveJournalCashBankDetails($data, $journalDetail) {
     $journalCashBankDetails = new JournalCashBankDetails(
-      'unit_id' => $data->unit_id,
+      ['unit_id' => $data->unit_id,
       'fund_requests_id' => $data->fund_requests_id,
       'tax_number' => $data->tax_number,
-      'tax_value' => $data->tax_value
+      'tax_value' => $data->tax_value]
     );
     $journalDetail->journalCashBankDetails()->save($journalCashBankDetails);
   }
 
   public function saveJournalPaymentDetails($data, $journal) {
+    $va_code = $data->va_code;
+
     $journalPaymentDetails = new JournalPaymentDetails([
       'payment_type' => $data->payment_type,
       'va_code' => $data->va_code,
       'mmyy' => $data->mmyy
     ]);
 
-    $journal->journalPaymentDetails()->save();
+    $journal->journalPaymentDetails->save($journalPaymentDetails);
   }
 }

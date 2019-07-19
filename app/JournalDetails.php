@@ -9,7 +9,7 @@ class JournalDetails extends Model
 {
     protected $fillable =[
       'id',
-      'journal_id',
+      'journals_id',
       'code_of_account',
       'description',
       'debit',
@@ -23,7 +23,7 @@ class JournalDetails extends Model
     }
 
     public function journal() {
-      return $this->belongsTo('App\Journals','journal_id','id');
+      return $this->belongsTo('App\Journals','journals_id','id');
     }
 
     public function journalCashBankDetails() {
