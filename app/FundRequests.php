@@ -31,6 +31,9 @@ class FundRequests extends Model
       ]);
     }
 
+    public function scopeOptions($query) {
+        return $query->select(DB::raw('distinct id'));
+    }
 /**
  * [budgetDetail description]
  * @return [type] [description]

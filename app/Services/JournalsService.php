@@ -107,6 +107,7 @@ class JournalsService extends BaseService {
 
   public function saveJournalPaymentDetails($data, $journal) {
     $journalPaymentDetails = new JournalPaymentDetails([
+      'payment_type' => $data->payment_type,
       'va_code' => $data->va_code,
       'mmyy' => $data->mmyy
     ]);

@@ -30,4 +30,9 @@ class OptionsController extends Controller
       $data = $this->optionsService->getPeriodes($request->filters, isset($type));
       return $this->returnOption($request, $data);
     }
+
+    public function fund_request(Request $request, $type=null) {
+      $data = $this->optionsService->getFundRequest($request->filters, isset($type));
+      return $this->returnOption($request, $data);
+    }
 }

@@ -9,6 +9,7 @@ class JournalPaymentDetails extends Model
 
   protected $fillable = [
     'journals_id',
+    'payment_type',
     'payment_va_code',
     'mmyy',
   ];
