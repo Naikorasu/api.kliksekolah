@@ -51,7 +51,9 @@ class BudgetsService extends BaseService {
     $budget_head = New Budgets($data_head);
     $budget_head->save();
 
-    $this->updateEntityUnit($budget_head);
+    if(isset(Auth::user()->prm_school_units_id)) {
+      $this->updateEntityUnit($budget_head);
+    }
 
     for ($y = 0; $y <= 4; $y++) {
 
