@@ -62,11 +62,13 @@ class BudgetsController extends Controller
             'head_unique_id' => 'required',
         ]);
 
-        $deleted_budget = Budgets::where('unique_id', $request->head_unique_id)->forceDelete();
-        $deleted_account = BudgetAccounts::where('head', $request->head_unique_id)->forceDelete();
-        $deleted_detail = BudgetDetails::where('head', $request->head_unique_id)->forceDelete();
+        $budget = Budgets::find($request->head_unique_id);
 
-        if ($deleted_budget > 0 || $deleted_account > 0 || $deleted_detail > 0) {
+        $deleted_account = BudgetAccounts::where('head', $budget->unique_id)->forceDelete();
+        $deleted_detail = BudgetDetails::where('head', $budget->unique_id)->forceDelete();
+        $budget->forceDelete();
+
+        if (isset($budget)) {
             $message = "Successfuly Delete Data with Unique ID $request->head_unique_id";
             $result = array(
                 'data_budget' => $deleted_budget,
