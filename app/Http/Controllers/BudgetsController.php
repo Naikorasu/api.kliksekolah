@@ -64,12 +64,12 @@ class BudgetsController extends Controller
 
         $budget = Budgets::find($request->head_unique_id);
 
-        $deleted_account = BudgetAccounts::where('head', $budget->unique_id)->forceDelete();
-        $deleted_detail = BudgetDetails::where('head', $budget->unique_id)->forceDelete();
+        $deleted_account = BudgetAccounts::where('head', $budget['unique_id'])->forceDelete();
+        $deleted_detail = BudgetDetails::where('head', $budget['unique_id'])->forceDelete();
         $budget->forceDelete();
 
         if (isset($budget)) {
-            $message = "Successfuly Deleted Data with Unique ID $budget->head_unique_id";
+            $message = "Successfuly Deleted Data with Unique ID ".$budget['unique_id'];
             $result = array(
                 'data_budget' => $budget
             );
