@@ -136,11 +136,11 @@ class JournalsService extends BaseService {
   }
 
   private function generateJournalNumber($type, $isCredit, $date) {
-    $unit = Auth::user()->schoolUnit();
+    $unit = Auth::user()->schoolUnit()->unit_code;
     $unitCode = '000';
     dd($unit);
     if(isset($unit)) {
-      $unitCode = $unit->unit_code;
+      $unitCode = $unit;
     }
     $d = date_parse_from_format("Y-m-d", $date);
     $month = $d['month'];
