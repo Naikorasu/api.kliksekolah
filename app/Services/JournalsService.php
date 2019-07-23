@@ -140,7 +140,7 @@ class JournalsService extends BaseService {
     $d = date_parse_from_format("Y-m-d", $date);
     $month = $d['month'];
     $year = $d['year'];
-    $counter = str_pad(Journals::counter($type, $isCredit,$month, $year) + 1, 3,'0',STR_PAD_LEFT);
+    $counter = Journals::counter($type, $isCredit,$month, $year);
     $code = '';
     switch($type) {
       case 'KAS':
