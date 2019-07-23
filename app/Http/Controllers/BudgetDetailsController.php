@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\BudgetDetails;
 use App\Services\BudgetDetailsService;
 
 class BudgetDetailsController extends Controller
