@@ -80,7 +80,7 @@ class BudgetDetails extends Model
         ]);
       })->with([
         'head' => function($query) {
-            $query->where('approved', true);
+            $query->where('approved', false);
         }
       ]);
     }

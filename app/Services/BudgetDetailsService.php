@@ -90,7 +90,7 @@ class BudgetDetailsService extends BaseService {
     }
     $conditions = $this->buildFilters($filters);
 
-    $results = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->with('budget')->where($conditions)->rAPBU()->orderBy('created_at', 'DESC')->get();
+    $results = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->rAPBU()->orderBy('created_at', 'DESC')->get();
 
     $incomes = [];
     $expenses = [];
