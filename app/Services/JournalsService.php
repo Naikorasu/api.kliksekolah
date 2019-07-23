@@ -137,7 +137,7 @@ class JournalsService extends BaseService {
 
   private function generateJournalNumber($type, $isCredit, $date) {
     $unit = Auth::user()->schoolUnit();
-    $d = date_parse_from_format("Y-m-d", $date)
+    $d = date_parse_from_format("Y-m-d", $date);
     $month = $d['month'];
     $year = $d['year'];
     $counter = str_pad(Journals::counter($type, $isCredit,$month, $year) + 1, 3,'0',STR_PAD_LEFT);
