@@ -48,9 +48,8 @@ class JournalsService extends BaseService {
     }
 
     $journal->date = $data->date;
-    $journal->journal_number = $journalNumber;
     $journal->user_id = Auth::user()->id;
-    $journal->accepted_by = $data->accepted_by;
+    $journal->accepted_by = $data->received_by;
     $journal->submitted_by = $data->submitted_by;
     $journal->save();
 
