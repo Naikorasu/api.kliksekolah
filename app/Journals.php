@@ -20,7 +20,7 @@ class Journals extends Model
         where('journal_type', $type)->
         where('MONTH(date)', $month)->
         where('YEAR(date)', $year)->
-        whereHas('journalDetails', function(Builder $q) use($isCredit) {
+        whereHas('journalDetails', function($q) use($isCredit) {
           if($isCredit) {
             $q->where('credit', '<>', 'null');
           } else {
