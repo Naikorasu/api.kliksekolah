@@ -137,11 +137,14 @@ class JournalsService extends BaseService {
 
   private function generateJournalNumber($type, $isCredit, $date) {
     $unit = Auth::user()->schoolUnit();
+    $unitCode = '000';
+    if(isset($unit)) {
+      $unitCode = $unit->unit_code;
+    }
     $d = date_parse_from_format("Y-m-d", $date);
     $month = $d['month'];
     $year = $d['year'];
-    $counter = Journals::counter($type, $isCredit,$month, $year) + 1;
-    $counter = str_pad(strval($counter + 1), 3,'0',STR_PAD_LEFT);
+    $counter = str_pad(strval(Journals::counter($type, $isCredit,$month, $year) + 1), 3,'0',STR_PAD_LEFT);
     $code = '';
     switch($type) {
       case 'KAS':
@@ -173,7 +176,7 @@ class JournalsService extends BaseService {
       $unit = '000';
     }
 
-    $journalNumber = $code.str_pad($year, 3, '0', STR_PAD_LEFT).$counter.$unit;
+    $journalNumber = $code.str_pad($year, 3, '0', STR_PAD_LEFT).$counter.$unitCode;
     return $journalNumber;
   }
 }
