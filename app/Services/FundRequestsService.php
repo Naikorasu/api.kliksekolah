@@ -37,7 +37,7 @@ class FundRequestsService extends BaseService {
   public function list($filters=[]) {
     $conditions = $this->buildFilters($filters);
 
-    $fundRequest = FundRequests::with('budgetDetail')->where($conditions)->sortBy('created_at', 'desc')->get();
+    $fundRequest = FundRequests::with('budgetDetail')->where($conditions)->orderBy('created_at', 'DESC')->get();
     return $fundRequest;
   }
 

@@ -12,7 +12,7 @@ class NonBudgetsService extends BaseService {
 
   public function list($filters) {
     $conditions = $this->buildFilters($filters);
-    return NonBudgets::where($conditions)->sortBy('created_at','desc')->paginate(5);
+    return NonBudgets::where($conditions)->orderBy('created_at','DESC')->paginate(5);
   }
 
   public function get($id,$submitted=false,$approved=false) {
