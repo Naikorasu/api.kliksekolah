@@ -20,11 +20,11 @@ class Journals extends Model
         where('journal_type', $type)->
         where('MONTH(date)', $month)->
         where('YEAR(date)', $year)->
-        whereHas('journalDetails', function(Builder $query) use($isCredit) {
+        whereHas('journalDetails', function(Builder $q) use($isCredit) {
           if($isCredit) {
-            $query->where('credit', '<>', 'null');
+            $q->where('credit', '<>', 'null');
           } else {
-            $query->where('debit', '<>', 'null');
+            $q->where('debit', '<>', 'null');
           }
         })->count();
 
