@@ -42,7 +42,7 @@ class JournalsService extends BaseService {
     if(!isset($journal)) {
       $journal = new Journals();
       $journal->journal_type = $type;
-      $journal->journalNumber = $this->generateJournalNumber($type, $isCredit, $data->date);
+      $journal->journal_number = $this->generateJournalNumber($type, $isCredit, $data->date);
     }
 
     $journal->date = $data->date;
