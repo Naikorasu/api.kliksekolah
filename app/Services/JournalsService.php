@@ -141,6 +141,7 @@ class JournalsService extends BaseService {
     $month = $d['month'];
     $year = $d['year'];
     $counter = Journals::counter($type, $isCredit,$month, $year);
+    dd($counter);
     $code = '';
     switch($type) {
       case 'KAS':
