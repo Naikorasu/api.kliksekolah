@@ -35,6 +35,6 @@ class Journals extends Model
     }
 
     public function journalDetails() {
-      return $this->hasMany('App\JournalDetails', 'journal_id', 'id');
+      return $this->hasMany('App\JournalDetails', 'journals_id', 'id');
     }
 }
