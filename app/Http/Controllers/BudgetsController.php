@@ -69,11 +69,9 @@ class BudgetsController extends Controller
         $budget->forceDelete();
 
         if (isset($budget)) {
-            $message = "Successfuly Delete Data with Unique ID $request->head_unique_id";
+            $message = "Successfuly Deleted Data with Unique ID $budget->head_unique_id";
             $result = array(
-                'data_budget' => $deleted_budget,
-                'data_account' => $deleted_account,
-                'data_detail' => $deleted_detail,
+                'data_budget' => $budget
             );
         } else {
             $message = "No Head Data Has Been Delete";
