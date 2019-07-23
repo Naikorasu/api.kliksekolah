@@ -138,7 +138,6 @@ class JournalsService extends BaseService {
   private function generateJournalNumber($type, $isCredit, $date) {
     $unit = Auth::user()->schoolUnit['unit_code'];
     $unitCode = '000';
-    dd($unit);
     if(isset($unit)) {
       $unitCode = $unit;
     }
