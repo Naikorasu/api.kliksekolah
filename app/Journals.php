@@ -15,6 +15,21 @@ class Journals extends Model
       'user_id'
     ];
 
+    public function scopeCounter($query, $type, $isCredit, $month, $year) {
+        return $query->
+        where('journal_type', $type)->
+        where('MONTH(date)', $month)->
+        where('YEAR(date)', $year)->
+        whereHas('journalDetails', function(Builder $query) use($isCredit) {
+          if($isCredit) {
+            $query->where('credit', '<>', 'null');
+          } else {
+            $query->where('debit', '<>', 'null');
+          }
+        })->count();
+
+    }
+
     public function journalPaymentDetails() {
       return $this->hasOne('App\JournalPaymentDetails');
     }

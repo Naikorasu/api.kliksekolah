@@ -16,6 +16,7 @@ class JournalsService extends BaseService {
   public function save($data, $type) {
 
     $isCredit = false;
+    $journalNumber = '';
 
     if(isset($data->id)) {
       try {
@@ -24,6 +25,7 @@ class JournalsService extends BaseService {
           $journal = $journal->with('journalDetails.journalCashBankDetails')->findOrFail($data->id);
           $journal->journalDetails()->journalCashBankDetails()->forceDelete();
           $isCredit = $data->type == 'KAS_MASUK';
+
         } else if ($type == 'PEMBAYARAN') {
           $journal = $journal->with('journalPaymentDetails')->findOrFail($data->id);
           $journal->journalPaymentDetails()->forceDelete();
@@ -40,10 +42,11 @@ class JournalsService extends BaseService {
     if(!isset($journal)) {
       $journal = new Journals();
       $journal->journal_type = $type;
+      $journal->journalNumber = $this->generateJournalNumber($type, $isCredit, $data->date);
     }
 
     $journal->date = $data->date;
-    $journal->journal_number = $data->journal_number;
+    $journal->journal_number = $journalNumber;
     $journal->user_id = Auth::user()->id;
     $journal->accepted_by = $data->accepted_by;
     $journal->submitted_by = $data->submitted_by;
@@ -51,6 +54,7 @@ class JournalsService extends BaseService {
 
     if($type == 'PEMBAYARAN') {
       $this->saveJournalPaymentDetails($data, $journal);
+
     }
 
     if($type == 'KAS' || $type == 'BANK') {
@@ -129,5 +133,46 @@ class JournalsService extends BaseService {
     ]);
 
     $journal->journalPaymentDetails->save($journalPaymentDetails);
+  }
+
+  private function generateJournalNumber($type, $isCredit, $date) {
+    $unit = Auth::user()->schoolUnit();
+    $d = date_parse_from_format("Y-m-d", $date)
+    $month = $d['month'];
+    $year = $d['year'];
+    $counter = str_pad(Journals::counter($type, $isCredit,$month, $year) + 1, 3,'0',STR_PAD_LEFT);
+    $code = '';
+    switch($type) {
+      case 'KAS':
+        $code = 'BK';
+        break;
+      case 'BANK':
+        $code = 'BB';
+        break;
+      case 'UMUM':
+        $code = 'BU';
+        break;
+      case 'PEMBAYARAN':
+        $code = 'BP';
+        break;
+      case 'PENYESUAIAN':
+        $code = 'BN';
+        break;
+      default:
+        $code = '';
+    }
+
+    if($isCredit) {
+      $code = $code.'M';
+    } else {
+      $code = $code.'K';
+    }
+
+    if(!isset($unit)) {
+      $unit = '000';
+    }
+
+    $journalNumber = $code.str_pad($year, 3, '0', STR_PAD_LEFT).$counter.$unit;
+    return $journalNumber;
   }
 }
