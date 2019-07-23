@@ -18,8 +18,8 @@ class Journals extends Model
     public function scopeCounter($query, $type, $isCredit, $month, $year) {
         return $query->
         where('journal_type', $type)->
-        where('MONTH(date)', $month)->
-        where('YEAR(date)', $year)->
+        whereMonth('date', $month)->
+        whereYear('date', $year)->
         whereHas('journalDetails', function($q) use($isCredit) {
           if($isCredit) {
             $q->where('credit', '<>', 'null');
