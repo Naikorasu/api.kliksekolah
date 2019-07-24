@@ -49,7 +49,8 @@ class NonBudgetsService extends BaseService {
 
   public function delete($id) {
     $nonBudget = $this->get($id,false,false);
-    return $nonBudget->forceDelete();
+    $nonBudget->forceDelete();
+    return $nonBudget;
   }
 
   public function submit($id) {
