@@ -116,6 +116,7 @@ Route::group([
       Route::post('get', 'NonBudgetsController@get');
       Route::post('add', 'NonBudgetsController@add');
       Route::post('edit', 'NonBudgetsController@edit');
+      Route::post('delete', 'NonBudgetsController@delete');
       Route::post('submit', 'NonBudgetsController@submit');
       Route::post('{status}', 'NonBudgetsController@updateStatus')->where('status', '(approve|reject)');
     });
