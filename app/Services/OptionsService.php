@@ -77,11 +77,7 @@ class OptionsService extends BaseService {
 
   public function getBudgets($filters, $keyword = '') {
     $conditions = $this->buildFilters($filters);
-
-    if(strlen($keyword) > 0) {
-      array_push($conditions, ['name', 'like', $keyword.'%']);
-    }
-
+    
     try {
       $collection = Budgets::options($keyword)->where($conditions)->get();
 
