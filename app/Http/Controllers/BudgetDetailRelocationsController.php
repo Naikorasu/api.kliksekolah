@@ -92,6 +92,17 @@ class BudgetDetailRelocationsController extends Controller
     ],200);
   }
 
+  public function delete(Request $request) {
+    $request->validate([
+      'id' => 'required'
+    ]);
+    $budgetRelocation = $this->budgetDetailRelocationService->delete($request->id);
+    return response()->json([
+      'message' => 'Budget relocation has been successully deleted';
+      'data' => $budgetRelocation
+    ]);
+  }
+
   // private function save(Request $request) {
   //   $request->validate([
   //     'sources' => 'required|array|min:1',

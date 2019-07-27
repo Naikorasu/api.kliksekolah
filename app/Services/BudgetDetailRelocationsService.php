@@ -98,6 +98,15 @@ class BudgetDetailRelocationsService extends BaseService {
     return $budgetRelocation;
   }
 
+  public function delete($id) {
+    $budgetRelocation = BudgetRelocations::findOrFail($id);
+    $budgetRelocation->budgetRelocationSources()->delete();
+    $budgetRelocation->budgetRelocationRecipients()->delete();
+    $budgetRelocation->delete();
+
+    return $budgetRelocation;
+  }
+
   public function updateStatus($id, $type=false) {
     try {
       $budgetRelocation = BudgetRelocations::where('approved',false)->findOrFail($id);

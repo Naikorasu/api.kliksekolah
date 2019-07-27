@@ -85,6 +85,8 @@ Route::group([
           Route::post('list', 'BudgetDetailRelocationsController@list');
           Route::post('submit', 'BudgetDetailRelocationsController@submit');
           Route::post('save','BudgetDetailRelocationsController@save');
+          Route::post('delete','BudgetDetailRelocationsController@elete');
+
           Route::post('{status}', 'BudgetDetailRelocationsController@updateStatus')->where('status', '(approve|reject)');
         });
 
