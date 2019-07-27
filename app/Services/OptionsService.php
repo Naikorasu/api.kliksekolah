@@ -77,7 +77,6 @@ class OptionsService extends BaseService {
 
   public function getBudgets($filters, $keyword = '') {
     $conditions = $this->buildFilters($filters);
-    
     try {
       $collection = Budgets::options($keyword)->where($conditions)->get();
 
