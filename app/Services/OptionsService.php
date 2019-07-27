@@ -78,7 +78,7 @@ class OptionsService extends BaseService {
   public function getBudgets($filters, $keyword = '') {
     $conditions = $this->buildFilters($filters);
     try {
-      $collection = Budgets::where(['desc', 'like', '%'.$keyword])->where($conditions)->get();
+      $collection = Budgets::options($keyword)->where($conditions)->get();
 
       $options = [];
       foreach($collection as $option) {
