@@ -92,6 +92,19 @@ class FundRequestsService extends BaseService {
     return $fundRequest;
   }
 
+  public function delete($id) {
+    try {
+      $fundRequest = FundRequests::status(false, true)->findOrFail($id);
+    } catch (ModelNotFoundException $exception) {
+      throw new DataNotFoundException($exception->getMessage());
+    }
+
+    $fundRequest->delete()
+
+    return $fundRequest;
+  }
+
+
   /**
    * fn:updateStatus update the request status
    * @param  int  $id     the request ID

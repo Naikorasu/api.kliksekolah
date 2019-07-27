@@ -87,6 +87,20 @@ class FundRequestsController extends Controller
       ], 200);
     }
 
+    public function delete(Request $request) {
+      $request->validate([
+          'id' => 'required|integer'
+      ]);
+
+      $data = $this->fundRequestService->delete($request->id);
+
+      return response()->json([
+        'message' => 'Successfully deleted the fund request',
+        'data' => $data
+      ], 200);
+    }
+
+
     public function submit(Request $request) {
       $request->validate([
         'id' => 'required|integer'

@@ -97,7 +97,7 @@ Route::group([
           Route::post('get', 'FundRequestsController@get');
           Route::post('add', 'FundRequestsController@add');
           Route::post('edit', 'FundRequestsController@edit');
-          Route::post('cancel', 'FundRequestsController@cancel');
+          Route::post('delete', 'FundRequestsController@delete');
           Route::post('submit', 'FundRequestsController@submit');
           Route::post('{status}', 'FundRequestsController@updateStatus')->where('status', '(approve|reject)');
         });
