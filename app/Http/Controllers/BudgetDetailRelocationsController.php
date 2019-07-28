@@ -98,7 +98,7 @@ class BudgetDetailRelocationsController extends Controller
     ]);
     $budgetRelocation = $this->budgetDetailRelocationService->delete($request->id);
     return response()->json([
-      'message' => 'Budget relocation has been successully deleted';
+      'message' => 'Budget relocation has been successully deleted',
       'data' => $budgetRelocation
     ]);
   }
