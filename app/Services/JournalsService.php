@@ -94,7 +94,7 @@ class JournalsService extends BaseService {
           'reconciliation' => []
         ];
 
-        foreach($data->journalDetails as $index => $detail) {
+        foreach($data->journal_details as $index => $detail) {
           if(isset($detail->unit_id)) {
             array_push($data->details->reconciliation, $detail);
           } else {
