@@ -84,15 +84,25 @@ class JournalsService extends BaseService {
 
   public function get($id, $type) {
     $journal = Journals::with('journalDetails');
-
-    if($type == 'KAS' || $type == 'BANK') {
-      $journal->with('journalDetails.journalCashBankDetails');
-    } else if ($type == 'PEMBAYARAN') {
-      $journal->with('journalPaymentDetails');
-    }
-
+    $data = [];
     try {
-      return $journal->findOrFail($id);;
+      if($type == 'KAS' || $type == 'BANK') {
+        $data = $journal->with('journalDetails.journalCashBankDetails')->findOrFail($id);
+        $data['details'] = [
+          'standard' => [],
+          'reconciliation' => []
+        ];
+        foreach($data->journalDetails as $index => $detail) {
+          if(isset($detail->unit_id)) {
+            array_push($data['details']['reconciliation'], $detail);
+          } else {
+            array_push($data['details']['standard'], $detail);
+          }
+        }
+      } else if ($type == 'PEMBAYARAN') {
+        $data = $journal->with('journalPaymentDetails')->findOrFail($id);
+      }
+       return $data;
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->message());
     }
