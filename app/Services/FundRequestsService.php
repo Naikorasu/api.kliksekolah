@@ -56,14 +56,14 @@ class FundRequestsService extends BaseService {
     if(is_array($details)) {
       foreach($details as $detail) {
         array_push($fundRequestDetails, [
-          'budget_detail_unique_id' => $budget_detail_unique_id,
+          'budget_detail_unique_id' => $fundRequest->id,
           'amount' => $detail->amount,
           'description' => $detail->description
         ]);
       }
     } else {
       array_push($fundRequestDetails, [
-        'budget_detail_unique_id' => $budget_detail_unique_id,
+        'budget_detail_unique_id' => $fundRequest->id,
         'amount' => $details['amount'],
         'description' => $details['description']
       ]);

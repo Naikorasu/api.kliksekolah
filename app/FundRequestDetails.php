@@ -18,6 +18,6 @@ class FundRequestDetails extends Model
     }
 
     public function budgetDetail() {
-      return $this->belongsTo(BudgetDetails::Class,'budget_detail_unique_id','unique_id');
+      return $this->belongsTo(BudgetDetails::Class,'budget_detail_unique_id','id');
     }
 }
