@@ -13,8 +13,7 @@ use App\BudgetDetails;
 class JournalRealizationService extends BaseService {
 
   public function list() {
-
-    $journal = JournalDetailAttributes::where('unit_id', 'NOT NULL')->with('journalDetails', 'journalDetails.journal', 'schoolUnit', 'fundRequest', 'fundRequest.budgetDetail')->get();
+    $journal = JournalDetailAttributes::with('journalDetails', 'journalDetails.journal', 'schoolUnit', 'fundRequest', 'fundRequest.budgetDetail')->get();
 
     return $journal;
   }
