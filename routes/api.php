@@ -133,6 +133,12 @@ Route::group([
       Route::post('{journalType}/list', 'JournalsController@list');
     });
 
+    Route::group([
+        'prefix' => 'report'
+    ], function() {
+      Route::post('{type}', 'ReportController@get');
+    });
+
     //param
     Route::group([
         'prefix' => 'param'
