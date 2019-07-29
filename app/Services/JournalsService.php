@@ -88,11 +88,12 @@ class JournalsService extends BaseService {
     try {
       if($type == 'KAS' || $type == 'BANK') {
         $data = $journal->with('journalDetails')->findOrFail($id);
+          dd($data);
         $data['details'] = [
           'standard' => [],
           'reconciliation' => []
         ];
-        dd($data);
+
         foreach($data['journalDetails'] as $index => $detail) {
           if(isset($detail->unit_id)) {
             array_push($data['details']['reconciliation'], $detail);
