@@ -75,12 +75,12 @@ class JournalsService extends BaseService {
       }
     } else if($type == 'PEMBAYARAN') {
       $coa = '41301';
-      switch($request->payment_type) {
+      switch ($data->payment_type) {
         case 'Uang Sekolah':
           $coa = '41301';
           break;
         case 'Uang Komputer':
-          $coa = '41401'
+          $coa = '41401';
           break;
         case 'Uang POMG':
           $coa = '41601';
@@ -100,15 +100,13 @@ class JournalsService extends BaseService {
         case 'Uang Kegiatan (non Rutin)':
           $coa = '41501';
           break;
+        default:
+          break;
        }
-       $journalDetail = new JournalDetails();
-       $journalDetail->code_of_account = $coa;
-       $journalDetail->credit = $request->nominal;
-       $this->journalDetails()->save($journalDetail);
-       $this->journalDetails->journalPaymentDetails()->save( new JournalPaymentDetails([
-           'mmyy' => $request->mmyy,
-           'payment_va_code' => $request->va_code,
-           'payment_type' => $request->payment_type
+       $journal->journalPaymentDetails()->save( new JournalPaymentDetails([
+           'mmyy' => $data->mmyy,
+           'payment_va_code' => $data->va_code,
+           'payment_type' => $data->payment_type
          ])
        );
 
@@ -119,7 +117,7 @@ class JournalsService extends BaseService {
       }
     }
 
-    return $journal->load('journalDetails.journalPaymentDetails','journalDetails', 'journalDetails.journalCashBankDetails');
+    return $journal->load('journalPaymentDetails','journalDetails', 'journalDetails.journalCashBankDetails');
   }
 
   public function get($id, $type) {
@@ -157,7 +155,7 @@ class JournalsService extends BaseService {
           }
         }
       } else if ($type == 'PEMBAYARAN') {
-        $data = $journal->with('journalDetails', 'journalDetails.journalPaymentDetails')->findOrFail($id);
+        $data = $journal->with('journalPaymentDetails')->findOrFail($id);
       }
        return $data;
     } catch (ModelNotFoundException $exception) {
