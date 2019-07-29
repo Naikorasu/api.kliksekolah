@@ -51,7 +51,24 @@ class FundRequestsService extends BaseService {
     $fundRequest->amount = 0;
     $fundRequest->user_id = Auth::user()->id;
     $fundRequest->save();
-    $fundRequest->fundRequestDetails()->createMany($details);
+    $fundRequestDetails = [];
+
+    if(is_array($details)) {
+      foreach($details as $detail) {
+        array_push($fundRequestDetails, [
+          'budget_detail_unique_id' => $budget_detail_unique_id,
+          'amount' => $detail->amount,
+          'description' => $detail->description
+        ]);
+      }
+    } else {
+      array_push($fundRequestDetails, [
+        'budget_detail_unique_id' => $budget_detail_unique_id,
+        'amount' => $details->amount,
+        'description' => $details->description
+      ]);
+    }
+    $fundRequest->fundRequestDetails()->createMany($fundRequestDetails);
 
     $this->updateEntityUnit($fundRequest);
     return $fundRequest;
