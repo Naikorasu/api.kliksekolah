@@ -44,11 +44,11 @@ class FundRequestsService extends BaseService {
   public function add($budget_detail_unique_id, $details) {
     $budgetDetail = $this->budgetDetailService->get($budget_detail_unique_id, true);
 
-    $this->validateAmount($budgetDetail->remains, $budgetDetail->total, $details->amount);
+    $this->validateAmount($budgetDetail->remains, $budgetDetail->total, 0);
 
     $fundRequest = new FundRequests();
     $fundRequest->budget_detail_unique_id = $budget_detail_unique_id;
-    $fundRequest->amount = $amount;
+    $fundRequest->amount = 0;
     $fundRequest->user_id = Auth::user()->id;
     $fundRequest->save();
     $fundRequest->fundRequestDetails()->createMany($details);
