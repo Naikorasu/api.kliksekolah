@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Services\JournalsService;
+use App\Services\JournalRealizationService;
 use Illuminate\Http\Request;
 
 class JournalsController extends Controller
 {
     private $journalsService;
+    private $journalRealizationService;
 
-    public function __construct(JournalsService $journalsService) {
+    public function __construct(JournalsService $journalsService, JournalRealizationService $journalRealizationService) {
       $this->journalsService = $journalsService;
+      $this->journalRealizationService = $journalRealizationService;
     }
 
     public function get(Request $request, $type='KAS') {
@@ -31,10 +34,12 @@ class JournalsController extends Controller
     }
 
     public function list(Request $request, $type='KAS') {
-      $journals = $this->journalsService->list($type);
-
+      if($type == 'realization') {
+        $journals = $this->journalRealizationService->list();
+      } else {
+        $journals = $this->journalsService->list($type);
+      }
       return response()->json([
-        'message' => 'successfully saved journal',
         'data' => $journals
       ]);
     }

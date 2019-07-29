@@ -5,7 +5,7 @@ use Auth;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Exceptions\DataNotFoundException;
-use App\JournalDetailAttributes;
+use App\JournalCashBankDetails;
 use App\FundRequests;
 use App\BudgetDetails;
 
@@ -13,7 +13,7 @@ use App\BudgetDetails;
 class JournalRealizationService extends BaseService {
 
   public function list() {
-    $journal = JournalDetailAttributes::with('journalDetails', 'journalDetails.journal', 'schoolUnit', 'fundRequest', 'fundRequest.budgetDetail')->get();
+    $journal = JournalCashBankDetails::whereHas('fundRequest')->with('fundRequest', 'journalDetail', 'journalDetail.journal');
 
     return $journal;
   }
