@@ -17,6 +17,8 @@ class JournalsService extends BaseService {
 
     $isCredit = false;
     $journalNumber = '';
+    $receivedBy = (isset($data->received_by)) ? $data->received_by : '';
+    $submittedBy = (isset($data->submitted_by)) ? $data->submitted_by : '';
 
     if(isset($data->id)) {
       try {
@@ -43,14 +45,14 @@ class JournalsService extends BaseService {
       $journal = new Journals();
       $journal->journal_type = $type;
       $journal->journal_number = $this->generateJournalNumber($type, $isCredit, $data->date);
-      $journal->accepted_by = $data->received_by;
-      $journal->submitted_by = $data->submitted_by;
+      $journal->accepted_by = $received_by;
+      $journal->submitted_by = $submitted_by;
     }
 
     $journal->date = $data->date;
     $journal->user_id = Auth::user()->id;
-    $journal->accepted_by = $data->received_by;
-    $journal->submitted_by = $data->submitted_by;
+    $journal->accepted_by = $received_by;
+    $journal->submitted_by = $submitted_by;
     $journal->save();
 
     if($type == 'PEMBAYARAN') {
