@@ -178,9 +178,10 @@ class JournalsService extends BaseService {
         $debit = $fields->nominal;
       }
     } else {
-      $credit = $fields->credit;
-      $debit = $fields->debit;
+      $credit = isset($fields->credit) ? $fields->credit : null;
+      $debit = isset($fields->debit) ? $fields->debit : null;
     }
+
     $journalDetail = new JournalDetails([
       'code_of_account' => (isset($fields->code_of_account)) ? $fields->code_of_account : null,
       'description' => (isset($fields->description)) ? $fields->description : '',
