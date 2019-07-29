@@ -159,7 +159,7 @@ class JournalsService extends BaseService {
 
     $journalPaymentDetails = new JournalPaymentDetails([
       'payment_type' => $data->payment_type,
-      'va_code' => $data->va_code,
+      'payment_va_code' => $data->va_code,
       'mmyy' => $data->mmyy
     ]);
 
