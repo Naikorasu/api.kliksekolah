@@ -163,7 +163,7 @@ class JournalsService extends BaseService {
       'mmyy' => $data->mmyy
     ]);
 
-    $journal->journalPaymentDetails->save($journalPaymentDetails);
+    $journal->journalPaymentDetails()->save($journalPaymentDetails);
   }
 
   private function generateJournalNumber($type, $isCredit, $date) {
