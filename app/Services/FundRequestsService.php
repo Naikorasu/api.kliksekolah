@@ -64,8 +64,8 @@ class FundRequestsService extends BaseService {
     } else {
       array_push($fundRequestDetails, [
         'budget_detail_unique_id' => $budget_detail_unique_id,
-        'amount' => $details->amount,
-        'description' => $details->description
+        'amount' => $details['amount'],
+        'description' => $details['description']
       ]);
     }
     $fundRequest->fundRequestDetails()->createMany($fundRequestDetails);
