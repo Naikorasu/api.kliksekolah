@@ -93,12 +93,26 @@ class JournalsService extends BaseService {
           'standard' => [],
           'reconciliation' => []
         ];
+        $data->type = 'KAS_MASUK';
 
         foreach($data->journal_details as $index => $detail) {
-          if(isset($detail->unit_id)) {
-            array_push($data->details['reconciliation'], $detail);
+          $journalCashBankDetails = $detail->journal_cash_bank_details;
+          $data->type = (isset($detail->debit)) ? 'KAS_KELUAR' : 'KAS_MASUK';
+          if(isset($journalCashBankDetails->unit_id)) {
+            array_push($data->details['reconciliation'], [
+                'code_of_account' => $detail->code_of_account,
+                'nominal' => (isset($detail->credit)) ? $detail->credit : $detail->debit,
+                'tax_type' => null,
+                'tax_value' => null
+            ]);
           } else {
-            array_push($data->details['standard'], $detail);
+            array_push($data->details['standard'], [
+                'code_of_account' => $detail->code_of_account,
+                'nominal' => (isset($detail->credit)) ? $detail->credit : $detail->debit,
+                'tax_type' => $journalCashBankDetails->tax_type,
+                'tax_value' => $journalCashBankDetails->tax_value
+
+            ]);
           }
         }
       } else if ($type == 'PEMBAYARAN') {
