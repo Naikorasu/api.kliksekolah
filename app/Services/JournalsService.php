@@ -164,7 +164,7 @@ class JournalsService extends BaseService {
   }
 
   public function list($type) {
-    $journal = Journals::where('journal_type', $type)->orderBy('date')->get();
+    $journal = Journals::where('journal_type', $type)->orderBy('date', 'desc')->get();
     return $journal;
   }
 
