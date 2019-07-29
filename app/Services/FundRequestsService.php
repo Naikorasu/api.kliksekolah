@@ -99,7 +99,7 @@ class FundRequestsService extends BaseService {
       throw new DataNotFoundException($exception->getMessage());
     }
 
-    $fundRequest->delete()
+    $fundRequest->delete();
 
     return $fundRequest;
   }
