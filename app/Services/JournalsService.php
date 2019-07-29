@@ -92,6 +92,7 @@ class JournalsService extends BaseService {
           'standard' => [],
           'reconciliation' => []
         ];
+        dd($data);
         foreach($data['journalDetails'] as $index => $detail) {
           if(isset($detail->unit_id)) {
             array_push($data['details']['reconciliation'], $detail);
