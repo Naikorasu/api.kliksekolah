@@ -50,7 +50,7 @@ class FundRequestsController extends Controller
         'amount' => 'required'
       ]);
 
-      $data = $this->fundRequestService->add($request->budget_detail_unique_id, $request->details);
+      $data = $this->fundRequestService->add($request->budget_detail_unique_id, $request);
 
       return response()->json([
           'message' => 'Successfully Add Fund Request',
