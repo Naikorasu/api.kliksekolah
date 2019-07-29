@@ -260,4 +260,10 @@ class JournalsService extends BaseService {
     $journalNumber = $code.str_pad($year, 3, '0', STR_PAD_LEFT).$counter.$unitCode;
     return $journalNumber;
   }
+
+  public function delete($id) {
+    $journal = Journals::findOrFail($id);
+    $journal->delete();
+    return $journal;
+  }
 }

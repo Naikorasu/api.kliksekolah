@@ -45,6 +45,9 @@ class JournalsController extends Controller
     }
 
     public function delete(Request $request, $type) {
-
+      $journals = $this->journalsService->delete($request->id);
+      return response()->json([
+          'data' => $journals
+      ]);
     }
 }
