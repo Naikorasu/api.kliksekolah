@@ -42,7 +42,7 @@ class FundRequests extends Model
       return $this->belongsTo(BudgetDetails::Class,'budget_detail_unique_id','unique_id');
     }
 
-    public function fund_request_details() {
+    public function fundRequestDetails() {
       return $this->hasMany(FundRequestDetails::class, 'fund_request_id', 'id');
     }
 
