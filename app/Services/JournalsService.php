@@ -73,6 +73,44 @@ class JournalsService extends BaseService {
         $journalDetail = $this->saveJournalDetail($journal, $fields, $isCredit);
         $this->saveJournalCashBankDetails($data, $journalDetail);
       }
+    } else if($type == 'PEMBAYARAN') {
+      switch($request->payment_type) {
+        case 'Uang Sekolah':
+          $coa = '41301';
+          break;
+        case 'Uang Komputer':
+          $coa = '41401'
+          break;
+        case 'Uang POMG':
+          $coa = '41601';
+          break;
+        case 'Uang Kegiatan':
+          $coa = '41501';
+          break;
+        case 'DPP':
+          $coa = '41101';
+          break;
+        case 'UPP':
+          $coa = '41201';
+          break;
+        case 'Seragam':
+          $coa = '42102';
+          break;
+        case 'Uang Kegiatan (non Rutin)':
+          $coa = '41501';
+          break;
+       }
+       $journalDetail = new JournalDetails();
+       $journalDetail->code_of_account = $coa;
+       $journalDetail->credit = $request->nominal;
+       $journalDetail->journalPaymentDetails()->save( new JournalPaymentDetails(
+         [
+           'mmyy' => $request->mmyy,
+           'payment_va_code' => $request->va_code,
+           'payment_type' => $request->payment_type
+         ]
+       ));
+
     } else {
       foreach($data->details as $index => $detail) {
         $fields = (object) $detail;
