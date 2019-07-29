@@ -70,7 +70,7 @@ class FundRequestsService extends BaseService {
     }
     $fundRequest->fundRequestDetails()->createMany($fundRequestDetails);
 
-    $this->updateEntityUnit($fundRequest);
+    //$this->updateEntityUnit($fundRequest);
     return $fundRequest;
   }
 
