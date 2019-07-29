@@ -87,16 +87,16 @@ class JournalsService extends BaseService {
     $data = [];
     try {
       if($type == 'KAS' || $type == 'BANK') {
-        $data = $journal->with('journalDetails.journalCashBankDetails')->findOrFail($id);
-        $data->details = [
+        $data = $journal->with('journalDetails.journalCashBankDetails')->findOrFail($id)->toJson();
+        $data['details'] = [
           'standard' => [],
           'reconciliation' => []
         ];
-        foreach($data->journalDetails as $index => $detail) {
+        foreach($data['journalDetails'] as $index => $detail) {
           if(isset($detail->unit_id)) {
-            array_push($data->details->reconciliation, $detail);
+            array_push($data['details']['reconciliation'], $detail);
           } else {
-            array_push($data->details->standard, $detail);
+            array_push($data['details']['standard'], $detail);
           }
         }
       } else if ($type == 'PEMBAYARAN') {
