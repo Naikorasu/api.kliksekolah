@@ -103,15 +103,16 @@ class JournalsService extends BaseService {
                 'code_of_account' => $detail->code_of_account,
                 'nominal' => (isset($detail->credit)) ? $detail->credit : $detail->debit,
                 'tax_type' => null,
-                'tax_value' => null
+                'tax_value' => null,
+                'parameter_code' => $detail->parameter_code
             ]);
           } else {
             array_push($data->details['standard'], [
                 'code_of_account' => $detail->code_of_account,
                 'nominal' => (isset($detail->credit)) ? $detail->credit : $detail->debit,
                 'tax_type' => $journalCashBankDetails->tax_type,
-                'tax_value' => $journalCashBankDetails->tax_value
-
+                'tax_value' => $journalCashBankDetails->tax_value,
+                'parameter_code' => $detail->parameter_code
             ]);
           }
         }
