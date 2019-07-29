@@ -87,7 +87,7 @@ class JournalsService extends BaseService {
     $data = [];
     try {
       if($type == 'KAS' || $type == 'BANK') {
-        $data = $journal->with('journalDetails')->findOrFail($id)->attributesToArray();
+        $data = $journal->with('journalDetails')->findOrFail($id)->toJson();
 
         $data['details'] = [
           'standard' => [],
