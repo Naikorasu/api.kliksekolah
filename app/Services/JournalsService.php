@@ -94,9 +94,9 @@ class JournalsService extends BaseService {
         ];
         foreach($data->journalDetails as $index => $detail) {
           if(isset($detail->unit_id)) {
-            array_push($data['details']['reconciliation'], $detail);
+            array_push($data->details['reconciliation'], $detail);
           } else {
-            array_push($data['details']['standard'], $detail);
+            array_push($data->details['standard'], $detail);
           }
         }
       } else if ($type == 'PEMBAYARAN') {
