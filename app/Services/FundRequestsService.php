@@ -44,7 +44,7 @@ class FundRequestsService extends BaseService {
   public function add($budget_detail_unique_id, $details) {
     $budgetDetail = $this->budgetDetailService->get($budget_detail_unique_id, true);
 
-    $this->validateAmount($budgetDetail->remains, $budgetDetail->total, $amount);
+    $this->validateAmount($budgetDetail->remains, $budgetDetail->total, $details->amount);
 
     $fundRequest = new FundRequests();
     $fundRequest->budget_detail_unique_id = $budget_detail_unique_id;
