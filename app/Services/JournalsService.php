@@ -6,6 +6,7 @@ use Auth;
 use DateTime;
 use App\Journals;
 use App\JournalCashBankDetails;
+use App\JournalPaymentDetails;
 use App\JournalDetails;
 use App\Exceptions\DataNotFoundException;
 use App\JournalDetailAttributes;
