@@ -169,11 +169,23 @@ class JournalsService extends BaseService {
   }
 
   public function saveJournalDetail($journal, $fields, $isCredit) {
+    $credit = null;
+    $debit = null;
+    if(property_exists($fields, 'nominal')) {
+      if($isCredit) {
+        $credit = $fields->nominal;
+      } else {
+        $debit = $fields->nominal;
+      }
+    } else {
+      $credit = $fields->credit;
+      $debit = $fields->debit;
+    }
     $journalDetail = new JournalDetails([
       'code_of_account' => (isset($fields->code_of_account)) ? $fields->code_of_account : null,
       'description' => (isset($fields->description)) ? $fields->description : '',
-      'credit' => (isset($fields->credit)) ? $fields->credit : (isset($fields->nominal) && $isCredit) ? $fields->nominal : null,
-      'debit' => (isset($fields->debit)) ? $fields->debit : (isset($fields->nominal) && !$isCredit) ? $fields->nominal : null,
+      'credit' => $credit,
+      'debit' => $debit,
       'journals_id' => $journal->id
     ]);
 
