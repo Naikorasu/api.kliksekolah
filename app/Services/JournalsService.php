@@ -74,6 +74,7 @@ class JournalsService extends BaseService {
         $this->saveJournalCashBankDetails($data, $journalDetail);
       }
     } else if($type == 'PEMBAYARAN') {
+      $coa = '41301';
       switch($request->payment_type) {
         case 'Uang Sekolah':
           $coa = '41301';
@@ -103,13 +104,13 @@ class JournalsService extends BaseService {
        $journalDetail = new JournalDetails();
        $journalDetail->code_of_account = $coa;
        $journalDetail->credit = $request->nominal;
-       $journalDetail->journalPaymentDetails()->save( new JournalPaymentDetails(
-         [
+       $this->journalDetails()->save($journalDetail);
+       $this->journalDetails->journalPaymentDetails()->save( new JournalPaymentDetails([
            'mmyy' => $request->mmyy,
            'payment_va_code' => $request->va_code,
            'payment_type' => $request->payment_type
-         ]
-       ));
+         ])
+       );
 
     } else {
       foreach($data->details as $index => $detail) {
@@ -118,7 +119,7 @@ class JournalsService extends BaseService {
       }
     }
 
-    return $journal->load('journalPaymentDetails','journalDetails', 'journalDetails.journalCashBankDetails');
+    return $journal->load('journalDetails.journalPaymentDetails','journalDetails', 'journalDetails.journalCashBankDetails');
   }
 
   public function get($id, $type) {
@@ -156,7 +157,7 @@ class JournalsService extends BaseService {
           }
         }
       } else if ($type == 'PEMBAYARAN') {
-        $data = $journal->with('journalPaymentDetails')->findOrFail($id);
+        $data = $journal->with('journalDetails', 'journalDetails.journalPaymentDetails')->findOrFail($id);
       }
        return $data;
     } catch (ModelNotFoundException $exception) {
