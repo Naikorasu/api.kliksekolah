@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Auth;
+use App\Journals;
 
 class ReportService extends BaseService {
 
