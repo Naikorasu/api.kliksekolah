@@ -16,8 +16,8 @@ class ReportController extends Controller
     public function get(Request $request, $type) {
       $data = $this->reportService->get($type, $request->from, $request->to);
 
-      return response()->json([
-        'data' => $data
-      ]);
+      return response()->json(
+        $data
+      );
     }
 }
