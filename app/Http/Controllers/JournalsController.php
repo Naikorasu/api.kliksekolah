@@ -37,7 +37,7 @@ class JournalsController extends Controller
       if($type == 'realization') {
         $journals = $this->journalRealizationService->list();
       } else {
-        $journals = $this->journalsService->list($type);
+        $journals = $this->journalsService->list(strtoupper($type));
       }
       return response()->json([
         'data' => $journals
