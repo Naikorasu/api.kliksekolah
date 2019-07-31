@@ -165,7 +165,7 @@ class JournalsService extends BaseService {
   }
 
   public function list($type) {
-    if($type == 'NON-KAS' || $type == 'PENYESUAIAN' || $type = 'UMUM') {
+    if($type == 'NON-KAS' || $type == 'PENYESUAIAN' || $type = 'UMUM' || $type = 'PENUTUP') {
       $journals = JournalDetails::whereHas(
         'journal', function($q) use($type) {
           $q->where('journal_type', $type)->orderBy('date','DESC');
@@ -186,7 +186,8 @@ class JournalsService extends BaseService {
           'date' => $journal->journal->date,
           'description' => $journal->description,
           'account' => $accountName,
-          'journal_number' => $journal->journal->journal_number
+          'journal_number' => $journal->journal->journal_number,
+          'journal' => $journal->journal
         ];
       });
     } else {
@@ -270,16 +271,16 @@ class JournalsService extends BaseService {
         $code = 'BB';
         break;
       case 'UMUM':
-        $code = 'BU';
+        $code = 'UM';
         break;
       case 'PEMBAYARAN':
-        $code = 'BP';
+        $code = 'PB';
         break;
       case 'PENYESUAIAN':
-        $code = 'BN';
+        $code = 'PN';
         break;
       default:
-        $code = '';
+        $code = 'NK';
     }
 
     if($isCredit) {
