@@ -175,7 +175,9 @@ class JournalsService extends BaseService {
         $accountName = '';
         if(isset($journal->code_of_account)) {
           $coa = CodeAccount::where('code',$journal->code_of_account)->first();
-          $accountName = $coa->title;
+          if(isset($coa)) {
+            $accountName = $coa->title;
+          }
         }
         return [
           'id' => $journal->journals_id,
