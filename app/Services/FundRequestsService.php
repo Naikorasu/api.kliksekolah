@@ -38,9 +38,21 @@ class FundRequestsService extends BaseService {
   public function list($filters=[]) {
     $conditions = $this->buildFilters($filters);
 
-    $fundRequest = FundRequests::with('fundRequestDetails','fundRequestDetails.budgetDetail','budgetDetail')->where($conditions)->orderBy('created_at', 'DESC')->get();
+    $fundRequests = FundRequests::select('id', 'created_at', 'nomor_permohonan', 'description')->totalAmount()->where($conditions)->orderBy('created_at', 'DESC')->paginate(5);
 
-    return $fundRequest;
+    $data = [];
+    foreach($fundRequests as $fundRequest) {
+      array_push($data, [
+        'id' => $fundRequest->id,
+        'created_at' => $fundRequest->created_at,
+        'nomor_permohonan' => $fundRequest->nomor_permohonan,
+        'budgetDetail' => [
+          'description' => $fundRequest->description,
+          'amount' => $fundRequest->amount
+        ]
+      ]);
+    }
+    return $data;
   }
 
   public function add($budget_detail_unique_id, $details) {
@@ -67,6 +79,7 @@ class FundRequestsService extends BaseService {
     $fundRequest->budget_detail_unique_id = $budget_detail_unique_id;
     $fundRequest->amount = 0;
     $fundRequest->user_id = Auth::user()->id;
+    $fundRequest->description = $details->description;
     $fundRequest->save();
     $fundRequestDetails = [];
 
@@ -107,6 +120,7 @@ class FundRequestsService extends BaseService {
     $fundRequest->budget_detail_unique_id = $budget_detail_unique_id;
     $fundRequest->amount = $amount;
     $fundRequest->user_id = Auth::user()->id;
+    $fundRequest->description = $details->description;
     $fundRequest->save();
     $fundRequestDetails = [];
 

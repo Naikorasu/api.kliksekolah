@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use App\FundRequestDetails;
 
 class FundRequests extends Model
@@ -32,7 +33,13 @@ class FundRequests extends Model
     }
 
     public function scopeOptions($query) {
-        return $query->select(DB::raw('distinct id'));
+      return $query->select(DB::raw('distinct id'));
+    }
+
+    public function scopeTotalAmount($query) {
+      return $query->withCount(['fundRequestDetails as amount' => function($q) {
+        $q->select(DB::raw('SUM(amount) as total_amount'));
+      }]);
     }
 /**
  * [budgetDetail description]
