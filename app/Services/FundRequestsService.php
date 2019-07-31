@@ -43,11 +43,11 @@ class FundRequestsService extends BaseService {
     $fundRequests->getCollection()->transform(function($fundRequest) {
       return [
         'id' => $fundRequest['id'],
-        'created_at' => $fundRequest->created_at,
-        'nomor_permohonan' => $fundRequest->nomor_permohonan,
+        'amount' => $fundRequest->amount,
         'budget_detail' => [
           'description' => $fundRequest->description,
-          'amount' => $fundRequest->amount
+          'nomor_permohonan' => $fundRequest->nomor_permohonan,
+          'created_at' => $fundRequest->created_at
         ]
       ];
     });
