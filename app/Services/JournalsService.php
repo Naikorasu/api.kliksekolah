@@ -164,8 +164,27 @@ class JournalsService extends BaseService {
   }
 
   public function list($type) {
-    $journal = Journals::where('journal_type', $type)->orderBy('date', 'desc')->get();
-    return $journal;
+    if($type = 'NON-KAS') {
+      $journals = JournalDetails::whereHas(
+        'journal', function($q) use($type) {
+          $q->where('journal_type', $type)->orderBy('date','DESC');
+        }
+      )->with('journal')->get();
+      $journals = $journals->sortByDesc('journal.date')->transform(function($journal) {
+        return [
+          'id' => $journal->journals_id,
+          'debit' => $journal->debit,
+          'credit' => $journal->credit,
+          'date' => $journal->journal->date,
+          'description' => $journal->description,
+          'name' => $journal->name,
+          'journal_number' => $journal->journal->journal_number
+        ];
+      });
+    } else {
+      $journals = Journals::where('journal_type', $type)->with('journal_details')->orderBy('date', 'DESC')->get();
+    }
+    return $journals;
   }
 
   public function saveJournalDetail($journal, $fields, $isCredit) {
@@ -185,6 +204,7 @@ class JournalsService extends BaseService {
     $journalDetail = new JournalDetails([
       'code_of_account' => (isset($fields->code_of_account)) ? $fields->code_of_account : null,
       'description' => (isset($fields->description)) ? $fields->description : '',
+      'name' => $fields->name,
       'credit' => $credit,
       'debit' => $debit,
       'journals_id' => $journal->id

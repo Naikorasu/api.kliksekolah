@@ -10,6 +10,7 @@ class JournalDetails extends Model
     protected $fillable =[
       'id',
       'journals_id',
+      'name',
       'code_of_account',
       'description',
       'debit',

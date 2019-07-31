@@ -61,4 +61,8 @@ class ReportService extends BaseService {
       'formatted' => $data
     ];
   }
+
+  public function balance($filters) {
+    $journals = Journals::with('journalDetails')->get();
+  }
 }
