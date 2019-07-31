@@ -40,19 +40,19 @@ class FundRequestsService extends BaseService {
 
     $fundRequests = FundRequests::select('id', 'created_at', 'nomor_permohonan', 'description')->totalAmount()->where($conditions)->orderBy('created_at', 'DESC')->paginate(5);
 
-    $data = [];
-    foreach($fundRequests as $fundRequest) {
-      array_push($data, [
-        'id' => $fundRequest->id,
+    $fundRequests->getCollection()->transform(function($fundRequest) {
+      return [
+        'id' => $fundRequest['id'],
         'created_at' => $fundRequest->created_at,
         'nomor_permohonan' => $fundRequest->nomor_permohonan,
         'budgetDetail' => [
           'description' => $fundRequest->description,
           'amount' => $fundRequest->amount
         ]
-      ]);
-    }
-    return $data;
+      ];
+    });
+
+    return $fundRequests;
   }
 
   public function add($budget_detail_unique_id, $details) {
