@@ -164,7 +164,7 @@ class JournalsService extends BaseService {
   }
 
   public function list($type) {
-    if($type == 'NON-KAS' || $type == 'PENYESUAIAN') {
+    if($type == 'NON-KAS' || $type == 'PENYESUAIAN' || $type = 'UMUM') {
       $journals = JournalDetails::whereHas(
         'journal', function($q) use($type) {
           $q->where('journal_type', $type)->orderBy('date','DESC');
@@ -173,11 +173,11 @@ class JournalsService extends BaseService {
       $journals = $journals->sortByDesc('journal.date')->transform(function($journal) {
         return [
           'id' => $journal->journals_id,
-          'debit' => $journal->debit,
+          'debet' => $journal->debit,
           'credit' => $journal->credit,
           'date' => $journal->journal->date,
           'description' => $journal->description,
-          'name' => $journal->name,
+          'account' => $journal->name,
           'journal_number' => $journal->journal->journal_number
         ];
       });
