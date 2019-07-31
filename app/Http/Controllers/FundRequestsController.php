@@ -18,7 +18,7 @@ class FundRequestsController extends Controller
     }
 
     public function list(Request $request) {
-      $fundRequest = FundRequests::with('budgetDetail.parameter_code')->paginate(5);
+      $fundRequest = $this->fundRequestService->list($request->filters);
 
       return response()->json([
         'data' => $fundRequest

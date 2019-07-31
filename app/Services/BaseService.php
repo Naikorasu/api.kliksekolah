@@ -74,9 +74,15 @@ class BaseService{
   }
 
   protected function updateEntityUnit($model) {
+    $schoolUnitId = 0;
+    if(isset(Auth::user()->schoolUnit)) {
+      $schoolUnitId = Auth::user()->prm_school_units_id;
+    }
+
     $entityUnit = new EntityUnits([
-      'prm_school_units_id' => Auth::user()->prm_school_units_id
+      'prm_school_units_id' => $schoolUnitId
     ]);
+
     $model->school_unit()->save($entityUnit);
   }
 

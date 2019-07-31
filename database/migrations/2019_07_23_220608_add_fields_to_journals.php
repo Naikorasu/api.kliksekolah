@@ -14,8 +14,12 @@ class AddFieldsToJournals extends Migration
     public function up()
     {
         Schema::table('journals', function (Blueprint $table) {
-            $table->string('accepted_by',255)->default('');
-            $table->string('submitted_by', 255)->default('');
+            if(!Schema::hasColumn('journals','accepted_by')) {
+              $table->string('accepted_by',255)->default('');
+            }
+            if(!Schema::hasColumn('journals','submitted_by')) {
+              $table->string('submitted_by', 255)->default('');
+            }
         });
     }
 

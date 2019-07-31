@@ -10,6 +10,7 @@ use Auth;
 use App\FundRequests;
 use App\BudgetDetails;
 use App\Services\BudgetDetailsService;
+use App\EntityUnits;
 
 class FundRequestsService extends BaseService {
 
@@ -37,7 +38,8 @@ class FundRequestsService extends BaseService {
   public function list($filters=[]) {
     $conditions = $this->buildFilters($filters);
 
-    $fundRequest = FundRequests::with('budgetDetail')->where($conditions)->orderBy('created_at', 'DESC')->get();
+    $fundRequest = FundRequests::with('fundRequestDetails','fundRequestDetails.budgetDetail','budgetDetail')->where($conditions)->orderBy('created_at', 'DESC')->get();
+
     return $fundRequest;
   }
 
@@ -46,7 +48,22 @@ class FundRequestsService extends BaseService {
 
     $this->validateAmount($budgetDetail->remains, $budgetDetail->total, 0);
 
+    $unit_code = 0;
+    $schoolUnit = Auth::user()->schoolUnit;
+    $counter = EntityUnits::where('entity_type', 'App\FundRequests');
+
+    if(isset($schoolUnit)) {
+      $unit_code = $schoolUnit->unit_code;
+      $counter->where('prm_school_units', $schoolUnit->id);
+    }
+
     $fundRequest = new FundRequests();
+    $fundRequest->nomor_permohonan =
+      str_pad(date('Y'), 3, '0', STR_PAD_LEFT).'.'.
+      str_pad(date('m'), 2, '0', STR_PAD_LEFT).'.'.
+      str_pad(date('d'), 2, '0', STR_PAD_LEFT).'.'.
+      str_pad($unit_code,3,'0',STR_PAD_LEFT).'.'.
+      str_pad($counter->count()+1,4,'0',STR_PAD_LEFT);
     $fundRequest->budget_detail_unique_id = $budget_detail_unique_id;
     $fundRequest->amount = 0;
     $fundRequest->user_id = Auth::user()->id;
@@ -68,10 +85,11 @@ class FundRequestsService extends BaseService {
         'description' => $details['description']
       ]);
     }
+
     $fundRequest->fundRequestDetails()->createMany($fundRequestDetails);
 
-    //$this->updateEntityUnit($fundRequest);
-    return $fundRequest;
+    $this->updateEntityUnit($fundRequest);
+    return $fundRequest->load('fundRequestDetails','fundRequestDetails.budgetDetail','budgetDetail');
   }
 
   public function edit($id, $budget_detail_unique_id, $details) {
@@ -90,11 +108,27 @@ class FundRequestsService extends BaseService {
     $fundRequest->amount = $amount;
     $fundRequest->user_id = Auth::user()->id;
     $fundRequest->save();
-    $fundRequest->fundRequestDetails()->createMany($details);
+    $fundRequestDetails = [];
 
-    $this->updateEntityUnit($fundRequest);
+    if(is_array($details)) {
+      foreach($details as $detail) {
+        array_push($fundRequestDetails, [
+          'budget_detail_unique_id' => $budgetDetail->id,
+          'amount' => $detail['amount'],
+          'description' => $detail['description']
+        ]);
+      }
+    } else {
+      array_push($fundRequestDetails, [
+        'budget_detail_unique_id' => $budgetDetail->id,
+        'amount' => $details['amount'],
+        'description' => $details['description']
+      ]);
+    }
 
-    return $fundRequest;
+    $fundRequest->fundRequestDetails()->createMany($fundRequestDetails);
+
+    return $fundRequest->load('fundRequestDetails','fundRequestDetails.budgetDetail','budgetDetail');
   }
 
   public function cancel($id) {
