@@ -45,7 +45,7 @@ class FundRequestsService extends BaseService {
         'id' => $fundRequest['id'],
         'created_at' => $fundRequest->created_at,
         'nomor_permohonan' => $fundRequest->nomor_permohonan,
-        'budgetDetail' => [
+        'budget_detail' => [
           'description' => $fundRequest->description,
           'amount' => $fundRequest->amount
         ]
