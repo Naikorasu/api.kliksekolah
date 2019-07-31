@@ -164,7 +164,7 @@ class JournalsService extends BaseService {
   }
 
   public function list($type) {
-    if($type == 'NON-KAS') {
+    if($type == 'NON-KAS' || $type == 'PENYESUAIAN') {
       $journals = JournalDetails::whereHas(
         'journal', function($q) use($type) {
           $q->where('journal_type', $type)->orderBy('date','DESC');
