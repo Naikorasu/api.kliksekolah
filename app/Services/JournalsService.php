@@ -187,7 +187,7 @@ class JournalsService extends BaseService {
           'description' => $journal->description,
           'account' => $accountName,
           'journal_number' => $journal->journal->journal_number,
-          'journal' => $journal->journal
+          'type' => $journal->journal->journal_type
         ];
       });
     } else {
