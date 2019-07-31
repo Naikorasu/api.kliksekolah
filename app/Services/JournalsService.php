@@ -172,13 +172,18 @@ class JournalsService extends BaseService {
         }
       )->with('journal')->get();
       $journals = $journals->sortByDesc('journal.date')->transform(function($journal) {
+        $accountName = '';
+        if(isset($journal->code_of_account)) {
+          $coa = CodeAccount::where('code',$journal->code_of_account)->first();
+          $accountName = $coa->title;
+        }
         return [
           'id' => $journal->journals_id,
           'debet' => $journal->debit,
           'credit' => $journal->credit,
           'date' => $journal->journal->date,
           'description' => $journal->description,
-          'account' => $journal->name,
+          'account' => $accountName,
           'journal_number' => $journal->journal->journal_number
         ];
       });
