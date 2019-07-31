@@ -167,7 +167,7 @@ class JournalsService extends BaseService {
   public function list($type) {
     if($type != 'KAS' && $type != 'BANK') {
       $journals = JournalDetails::join('journals', 'journals.id', '=', 'journal_details.journals_id')
-      ->orderBy('journals.date', 'DESC')->get();
+      ->orderBy('journals.date', 'DESC')->where('journals.journal_type',$type)->paginate(5);
       $journals = $journals->transform(function($journal) {
         $accountName = '';
         if(isset($journal->code_of_account)) {
