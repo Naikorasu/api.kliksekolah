@@ -9,6 +9,7 @@ use App\JournalCashBankDetails;
 use App\JournalPaymentDetails;
 use App\JournalDetails;
 use App\Exceptions\DataNotFoundException;
+use App\CodeAccount;
 use App\JournalDetailAttributes;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -200,11 +201,18 @@ class JournalsService extends BaseService {
       $credit = isset($fields->credit) ? $fields->credit : null;
       $debit = isset($fields->debit) ? $fields->debit : null;
     }
+    $accountName = '';
+    if(isset($fields->code_of_account)) {
+      $coa = CodeAccount::where('code',$fields->code_of_account)->first();
+      if(isset($coa)) {
+        $accountName = $coa->title;
+      }
+    }
 
     $journalDetail = new JournalDetails([
       'code_of_account' => (isset($fields->code_of_account)) ? $fields->code_of_account : null,
       'description' => (isset($fields->description)) ? $fields->description : '',
-      'name' => $fields->name,
+      'name' => $accountName,
       'credit' => $credit,
       'debit' => $debit,
       'journals_id' => $journal->id
