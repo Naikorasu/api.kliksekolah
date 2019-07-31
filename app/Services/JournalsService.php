@@ -190,6 +190,8 @@ class JournalsService extends BaseService {
           'type' => $journal->journal->journal_type
         ];
       });
+      $journals = $journals->sortByDesc('date');
+      $journals = $journals->values()->all();
     } else {
       $journals = Journals::where('journal_type', $type)->with('journalDetails')->orderBy('date', 'DESC')->get();
     }
