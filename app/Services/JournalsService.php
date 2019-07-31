@@ -171,7 +171,7 @@ class JournalsService extends BaseService {
           $q->where('journal_type', $type)->orderBy('date','DESC');
         }
       )->with('journal')->get();
-      $journals = $journals->sortByDesc('journal.date')->transform(function($journal) {
+      $journals = $journals->transform(function($journal) {
         $accountName = '';
         if(isset($journal->code_of_account)) {
           $coa = CodeAccount::where('code',$journal->code_of_account)->first();
