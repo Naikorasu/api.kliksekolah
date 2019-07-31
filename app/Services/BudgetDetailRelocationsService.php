@@ -28,7 +28,17 @@ class BudgetDetailRelocationsService extends BaseService {
 
   public function list($filters=[]) {
     $conditions = $this->buildFilters($filters);
-    return BudgetRelocations::totalPengajuan()->orderBy('created_at','DESC')->where($conditions)->get();
+    $budgetRelocations = BudgetRelocations::totalPengajuan()->orderBy('created_at','DESC')->where($conditions)->get();
+    $data = $budgetRelocations->transform(function($budgetRelocation) {
+      return [
+        'no_pengajuan' => $budgetRelocation->nomor_pengajuan,
+        'created_at' => $budgetRelocation->created_at,
+        'description' => $budgetRelocation->description,
+        'total' => $budgetRelocation->total,
+        'submitted' => $budgetRelocation->submitted
+      ];
+    });
+    return $data;
   }
 
   public function get($id) {
