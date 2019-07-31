@@ -182,7 +182,7 @@ class JournalsService extends BaseService {
         ];
       });
     } else {
-      $journals = Journals::where('journal_type', $type)->with('journal_details')->orderBy('date', 'DESC')->get();
+      $journals = Journals::where('journal_type', $type)->with('journalDetails')->orderBy('date', 'DESC')->get();
     }
     return $journals;
   }
