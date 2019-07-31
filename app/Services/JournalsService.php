@@ -170,7 +170,7 @@ class JournalsService extends BaseService {
         'journal', function($q) use($type) {
           $q->where('journal_type', $type)->orderBy('date','DESC');
         }
-      )->with('journal')->paginate(5);
+      )->with('journal')->get();
       $journals = $journals->transform(function($journal) {
         $accountName = '';
         if(isset($journal->code_of_account)) {
