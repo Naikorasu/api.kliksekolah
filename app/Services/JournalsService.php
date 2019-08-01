@@ -158,19 +158,9 @@ class JournalsService extends BaseService {
           }
         }
       } else if ($type == 'PEMBAYARAN') {
-        $data = $journal->with('journalPaymentDetails')->findOrFail($id);
-        $data = $data->transform(function($item) {
-          return [
-            'details' => $item->journal_details
-          ];
-        });
+        return $journal->with('journalPaymentDetails')->findOrFail($id);
       } else {
-        $data = $journal->findOrFail($id);
-        $data = $data->transform(function($item) {
-          return [
-            'details' => $item->journal_details
-          ];
-        });
+        return $journal->findOrFail($id);
       }
        return $data;
     } catch (ModelNotFoundException $exception) {
