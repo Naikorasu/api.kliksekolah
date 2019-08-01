@@ -114,6 +114,12 @@ class JournalsService extends BaseService {
          ])
        );
 
+       $journal->journalDetails()->save(new JournalDetails([
+          'code_of_account' => $coa,
+          'description' => $data->payment_type,
+          'credit' => $data->nominal
+       ]));
+
     } else {
       foreach($data->details as $index => $detail) {
         $fields = (object) $detail;
