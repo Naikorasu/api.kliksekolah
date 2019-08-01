@@ -159,6 +159,8 @@ class JournalsService extends BaseService {
         }
       } else if ($type == 'PEMBAYARAN') {
         $data = $journal->with('journalPaymentDetails')->findOrFail($id);
+      } else if ($type == 'PENYESUAIAN') {
+        $data = $journal->findOrFail($id);
       }
        return $data;
     } catch (ModelNotFoundException $exception) {
