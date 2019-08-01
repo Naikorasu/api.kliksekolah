@@ -40,7 +40,7 @@ class JournalsController extends Controller
         $journals = $this->journalsService->list(strtoupper($type));
       }
       return response()->json([
-        'data' => $journals
+        $journals
       ]);
     }
 
