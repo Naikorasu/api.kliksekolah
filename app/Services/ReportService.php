@@ -3,7 +3,13 @@
 namespace App\Services;
 
 use Auth;
+use App\CodeCategory;
+use App\CodeAccount;
+use App\CodeClass;
 use App\Journals;
+use Illuminate\Support\Facades\DB;
+
+
 
 class ReportService extends BaseService {
 
@@ -62,7 +68,40 @@ class ReportService extends BaseService {
     ];
   }
 
-  public function balance($filters) {
-    $journals = Journals::with('journalDetails')->get();
+  public function balance() {
+    $categories = CodeCategory::
+    with([
+      'group' => function($q) {
+        $q->orderBy('code');
+      },
+      'group.account' => function($q) {
+        $q->select(DB::raw('`title`, `code`, `group`, (SELECT SUM(credit) - SUM(debit) AS `amount` FROM `journal_details` WHERE `journal_details`.`code_of_account` = `prm_code_account`.`code` GROUP BY `journal_details`.`code_of_account`) as amount'));
+
+      }
+    ])->orderBy('code')->get();
+
+    $totalGlobal = 0;
+    foreach($categories as $category) {
+      $categoryTotal = 0;
+      foreach($category->group as $group) {
+        if(isset($group->account)) {
+          $groupTotal = 0;
+          foreach($group->account as $account) {
+            if(isset($account->amount)) {
+              $groupTotal += $account->amount;
+            }
+          }
+        }
+        $group->total = $groupTotal;
+        $categoryTotal += $groupTotal;
+      }
+      $category->total = $categoryTotal;
+      $totalGlobal += $categoryTotal;
+    }
+
+    return [
+      'total' => $totalGlobal,
+      'code_categories' => $categories,
+    ];
   }
 }

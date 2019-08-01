@@ -137,6 +137,7 @@ Route::group([
     Route::group([
         'prefix' => 'report'
     ], function() {
+      Route::post('balance', 'ReportController@balance');
       Route::post('{type}', 'ReportController@get');
     });
 

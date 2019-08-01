@@ -20,4 +20,12 @@ class ReportController extends Controller
         $data
       );
     }
+
+    public function balance(Request $request) {
+      $data = $this->reportService->balance();
+
+      return response()->json([
+        'data' => $data
+      ]);
+    }
 }
