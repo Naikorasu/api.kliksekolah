@@ -143,7 +143,8 @@ class JournalsService extends BaseService {
                 'nominal' => (isset($detail->credit)) ? $detail->credit : $detail->debit,
                 'tax_type' => null,
                 'tax_value' => null,
-                'parameter_code' => $detail->parameter_code
+                'parameter_code' => $detail->parameter_code,
+                'description' => $detail->description
             ]);
           } else {
             array_push($data->details['standard'], [
@@ -151,7 +152,8 @@ class JournalsService extends BaseService {
                 'nominal' => (isset($detail->credit)) ? $detail->credit : $detail->debit,
                 'tax_type' => $journalCashBankDetails->tax_type,
                 'tax_value' => $journalCashBankDetails->tax_value,
-                'parameter_code' => $detail->parameter_code
+                'parameter_code' => $detail->parameter_code,
+                'description' => $detail->description
             ]);
           }
         }
