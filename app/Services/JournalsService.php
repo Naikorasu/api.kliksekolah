@@ -177,7 +177,6 @@ class JournalsService extends BaseService {
           }
         }
         return [
-          'data' => [
           'id' => $journal->journals_id,
           'debet' => $journal->debit,
           'credit' => $journal->credit,
@@ -186,12 +185,16 @@ class JournalsService extends BaseService {
           'account' => $accountName,
           'journal_number' => $journal->code_of_account,
           'type' => $journal->journal->journal_type
-        ]];
+        ];
       });
+      return [
+        "data" => $journals
+      ];
     } else {
       $journals = Journals::where('journal_type', $type)->with('journalDetails')->orderBy('date', 'DESC')->paginate(5);
+      return $journals;
     }
-    return $journals;
+
   }
 
   public function saveJournalDetail($journal, $fields, $isCredit) {
