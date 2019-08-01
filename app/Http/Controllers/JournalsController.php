@@ -50,4 +50,11 @@ class JournalsController extends Controller
           'data' => $journals
       ]);
     }
+
+    public function preview(Request $request, $type) {
+      $journal = $this->journalsService->preview($request->id, strtoupper($type));
+      return response()->json([
+          'data' => $journal
+      ]);
+    }
 }

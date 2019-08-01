@@ -30,6 +30,18 @@ class Journals extends Model
 
     }
 
+    public function withTotalCredit($query) {
+      return $query->withCount(['journalDetails as total' => function($q) {
+        $q->select(DB::raw('SUM(credit) as total'));
+      }]);
+    }
+
+    public function withTotalDebit($query) {
+      return $query->withCount(['journalDetails as total' => function($q) {
+        $q->select(DB::raw('SUM(debit) as total'));
+      }]);
+    }
+
     public function journalPaymentDetails() {
       return $this->hasOne('App\JournalPaymentDetails');
     }
@@ -37,4 +49,13 @@ class Journals extends Model
     public function journalDetails() {
       return $this->hasMany('App\JournalDetails', 'journals_id', 'id');
     }
+
+    public function school_unit() {
+      return $this->morphMany('App\EntityUnits', 'entity');
+    }
+
+    public function user() {
+      return $this->hasOne('App\User', 'id', 'user_id');
+    }
+
 }

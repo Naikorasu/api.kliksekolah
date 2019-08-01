@@ -8,8 +8,11 @@ use App\Journals;
 use App\JournalCashBankDetails;
 use App\JournalPaymentDetails;
 use App\JournalDetails;
+use App\User;
 use App\Exceptions\DataNotFoundException;
 use App\CodeAccount;
+use App\EntityUnits;
+use App\SchoolUnits;
 use App\JournalDetailAttributes;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -160,6 +163,9 @@ class JournalsService extends BaseService {
       } else if ($type == 'PEMBAYARAN') {
         $journal = $journal->with('journalPaymentDetails')->findOrFail($id);
         $journal->details = $journal->journalDetails;
+        $journal->mmyy = $journal->journalPaymentDetails->mmyy;
+        $journal->payment_type = $journal->journalPaymentDetails->payment_type;
+        $journal->payment_va_code = $journal->journalPaymentDetails->payment_va_code;
         return $journal;
       } else {
         $journal = $journal->findOrFail($id);
@@ -311,5 +317,54 @@ class JournalsService extends BaseService {
     $journal = Journals::findOrFail($id);
     $journal->delete();
     return $journal;
+  }
+
+  public function preview($id, $type) {
+    $journal = Journals::where('journal_type', $type)->with('journalDetails', 'user');
+    if($type == 'KAS' || $type == 'BANK'){
+      $journal = $journal->with('journalDetails.journalCashBankDetails','school_unit.school_unit')->findOrFail($id);
+      $entityUnit = EntityUnits::where('entity_type', 'App\Journals')->find($journal->id);
+      $unit = null;
+      if(isset($entityUnit)) {
+        $unit = SchoolUnits::find($entityUnit->unit_id);
+      }
+
+      $total = 0;
+      $details = [];
+
+      if(isset($journal->journalDetails)) {
+        foreach($journal->journalDetails as $detail) {
+          array_push($details, [
+            'code_of_account' => $detail->code_of_account,
+            'amount' => (isset($detail->credit)) ? $detail->credit : $detail->debit,
+            'parameter_code' => $detail->parameter_code,
+            'description' => $detail->description
+          ]);
+
+          if($detail->credit) {
+            $total = $total + $detail->credit;
+          } else {
+            $total = $total + $detail->debit;
+          }
+        }
+      }
+
+      return [
+        'date' => $journal->date,
+        'journal_type' => $journal->journal_type,
+        'journal_number' => $journal->journal_number,
+        'accepted_by' => $journal->accepted_by,
+        'submitted_by' => $journal->submitted_by,
+        'booked_by' => (isset($journal->user)) ? $journal->user->name : '(                   )',
+        'title' => $journal->description,
+        'total' => $total,
+        'details' => $details,
+        'isCredit' => isset($journal->journalDetails[0]->credit),
+        'unit' => [
+          'name' => (isset($unit)) ? $unit->name : 'PUSAT',
+          'address' => ''
+        ]
+      ];
+    }
   }
 }
