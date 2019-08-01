@@ -159,11 +159,12 @@ class JournalsService extends BaseService {
         }
       } else if ($type == 'PEMBAYARAN') {
         $journal = $journal->with('journalPaymentDetails')->findOrFail($id);
-        $journal->details = $journal->journal_details;
+        $journal->details = $journal->journalDetails;
         return $journal;
       } else {
         $journal = $journal->findOrFail($id);
-        $journal->details = $journal->journal_details;
+        $journal->details = $journal->journalDetails;
+
         return $journal;
       }
        return $data;
