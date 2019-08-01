@@ -163,7 +163,7 @@ class JournalsService extends BaseService {
         return $journal;
       } else {
         $journal = $journal->findOrFail($id);
-        $journal->details = $journal['journal_details'];
+        $journal['details'] = $journal['journal_details'];
         return $journal;
       }
        return $data;
