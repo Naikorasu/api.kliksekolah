@@ -39,9 +39,9 @@ class JournalsController extends Controller
       } else {
         $journals = $this->journalsService->list(strtoupper($type));
       }
-      return response()->json([
+      return response()->json(
         $journals
-      ]);
+      );
     }
 
     public function delete(Request $request, $type) {
