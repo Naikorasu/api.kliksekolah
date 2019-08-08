@@ -28,4 +28,12 @@ class ReportController extends Controller
         'data' => $data
       ]);
     }
+
+    public function profitLoss(Request $request) {
+      $data = $this->reportService->profitLoss();
+
+      return response()->json([
+        'data' => $data
+      ]);
+    }
 }
