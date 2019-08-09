@@ -36,4 +36,16 @@ class ReportController extends Controller
         'data' => $data
       ]);
     }
+
+    public function generalLedger(Request $request) {
+      $request->validate([
+        'code_of_account' => 'required'
+      ]);
+
+      $data = $this->reportService->generalLedger($request->code_of_account, $request->from, $request->to);
+
+      return response()->json([
+        'data' => $data
+      ]);
+    }
 }

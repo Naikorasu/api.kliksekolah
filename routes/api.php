@@ -139,6 +139,7 @@ Route::group([
     ], function() {
       Route::post('balance', 'ReportController@balance');
       Route::post('profit-loss', 'ReportController@profitLoss');
+      Route::post('general-ledger', 'ReportController@generalLedger');
       Route::post('{type}', 'ReportController@get');
     });
 

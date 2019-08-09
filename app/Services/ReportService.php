@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use Auth;
+use App\JournalDetails;
+use App\YoYBalance;
 use App\CodeCategory;
 use App\CodeAccount;
 use App\CodeClass;
@@ -209,4 +211,74 @@ class ReportService extends BaseService {
     ];
   }
 
+  public function generalLedger($code_of_account, $from=null, $to=null) {
+    $data = [];
+
+    $account = CodeAccount::where('code', $code_of_account)->first();
+
+    $yoy_balance = YoYBalance::where([
+      ['year', '=', (isset($from)) ? date('Y', strtotime($from)) : date('Y')-1],
+      ['code_of_account', '=', $code_of_account]
+    ])->first();
+
+    $items = JournalDetails::
+      where('code_of_account',$code_of_account)
+      ->whereHas('journal', function($q) use($from, $to) {
+        if(isset($from)) {
+          $q->where('date', '>=', date(strtotime($from), 'Y'));
+        } else {
+          $q->whereYear('date', '>=', date('Y'));
+        }
+
+        if(isset($to)) {
+          $q->where('date', '<=', $to);
+        }
+      })
+      ->with('journal','parameter_code')->get();
+
+    $starting_balance = isset($yoy_balance) ? $yoy_balance : 0;
+
+    $totals = [
+      'starting' => $starting_balance,
+      'final' => null,
+      'debit' => 0,
+      'credit' => 0
+    ];
+
+    $items->transform(function($item) use($totals) {
+      if(isset($totals['final'])) {
+        $totals['starting'] = $totals['final'];
+      }
+
+      if(isset($item->credit)) {
+        $totals['final'] = $totals['starting'] + $item->credit;
+        $totals['credit'] += $item->credit;
+      }
+
+      if(isset($item->debit)) {
+        $totals['final'] = $totals['starting'] - $item->debit;
+        $totals['debit'] += $item->debit;
+      }
+
+      return [
+        'journal_type' => $item->journal->journal_type,
+        'description' => $item->description,
+        'starting_balance' => $totals['starting'],
+        'final_balance' => $totals['final'],
+        'debit' => $item->debit,
+        'credit' => $item->credit
+      ];
+    });
+
+    return [
+      'account_code' => $account->code,
+      'account_title' => $account->title,
+      'account_type' => $account->type,
+      'starting_balance_total' => $starting_balance,
+      'final_balance_total' => $totals['final'],
+      'debit_total' => $totals['debit'],
+      'credit_total' => $totals['credit'],
+      'items' => $items
+    ];
+  }
 }
