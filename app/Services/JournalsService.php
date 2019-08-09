@@ -72,14 +72,15 @@ class JournalsService extends BaseService {
     if($type == 'KAS' || $type == 'BANK') {
       foreach($data->details['standard'] as $index => $detail) {
         $fields = (object) $detail;
+        dd($fields);
         $journalDetail = $this->saveJournalDetail($journal, $fields, $isCredit);
-        $this->saveJournalCashBankDetails($fields, $journalDetail, $data->type);
+        $this->saveJournalCashBankDetails($fields, $journalDetail, $data->type, 'standard');
       }
 
       foreach($data->details['reconciliation'] as $index => $detail) {
         $fields = (object) $detail;
         $journalDetail = $this->saveJournalDetail($journal, $fields, $isCredit);
-        $this->saveJournalCashBankDetails($data, $journalDetail, $data->type);
+        $this->saveJournalCashBankDetails($data, $journalDetail, $data->type, 'reconciliation');
       }
     } else if($type == 'PEMBAYARAN') {
       $coa = '41301';
@@ -154,7 +155,7 @@ class JournalsService extends BaseService {
             $data->type = $journalCashBankDetails->type;
           }
 
-          if(isset($journalCashBankDetails->unit_id)) {
+          if($journalCashBankDetails->journal_detail_type == 'reconciliation') {
             array_push($data->details['reconciliation'], [
                 'code_of_account' => $detail->code_of_account,
                 'nominal' => (isset($detail->credit)) ? $detail->credit : $detail->debit,
@@ -263,10 +264,11 @@ class JournalsService extends BaseService {
     return $journalDetail;
   }
 
-  public function saveJournalCashBankDetails($data, $journalDetail, $type) {
+  public function saveJournalCashBankDetails($data, $journalDetail, $type, $journal_detail_type) {
     $journalCashBankDetails = new JournalCashBankDetails(
       [
         'unit_id' => isset($data->unit_id) ? $data->unit_id : null,
+        'journal_detail_type' => $journal_detail_type,
         'fund_requests_id' => isset($data->fund_request_id) ? $data->fund_request_id : null,
         'tax_number' => isset($data->tax_number) ? $data->tax_number :null,
         'tax_value' => isset($data->tax_value) ? $data->tax_value : null,
