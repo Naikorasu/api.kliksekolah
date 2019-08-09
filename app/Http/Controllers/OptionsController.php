@@ -45,4 +45,9 @@ class OptionsController extends Controller
       $data = $this->optionsService->getPph($request->filters);
       return $this->returnOption($request, $data);
     }
+
+    public function unit(Request $request) {
+      $data = $this->optionsService->getUnit($request->filters);
+      return $this->returnOption($request, $data);
+    }
 }

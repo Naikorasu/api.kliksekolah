@@ -6,6 +6,7 @@ use Auth;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Exceptions\DataNotFoundException;
 use App\CodeAccount;
+use App\SchoolUnits;
 use App\FundRequests;
 use App\CodeClass;
 
@@ -112,5 +113,25 @@ class OptionsService extends BaseService {
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
+  }
+
+  public function getUnit($filters) {
+    $conditions = $this->buildFilters($filters);
+
+    try {
+      $collection = SchoolUnits::where($conditions)->get();
+
+      $options = [];
+      foreach($collection as $option) {
+        array_push($options, [
+          "id" => $option->id,
+          "title" => $option->title
+        ]);
+      }
+      return $options;
+    } catch (ModelNotFoundException $exception) {
+      throw new DataNotFoundException($exception->getMessage());
+    }
+
   }
 }
