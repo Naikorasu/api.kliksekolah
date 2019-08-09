@@ -72,7 +72,6 @@ class JournalsService extends BaseService {
     if($type == 'KAS' || $type == 'BANK') {
       foreach($data->details['standard'] as $index => $detail) {
         $fields = (object) $detail;
-        dd($fields);
         $journalDetail = $this->saveJournalDetail($journal, $fields, $isCredit);
         $this->saveJournalCashBankDetails($fields, $journalDetail, $data->type, 'standard');
       }
