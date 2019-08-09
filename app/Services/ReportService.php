@@ -69,22 +69,31 @@ class ReportService extends BaseService {
   }
 
   public function balance() {
-    $categories = CodeCategory::
+    $categories = CodeClass::
     select(
       DB::raw('`title`, `code`, `id`, (SELECT SUM(credit) - SUM(debit) AS `amount` FROM `journal_details`
       LEFT JOIN `prm_code_account` on `prm_code_account`.`code` = `journal_details`.`code_of_account`
       LEFT JOIN `prm_code_group` on `prm_code_group`.`code` = `prm_code_account`.`group`
-      WHERE `prm_code_group`.`category` = `prm_code_category`.`code`
-      GROUP BY `prm_code_category`.`code`) as total'))
+      LEFT JOIN `prm_code_category` on `prm_code_category`.`code` = `prm_code_group`.`category`
+      WHERE `prm_code_category`.`class` = `prm_code_class`.`code`
+      GROUP BY `prm_code_class`.`code`) as total'))
     ->with([
-      'group' => function($q) {
+      'category' => function($q) {
+        $q->select(DB::raw('`title`, `code`, `class`, (SELECT SUM(credit) - SUM(debit) AS `amount` FROM `journal_details`
+        LEFT JOIN `prm_code_account` on `prm_code_account`.`code` = `journal_details`.`code_of_account`
+        LEFT JOIN `prm_code_group` on `prm_code_group`.`code` = `prm_code_account`.`group`
+        WHERE `prm_code_group`.`category` = `prm_code_category`.`code`
+        GROUP BY `prm_code_category`.`code`) as total'))
+        ->orderBy('code');
+      },
+      'category.group' => function($q) {
         $q->select(DB::raw('`title`, `code`, `category`, (SELECT SUM(credit) - SUM(debit) AS `amount` FROM `journal_details`
         LEFT JOIN `prm_code_account` on `prm_code_account`.`code` = `journal_details`.`code_of_account`
         WHERE `prm_code_account`.`group` = `prm_code_group`.`code`
         GROUP BY `prm_code_group`.`code`) as total'))
         ->orderBy('code');
       },
-      'group.account' => function($q) {
+      'category.group.account' => function($q) {
         $q->select(DB::raw('`title`, `code`, `group`, (SELECT SUM(credit) - SUM(debit) AS `amount` FROM `journal_details`
         WHERE `journal_details`.`code_of_account` = `prm_code_account`.`code`
         GROUP BY `journal_details`.`code_of_account`) as total'))
