@@ -79,7 +79,7 @@ class JournalsService extends BaseService {
       foreach($data->details['reconciliation'] as $index => $detail) {
         $fields = (object) $detail;
         $journalDetail = $this->saveJournalDetail($journal, $fields, $isCredit);
-        $this->saveJournalCashBankDetails($data, $journalDetail);
+        $this->saveJournalCashBankDetails($data, $journalDetail, $data->type);
       }
     } else if($type == 'PEMBAYARAN') {
       $coa = '41301';
