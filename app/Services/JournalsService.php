@@ -30,7 +30,11 @@ class JournalsService extends BaseService {
         $journal = Journals::with('journalDetails')->where('journal_type',$type);
         if($type == 'KAS' || $type == 'BANK') {
           $journal = $journal->with('journalDetails.journalCashBankDetails')->findOrFail($data->id);
-          $journal->journalDetails()->journalCashBankDetails()->forceDelete();
+
+          foreach($journal->journalDetails as $journalDetail) {
+            $journalDetail->journalCashBankDetails()->forceDelete();
+          }
+
           $isCredit = $data->type == 'KAS_MASUK';
 
         } else if ($type == 'PEMBAYARAN') {
