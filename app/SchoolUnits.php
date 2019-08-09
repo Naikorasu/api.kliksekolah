@@ -14,6 +14,9 @@ class SchoolUnits extends Model
       'unit_code'
     ];
 
+    public function jouurnalCashBankDetails() {
+      return $this->belongsTo('App\JournalCashBankDetails', 'unit_id', 'id');
+    }
     public function user() {
       return $this->belongsTo('App\User', 'prm_school_units_id', 'id');
     }

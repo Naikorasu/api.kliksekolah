@@ -12,7 +12,10 @@ class JournalCashBankDetails extends Model
       'fund_requests_id',
       'journal_detail_type',
       'tax_type',
-      'tax_value'
+      'tax_value',
+      'type',
+      'npwp',
+      'name'
     ];
 
     public function journalDetail() {
@@ -20,7 +23,7 @@ class JournalCashBankDetails extends Model
     }
 
     public function schoolUnit() {
-      return $this->hasOne('App\SchoolUnits','unit_id','id');
+      return $this->hasOne('App\SchoolUnits','id','unit_id');
     }
 
     public function fundRequest() {

@@ -578,6 +578,7 @@ class ComposerStaticInit70f86058477796cc8791554fb9c01655
         'App\\UserGroups' => __DIR__ . '/../..' . '/app/UserGroups.php',
         'App\\UserRoles' => __DIR__ . '/../..' . '/app/UserRoles.php',
         'App\\Workflows' => __DIR__ . '/../..' . '/app/Workflows.php',
+        'App\\YoYBalance' => __DIR__ . '/../..' . '/app/YoYBalance.php',
         'BeyondCode\\DumpServer\\DumpServerCommand' => __DIR__ . '/..' . '/beyondcode/laravel-dump-server/src/DumpServerCommand.php',
         'BeyondCode\\DumpServer\\DumpServerServiceProvider' => __DIR__ . '/..' . '/beyondcode/laravel-dump-server/src/DumpServerServiceProvider.php',
         'BeyondCode\\DumpServer\\Dumper' => __DIR__ . '/..' . '/beyondcode/laravel-dump-server/src/Dumper.php',

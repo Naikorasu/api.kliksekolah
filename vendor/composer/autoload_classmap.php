@@ -104,6 +104,7 @@ return array(
     'App\\UserGroups' => $baseDir . '/app/UserGroups.php',
     'App\\UserRoles' => $baseDir . '/app/UserRoles.php',
     'App\\Workflows' => $baseDir . '/app/Workflows.php',
+    'App\\YoYBalance' => $baseDir . '/app/YoYBalance.php',
     'BeyondCode\\DumpServer\\DumpServerCommand' => $vendorDir . '/beyondcode/laravel-dump-server/src/DumpServerCommand.php',
     'BeyondCode\\DumpServer\\DumpServerServiceProvider' => $vendorDir . '/beyondcode/laravel-dump-server/src/DumpServerServiceProvider.php',
     'BeyondCode\\DumpServer\\Dumper' => $vendorDir . '/beyondcode/laravel-dump-server/src/Dumper.php',

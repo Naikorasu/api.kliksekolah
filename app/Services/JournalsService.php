@@ -69,7 +69,7 @@ class JournalsService extends BaseService {
       foreach($data->details['standard'] as $index => $detail) {
         $fields = (object) $detail;
         $journalDetail = $this->saveJournalDetail($journal, $fields, $isCredit);
-        $this->saveJournalCashBankDetails($data, $journalDetail);
+        $this->saveJournalCashBankDetails($fields, $journalDetail, $data->type);
       }
 
       foreach($data->details['reconciliation'] as $index => $detail) {
@@ -135,23 +135,28 @@ class JournalsService extends BaseService {
     $data = [];
     try {
       if($type == 'KAS' || $type == 'BANK') {
-        $data = $journal->with('journalDetails.journalCashBankDetails')->findOrFail($id)->toJson();
+        $data = $journal->with('journalDetails.journalCashBankDetails', 'journalDetails.journalCashBankDetails.schoolUnit')->findOrFail($id)->toJson();
         $data = json_decode($data);
         $data->details = [
           'standard' => [],
           'reconciliation' => []
         ];
+
         $data->type = 'KAS_MASUK';
 
         foreach($data->journal_details as $index => $detail) {
           $journalCashBankDetails = $detail->journal_cash_bank_details;
-          $data->type = (isset($detail->debit)) ? 'KAS_KELUAR' : 'KAS_MASUK';
+          if(isset($journalCashBankDetails->type)) {
+            $data->type = $journalCashBankDetails->type;
+          }
+
           if(isset($journalCashBankDetails->unit_id)) {
             array_push($data->details['reconciliation'], [
                 'code_of_account' => $detail->code_of_account,
                 'nominal' => (isset($detail->credit)) ? $detail->credit : $detail->debit,
                 'tax_type' => null,
                 'tax_value' => null,
+                'unit_id' => $journalCashBankDetails->unit_id,
                 'parameter_code' => $detail->parameter_code,
                 'description' => $detail->description
             ]);
@@ -161,6 +166,8 @@ class JournalsService extends BaseService {
                 'nominal' => (isset($detail->credit)) ? $detail->credit : $detail->debit,
                 'tax_type' => $journalCashBankDetails->tax_type,
                 'tax_value' => $journalCashBankDetails->tax_value,
+                'npwp' => $journalCashBankDetails->npwp,
+                'name' => $journalCashBankDetails->name,
                 'parameter_code' => $detail->parameter_code,
                 'description' => $detail->description
             ]);
@@ -252,12 +259,16 @@ class JournalsService extends BaseService {
     return $journalDetail;
   }
 
-  public function saveJournalCashBankDetails($data, $journalDetail) {
+  public function saveJournalCashBankDetails($data, $journalDetail, $type) {
     $journalCashBankDetails = new JournalCashBankDetails(
-      ['unit_id' => $data->unit_id,
-      'fund_requests_id' => $data->fund_requests_id,
-      'tax_number' => $data->tax_number,
-      'tax_value' => $data->tax_value]
+      [
+        'unit_id' => isset($data->unit_id) ? $data->unit_id : null,
+        'fund_requests_id' => isset($data->fund_request_id) ? $data->fund_request_id : null,
+        'tax_number' => isset($data->tax_number) ? $data->tax_number :null,
+        'tax_value' => isset($data->tax_value) ? $data->tax_value : null,
+        'npwp' => isset($data->npwp) ? $data->npwp : null,
+        'type' => $type
+      ]
     );
     $journalDetail->journalCashBankDetails()->save($journalCashBankDetails);
   }
