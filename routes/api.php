@@ -53,6 +53,7 @@ Route::group([
       Route::post('periode/{type?}','OptionsController@periode');
       Route::post('fund-request','OptionsController@fundRequest');
       Route::post('budget','OptionsController@budget');
+      Route::post('pph', 'OptionsController@pph');
 
 
     });

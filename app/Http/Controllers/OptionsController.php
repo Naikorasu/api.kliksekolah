@@ -40,4 +40,9 @@ class OptionsController extends Controller
       $data = $this->optionsService->getBudgets($request->filters, $request->keyword);
       return $this->returnOption($request, $data);
     }
+
+    public function pph(Request $request) {
+      $data = $this->optionsService->getPph($request->filters);
+      return $this->returnOption($request, $data);
+    }
 }

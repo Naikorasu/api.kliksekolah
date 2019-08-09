@@ -5,6 +5,7 @@ namespace App\Services;
 use Auth;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Exceptions\DataNotFoundException;
+use App\CodeAccount;
 use App\FundRequests;
 use App\CodeClass;
 
@@ -85,6 +86,26 @@ class OptionsService extends BaseService {
         array_push($options, [
           "id" => $option->id,
           "title" => $option->desc
+        ]);
+      }
+      return $options;
+    } catch (ModelNotFoundException $exception) {
+      throw new DataNotFoundException($exception->getMessage());
+    }
+  }
+
+  public function getPph($filters) {
+    $conditions = $this->buildFilters($filters);
+
+    try {
+      $collection = CodeAccount::where('title', 'like', 'PPH%')
+      ->where($conditions)->get();
+
+      $options = [];
+      foreach($collection as $option) {
+        array_push($options, [
+          "id" => $option->id,
+          "title" => $option->title
         ]);
       }
       return $options;
