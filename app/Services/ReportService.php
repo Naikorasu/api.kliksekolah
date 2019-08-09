@@ -245,30 +245,41 @@ class ReportService extends BaseService {
       'credit' => 0
     ];
 
-    $items->transform(function($item) use($totals) {
+    $rows = [];
+
+    foreach($items as $item) {
       if(isset($totals['final'])) {
         $totals['starting'] = $totals['final'];
       }
 
       if(isset($item->credit)) {
-        $totals['final'] = $totals['starting'] + $item->credit;
-        $totals['credit'] += $item->credit;
+        if(isset($totals['final'])) {
+          $totals['final'] = $totals['final'] + floatval($item->credit);
+        } else {
+          $totals['final'] = $totals['starting'] + floatval($item->credit);
+        }
+        $totals['credit'] += floatval($item->credit);
       }
 
       if(isset($item->debit)) {
-        $totals['final'] = $totals['starting'] - $item->debit;
-        $totals['debit'] += $item->debit;
+        if(isset($totals['final'])) {
+          $totals['final'] = $totals['final'] - floatval($item->debit);
+        } else {
+          $totals['final'] = $totals['starting'] - floatval($item->debit);
+        }
+
+        $totals['debit'] += floatval($item->debit);
       }
 
-      return [
+      array_push($rows, [
         'journal_type' => $item->journal->journal_type,
         'description' => $item->description,
         'starting_balance' => $totals['starting'],
         'final_balance' => $totals['final'],
         'debit' => $item->debit,
         'credit' => $item->credit
-      ];
-    });
+      ]);
+    };
 
     return [
       'account_code' => $account->code,
@@ -278,7 +289,7 @@ class ReportService extends BaseService {
       'final_balance_total' => $totals['final'],
       'debit_total' => $totals['debit'],
       'credit_total' => $totals['credit'],
-      'items' => $items
+      'items' => $rows
     ];
   }
 }
