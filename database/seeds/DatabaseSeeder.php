@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
         // $this->call(UsersTableSeeder::class);
 
         $this->call([
-            BudgetsTableSeeder::class,
+            //BudgetsTableSeeder::class,
             ParameterTableSeeder::class,
             PrmSchoolUnitsTableSeeder::class,
             UserRolesTableSeeder::class

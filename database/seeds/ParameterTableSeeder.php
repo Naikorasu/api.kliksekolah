@@ -391,7 +391,7 @@ class ParameterTableSeeder extends Seeder
 
         DB::table('prm_code_group')->insert([
             'category' => "41000",
-            'code' => "41100",
+            'code' => "41800",
             'title' => "PENDAPATAN KOMITE SEKOLAH",
         ]);
 
