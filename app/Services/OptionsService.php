@@ -18,9 +18,8 @@ class OptionsService extends BaseService {
   //add code of account for budgetrequest, budget approval
   //Realisasi harus tarik dari budget detail yang sudah ada budget Request
 
-  public function getCodeOfAccounts($filters, $withRealization = false) {
+  public function getCodeOfAccounts($filters, $withRealization = false, $code=null) {
     $conditions = $this->buildFilters($filters);
-
     try {
       if($withRealization == true) {
         $collection = CodeClass::options()->whereHas(
@@ -31,6 +30,14 @@ class OptionsService extends BaseService {
           });
       } else {
         $collection = CodeClass::options();
+      }
+
+      if(isset($code)) {
+        $collection->whereHas(
+          'category.group.account', function($q) use($code) {
+            $q->where('code', 'like', $code.'%');
+          }
+        );
       }
       return $collection->where($conditions)->get();
 

@@ -20,13 +20,17 @@ class CodeAccountingController extends Controller
             'code' => '',
         ]);
 
+        $code = $request->code;
+
         //$data_category = CodeCategory::with('group')->get();
         //$data_group = CodeGroup::with('account')->get();
 
-        if ($request->code == '') {
+        if ($code == '') {
             $data_class = CodeClass::with('category')->get();
         } else {
-            $data_class = CodeClass::where('code', $request->code)->with('category')->get();
+            $data_class = CodeClass::whereHas('category.group.account', function($q) use($code) {
+                $q->where('code','like', $code.'%');
+            })->with('category')->get();
         }
 
         foreach ($data_class as $classes => $class) {

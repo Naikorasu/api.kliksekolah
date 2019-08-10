@@ -282,9 +282,9 @@ class ReportService extends BaseService {
     };
 
     return [
-      'account_code' => $account->code,
-      'account_title' => $account->title,
-      'account_type' => $account->type,
+      'account_code' => $account['code'],
+      'account_title' => $account['title'],
+      'account_type' => $account['type'],
       'starting_balance_total' => $starting_balance,
       'final_balance_total' => $totals['final'],
       'debit_total' => $totals['debit'],
