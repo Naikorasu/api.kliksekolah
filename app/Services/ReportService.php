@@ -118,33 +118,41 @@ class ReportService extends BaseService {
   }
 
   public function profitLoss($from = null, $to = null) {
+    $dateFrom = '`journals`.`date` >= "' .  (isset($from) ?  $from : date('Y').'-01-01' ) . '"';
+    $dateTo = '`journals`.`date` <= "' .  (isset($to) ?  $to : date('Y-m-d')) . '"';
+
     $incomes = CodeClass::where('code', '40000')
     ->select(
       DB::raw('`title`, `code`, `id`, (SELECT SUM(credit) - SUM(debit) AS `amount` FROM `journal_details`
       LEFT JOIN `prm_code_account` on `prm_code_account`.`code` = `journal_details`.`code_of_account`
       LEFT JOIN `prm_code_group` on `prm_code_group`.`code` = `prm_code_account`.`group`
       LEFT JOIN `prm_code_category` on `prm_code_category`.`code` = `prm_code_group`.`category`
-      WHERE `prm_code_category`.`class` = `prm_code_class`.`code`
+      WHERE `prm_code_category`.`class` = `prm_code_class`.`code` AND
+      `journal_details`.`journals_id` IN (SELECT id FROM `journals` WHERE '. $dateFrom . ' AND ' . $dateTo. ')
       GROUP BY `prm_code_class`.`code`) as total'))
     ->with([
-      'category' => function($q) {
+      'category' => function($q) use($dateFrom, $dateTo) {
         $q->select(DB::raw('`title`, `code`, `class`, (SELECT SUM(credit) - SUM(debit) AS `amount` FROM `journal_details`
         LEFT JOIN `prm_code_account` on `prm_code_account`.`code` = `journal_details`.`code_of_account`
         LEFT JOIN `prm_code_group` on `prm_code_group`.`code` = `prm_code_account`.`group`
-        WHERE `prm_code_group`.`category` = `prm_code_category`.`code`
+        WHERE `prm_code_group`.`category` = `prm_code_category`.`code` AND
+        `journal_details`.`journals_id` IN (SELECT id FROM `journals` WHERE '. $dateFrom . ' AND ' . $dateTo. ')
         GROUP BY `prm_code_category`.`code`) as total'))
         ->orderBy('code');
       },
-      'category.group' => function($q) {
+      'category.group' => function($q) use($dateFrom, $dateTo) {
         $q->select(DB::raw('`title`, `code`, `category`, (SELECT SUM(credit) - SUM(debit) AS `amount` FROM `journal_details`
         LEFT JOIN `prm_code_account` on `prm_code_account`.`code` = `journal_details`.`code_of_account`
-        WHERE `prm_code_account`.`group` = `prm_code_group`.`code`
+        WHERE `prm_code_account`.`group` = `prm_code_group`.`code` AND
+        `journal_details`.`journals_id` IN (SELECT id FROM `journals` WHERE '. $dateFrom . ' AND ' . $dateTo. ')
         GROUP BY `prm_code_group`.`code`) as total'))
         ->orderBy('code');
       },
-      'category.group.account' => function($q) {
+      'category.group.account' => function($q) use($dateFrom, $dateTo) {
+
         $q->select(DB::raw('`title`, `code`, `group`, (SELECT SUM(credit) - SUM(debit) AS `amount` FROM `journal_details`
-        WHERE `journal_details`.`code_of_account` = `prm_code_account`.`code`
+        WHERE `journal_details`.`code_of_account` = `prm_code_account`.`code` AND
+        `journal_details`.`journals_id` IN (SELECT id FROM `journals` WHERE '. $dateFrom . ' AND ' . $dateTo. ')
         GROUP BY `journal_details`.`code_of_account`) as total'))
         ->orderBy('code');
       }
@@ -158,27 +166,31 @@ class ReportService extends BaseService {
       LEFT JOIN `prm_code_account` on `prm_code_account`.`code` = `journal_details`.`code_of_account`
       LEFT JOIN `prm_code_group` on `prm_code_group`.`code` = `prm_code_account`.`group`
       LEFT JOIN `prm_code_category` on `prm_code_category`.`code` = `prm_code_group`.`category`
-      WHERE `prm_code_category`.`class` = `prm_code_class`.`code`
+      WHERE `prm_code_category`.`class` = `prm_code_class`.`code` AND
+      `journal_details`.`journals_id` IN (SELECT id FROM `journals` WHERE '. $dateFrom . ' AND ' . $dateTo. ')
       GROUP BY `prm_code_class`.`code`) as total'))
     ->with([
-      'category' => function($q) {
+      'category' => function($q) use($dateFrom, $dateTo) {
         $q->select(DB::raw('`title`, `code`, `class`, (SELECT SUM(credit) - SUM(debit) AS `amount` FROM `journal_details`
         LEFT JOIN `prm_code_account` on `prm_code_account`.`code` = `journal_details`.`code_of_account`
         LEFT JOIN `prm_code_group` on `prm_code_group`.`code` = `prm_code_account`.`group`
-        WHERE `prm_code_group`.`category` = `prm_code_category`.`code`
+        WHERE `prm_code_group`.`category` = `prm_code_category`.`code` AND
+        `journal_details`.`journals_id` IN (SELECT id FROM `journals` WHERE '. $dateFrom . ' AND ' . $dateTo. ')
         GROUP BY `prm_code_category`.`code`) as total'))
         ->orderBy('code');
       },
-      'category.group' => function($q) {
+      'category.group' => function($q) use($dateFrom, $dateTo) {
         $q->select(DB::raw('`title`, `code`, `category`, (SELECT SUM(credit) - SUM(debit) AS `amount` FROM `journal_details`
         LEFT JOIN `prm_code_account` on `prm_code_account`.`code` = `journal_details`.`code_of_account`
-        WHERE `prm_code_account`.`group` = `prm_code_group`.`code`
+        WHERE `prm_code_account`.`group` = `prm_code_group`.`code` AND
+        `journal_details`.`journals_id` IN (SELECT id FROM `journals` WHERE '. $dateFrom . ' AND ' . $dateTo. ')
         GROUP BY `prm_code_group`.`code`) as total'))
         ->orderBy('code');
       },
-      'category.group.account' => function($q) {
+      'category.group.account' => function($q) use($dateFrom, $dateTo) {
         $q->select(DB::raw('`title`, `code`, `group`, (SELECT SUM(credit) - SUM(debit) AS `amount` FROM `journal_details`
-        WHERE `journal_details`.`code_of_account` = `prm_code_account`.`code`
+        WHERE `journal_details`.`code_of_account` = `prm_code_account`.`code` AND
+        `journal_details`.`journal_id` IN (SELECT id FROM `journals` WHERE '. $dateFrom . ' AND ' . $dateTo. ')
         GROUP BY `journal_details`.`code_of_account`) as total'))
         ->orderBy('code');
       }

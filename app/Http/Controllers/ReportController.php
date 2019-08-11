@@ -30,7 +30,7 @@ class ReportController extends Controller
     }
 
     public function profitLoss(Request $request) {
-      $data = $this->reportService->profitLoss();
+      $data = $this->reportService->profitLoss($request->from, $request->to);
 
       return response()->json([
         'data' => $data
