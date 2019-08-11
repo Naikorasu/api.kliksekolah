@@ -190,7 +190,7 @@ class ReportService extends BaseService {
       'category.group.account' => function($q) use($dateFrom, $dateTo) {
         $q->select(DB::raw('`title`, `code`, `group`, (SELECT SUM(credit) - SUM(debit) AS `amount` FROM `journal_details`
         WHERE `journal_details`.`code_of_account` = `prm_code_account`.`code` AND
-        `journal_details`.`journal_id` IN (SELECT id FROM `journals` WHERE '. $dateFrom . ' AND ' . $dateTo. ')
+        `journal_details`.`journals_id` IN (SELECT id FROM `journals` WHERE '. $dateFrom . ' AND ' . $dateTo. ')
         GROUP BY `journal_details`.`code_of_account`) as total'))
         ->orderBy('code');
       }
