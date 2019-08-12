@@ -25,12 +25,16 @@ class CodeAccountingController extends Controller
         //$data_category = CodeCategory::with('group')->get();
         //$data_group = CodeGroup::with('account')->get();
 
-        if ($code == '') {
+        if ($code == '' || !isset($code)) {
             $data_class = CodeClass::with('category')->get();
         } else {
             $data_class = CodeClass::whereHas('category.group.account', function($q) use($code) {
                 $q->where('code','like', $code.'%');
             })->with('category')->get();
+            
+            if($data_class->isEmpty()) {
+              $data_class = CodeClass::with('category')->get();
+            }
         }
 
         foreach ($data_class as $classes => $class) {
