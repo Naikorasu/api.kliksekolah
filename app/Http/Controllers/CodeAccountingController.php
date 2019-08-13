@@ -16,26 +16,27 @@ class CodeAccountingController extends Controller
         $user = $request->user();
         $user_email = $user->email;
 
-        $request->validate([
-            'code' => '',
-        ]);
-
         $code = $request->code;
 
         //$data_category = CodeCategory::with('group')->get();
         //$data_group = CodeGroup::with('account')->get();
 
-        if ($code == '' || !isset($code)) {
-            $data_class = CodeClass::with('category')->get();
-        } else {
-            $data_class = CodeClass::whereHas('category.group.account', function($q) use($code) {
-                $q->where('code','like', $code.'%');
-            })->with('category')->get();
-            
-            if($data_class->isEmpty()) {
-              $data_class = CodeClass::with('category')->get();
-            }
+        $data_class = CodeClass::with('category', 'category.group', 'category.group.account');
+        if (isset($code)) {
+            $data_class = $data_class
+            ->where('code', 'like', $code.'%')
+            ->orWhereHas('category.group.account', function($q) use($code) {
+              $q->where('code','like', $code.'%');
+            })
+            ->orWhereHas('category.group', function($q) use($code) {
+              $q->where('code','like', $code.'%');
+            })
+            ->orWhereHas('category', function($q) use($code) {
+              $q->where('code','like', $code.'%');
+            });
         }
+
+        $data_class = $data_class->get();
 
         foreach ($data_class as $classes => $class) {
 

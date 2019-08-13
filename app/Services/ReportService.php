@@ -18,7 +18,7 @@ class ReportService extends BaseService {
   public function get($type, $from=null,$to=null){
     $data = [];
     $balance = 0;
-    $journals = Journals::with('journalDetails');
+    $journals = Journals::with('journalDetails')->orderBy('date','DESC');
 
     if(isset($from)) {
       if(!isset($to)) {
