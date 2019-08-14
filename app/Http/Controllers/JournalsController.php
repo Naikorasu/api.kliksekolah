@@ -58,8 +58,8 @@ class JournalsController extends Controller
       ]);
     }
 
-    public function post($request $request, $type) {
-      $journal = $this->journalsService->post($request->id);
+    public function postJournal(Request $request) {
+      $journal = $this->journalsService->postJournal($request->id);
       return response->json([
         'data'=>$journal
       ]);

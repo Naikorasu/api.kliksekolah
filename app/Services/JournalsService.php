@@ -391,7 +391,7 @@ class JournalsService extends BaseService {
     }
   }
 
-  public function post($id) {
+  public function postJournal($id) {
     $journal = Journals::find($id);
     $journal->is_posted = true;
     $journal->save();

@@ -134,6 +134,7 @@ Route::group([
       Route::post('{journalType}/delete', 'JournalsController@save');
       Route::post('{journalType}/list', 'JournalsController@list');
       Route::post('{journalType}/preview', 'JournalsController@preview');
+      Route::post('{journalType}/post', 'JournalsController@postJournal');
     });
 
     Route::group([
