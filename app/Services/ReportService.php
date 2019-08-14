@@ -245,6 +245,8 @@ class ReportService extends BaseService {
         if(isset($to)) {
           $q->where('date', '<=', $to);
         }
+
+        $q->where('is_posted', true);
       })
       ->with('journal','parameter_code')->get();
 

@@ -12,6 +12,7 @@ class Journals extends Model
       'journal_number',
       'accepted_by',
       'submitted_by',
+      'is_posted',
       'user_id'
     ];
 

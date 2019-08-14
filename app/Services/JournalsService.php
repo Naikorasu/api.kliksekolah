@@ -296,11 +296,12 @@ class JournalsService extends BaseService {
     if(isset($unit)) {
       $unitCode = $unit;
     }
-    $d = date_parse_from_format("Y-m-d", $date);
+    $d = date_parse_from_format("y-m-d", $date);
     $month = $d['month'];
     $year = $d['year'];
     $counter = str_pad(strval(Journals::counter($type, $isCredit,$month, $year) + 1), 3,'0',STR_PAD_LEFT);
     $code = '';
+
     switch($type) {
       case 'KAS':
         $code = 'BK';
@@ -331,7 +332,7 @@ class JournalsService extends BaseService {
       $unit = '000';
     }
 
-    $journalNumber = $code.str_pad($year, 3, '0', STR_PAD_LEFT).$counter.$unitCode;
+    $journalNumber = $code.str_pad($year, 2, '0', STR_PAD_LEFT).$counter.$unitCode;
     return $journalNumber;
   }
 
@@ -388,5 +389,12 @@ class JournalsService extends BaseService {
         ]
       ];
     }
+  }
+
+  public function post($id) {
+    $journal = Journals::find($id);
+    $journal->is_posted = true;
+    $journal->save();
+    return $journal;
   }
 }

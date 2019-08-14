@@ -33,11 +33,78 @@ class OptionsService extends BaseService {
       }
 
       if(isset($code)) {
-        $collection->whereHas(
-          'category.group.account', function($q) use($code) {
-            $q->where('code', 'like', $code.'%');
-          }
+        $collection->with(
+          ['category' => function($q) use($code) {
+            if(is_array($code)) {
+              foreach($code as $idx => $item) {
+                $q->orWhere('code', 'like', $item.'%');
+              }
+            } else {
+              $q->where('code', 'like', $code.'%');
+            }
+          }],
+          ['category.group' => function($q) use($code) {
+            if(is_array($code)) {
+              foreach($code as $idx => $item) {
+                $q->orWhere('code', 'like', $item.'%');
+              }
+            } else {
+              $q->where('code', 'like', $code.'%');
+            }
+          }],
+          ['category.group.account' => function($q) use($code) {
+            if(is_array($code)) {
+              foreach($code as $idx => $item) {
+                $q->orWhere('code', 'like', $item.'%');
+              }
+            } else {
+              $q->where('code', 'like', $code.'%');
+            }
+          }]
         );
+        // $collection->whereHas(
+        //   'category.group.account', function($q) use($code) {
+        //     if(is_array($code)) {
+        //       foreach($code as $idx => $item) {
+        //         $q->orWhere('code', 'like', $item.'%');
+        //       }
+        //     } else {
+        //       $q->where('code', 'like', $code.'%');
+        //     }
+        //   }
+        // )->orWhereHas(
+        //   'category.group', function($q) use($code) {
+        //     if(is_array($code)) {
+        //       foreach($code as $idx => $item) {
+        //         $q->orWhere('code', 'like', $item.'%');
+        //       }
+        //     } else {
+        //       $q->where('code', 'like', $code.'%');
+        //     }
+        //   }
+        // )->orWhereHas(
+        //   'category', function($q) use($code) {
+        //     if(is_array($code)) {
+        //       foreach($code as $idx => $item) {
+        //         $q->orWhere('code', 'like', $item.'%');
+        //       }
+        //     } else {
+        //       $q->where('code', 'like', $code.'%');
+        //     }
+        //   }
+        // );
+
+        if(is_array($code)) {
+          foreach($code as $idx => $item) {
+            $collection->orWhere(
+              'code', 'like', $item.'%'
+            );
+          }
+        } else {
+          $collection->orWhere(
+            'code', 'like', $code.'%'
+          );
+        }
       }
       return $collection->where($conditions)->get();
 
