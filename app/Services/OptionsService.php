@@ -35,22 +35,13 @@ class OptionsService extends BaseService {
       $collection->with(
         ['category' => function($q) use($categories) {
           if(isset($categories)) {
-            if(is_array($categories)) {
-              $q->whereIn('code', $categories);
-            } else {
-              $q->where('code', 'like', $categories.'%');
-            }
+            $q->whereIn('code', $categories);
           }
         }],
         ['category.group' => function($q) use($groups) {
           if(isset($groups)) {
-            if(is_array($groups)) {
-              $q->whereIn('code', $groups);
-            } else {
-              $q->where('code', 'like', $groups.'%');
-            }
+            $q->whereIn('code', $groups);
           }
-          dd($groups, $q->toSql());
         }],
         ['category.group.account' => function($q) use($codes) {
           if(isset($codes)) {
