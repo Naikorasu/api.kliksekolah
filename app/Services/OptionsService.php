@@ -18,7 +18,7 @@ class OptionsService extends BaseService {
   //add code of account for budgetrequest, budget approval
   //Realisasi harus tarik dari budget detail yang sudah ada budget Request
 
-  public function getCodeOfAccounts($filters, $withRealization = false, $code=null) {
+  public function getCodeOfAccounts($filters, $withRealization = false, $codes = null, $categories = null, $groups = null, $classes = null) {
     $conditions = $this->buildFilters($filters);
     try {
       if($withRealization == true) {
@@ -32,82 +32,46 @@ class OptionsService extends BaseService {
         $collection = CodeClass::options();
       }
 
-      if(isset($code)) {
-        $collection->with(
-          ['category' => function($q) use($code) {
-            if(is_array($code)) {
-              foreach($code as $idx => $item) {
-                $q->orWhere('code', 'like', $item.'%');
-              }
+      $collection->with(
+        ['category' => function($q) use($categories) {
+          if(isset($categories)) {
+            if(is_array($categories)) {
+              $q->whereIn('code', $categories);
             } else {
-              $q->where('code', 'like', $code.'%');
+              $q->where('code', 'like', $categories.'%');
             }
-          }],
-          ['category.group' => function($q) use($code) {
-            if(is_array($code)) {
-              foreach($code as $idx => $item) {
-                $q->orWhere('code', 'like', $item.'%');
-              }
-            } else {
-              $q->where('code', 'like', $code.'%');
-            }
-          }],
-          ['category.group.account' => function($q) use($code) {
-            if(is_array($code)) {
-              foreach($code as $idx => $item) {
-                $q->orWhere('code', 'like', $item.'%');
-              }
-            } else {
-              $q->where('code', 'like', $code.'%');
-            }
-          }]
-        );
-        // $collection->whereHas(
-        //   'category.group.account', function($q) use($code) {
-        //     if(is_array($code)) {
-        //       foreach($code as $idx => $item) {
-        //         $q->orWhere('code', 'like', $item.'%');
-        //       }
-        //     } else {
-        //       $q->where('code', 'like', $code.'%');
-        //     }
-        //   }
-        // )->orWhereHas(
-        //   'category.group', function($q) use($code) {
-        //     if(is_array($code)) {
-        //       foreach($code as $idx => $item) {
-        //         $q->orWhere('code', 'like', $item.'%');
-        //       }
-        //     } else {
-        //       $q->where('code', 'like', $code.'%');
-        //     }
-        //   }
-        // )->orWhereHas(
-        //   'category', function($q) use($code) {
-        //     if(is_array($code)) {
-        //       foreach($code as $idx => $item) {
-        //         $q->orWhere('code', 'like', $item.'%');
-        //       }
-        //     } else {
-        //       $q->where('code', 'like', $code.'%');
-        //     }
-        //   }
-        // );
-
-        if(is_array($code)) {
-          foreach($code as $idx => $item) {
-            $collection->orWhere(
-              'code', 'like', $item.'%'
-            );
           }
+        }],
+        ['category.group' => function($q) use($groups) {
+          if(isset($groups)) {
+            if(is_array($groups)) {
+              $q->whereIn('code', $groups);
+            } else {
+              $q->where('code', 'like', $groups.'%');
+            }
+          }
+          dd($groups, $q->toSql());
+        }],
+        ['category.group.account' => function($q) use($codes) {
+          if(isset($codes)) {
+            if(is_array($codes)) {
+                $q->whereIn('code', $codes);
+            } else {
+              $q->where('code', 'like', $codes.'%');
+            }
+          }
+        }]
+      );
+
+      if(isset($classes)) {
+        if(is_array($classes)) {
+          $collection->whereIn('code', $classes);
         } else {
-          $collection->orWhere(
-            'code', 'like', $code.'%'
-          );
+          $collection->where('code', 'like', $classes.'%');
         }
       }
-      return $collection->where($conditions)->get();
 
+      return $collection->where($conditions)->get();
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
