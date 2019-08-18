@@ -77,7 +77,10 @@ class BudgetDetails extends Model
           ['code_of_account', 'like', '4%']
         ])->orWhere([
           ['code_of_account', 'like', '5%']
+        ])->orWhere([
+            ['code_of_account', 'like', '13%']
         ]);
+
       })->with([
         'head' => function($query) {
             $query->where('approved', false);
