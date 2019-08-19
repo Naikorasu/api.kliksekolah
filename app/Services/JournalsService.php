@@ -147,7 +147,6 @@ class JournalsService extends BaseService {
           'standard' => [],
           'reconciliation' => []
         ];
-        $data->is_credit = $data->journalCashBankDetails->type == 'KAS_MASUK' || $data->journalCashBankDetails->type == 'BANK_MASUK';
 
         foreach($data->journal_details as $index => $detail) {
           $journalCashBankDetails = $detail->journal_cash_bank_details;
@@ -351,7 +350,7 @@ class JournalsService extends BaseService {
       if(isset($entityUnit)) {
         $unit = SchoolUnits::find($entityUnit->unit_id);
       }
-    
+
       $isCredit = $journal->journalDetails[0]->journalCashBankDetails->type == 'KAS_MASUK' || $journal->journalDetails[0]->journalCashBankDetails->type == 'BANK_MASUK';
 
       $total = 0;
