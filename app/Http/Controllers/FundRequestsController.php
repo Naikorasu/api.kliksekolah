@@ -20,9 +20,7 @@ class FundRequestsController extends Controller
     public function list(Request $request) {
       $fundRequest = $this->fundRequestService->list($request->filters);
 
-      return response()->json([
-        'data' => $fundRequest
-      ], 200);
+      return response()->json($fundRequest, 200);
 
     }
 
@@ -31,7 +29,7 @@ class FundRequestsController extends Controller
         'id' => 'required'
       ]);
 
-      $fundRequest = FundRequests::with('budgetDetail')->find($request->id);
+      $fundRequest = FundRequests::with('budgetDetail', 'budgetDetail.parameter_code', 'budgetDetail.head')->find($request->id);
 
       return response()->json([
         'data' => $fundRequest
@@ -72,6 +70,12 @@ class FundRequestsController extends Controller
           'message' => 'Successfully Updated Fund Request',
           'data' => $data
       ], 201);
+    }
+
+    public function loadAvailableBudgetDetails(Request $request) {
+      $data = $this->fundRequestService->loadAvailableBudgetDetails($request->filters);
+
+      return response()->json($data, 200);
     }
 
     public function cancel(Request $request) {

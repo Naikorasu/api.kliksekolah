@@ -43,6 +43,10 @@ class FundRequestsService extends BaseService {
     $fundRequests->getCollection()->transform(function($fundRequest) {
       return [
         'id' => $fundRequest['id'],
+        'nomor_permohonan' => $fundRequest->nomor_permohonan,
+        'created_at' => $fundRequest->created_at,
+        'description' => $fundRequest->description,
+        'is_approved' => $fundRequest->is_approved,
         'amount' => $fundRequest->amount,
         'budget_detail' => [
           'description' => $fundRequest->description,
@@ -167,6 +171,46 @@ class FundRequestsService extends BaseService {
     $fundRequest->delete();
 
     return $fundRequest;
+  }
+
+  public function loadAvailableBudgetDetails($filters) {
+    $budgetDetails = BudgetDetails::with('head','parameter_code')->orderBy('code_of_account');
+    if(isset($filters)) {
+      if(isset($filters['periode']) || isset($filters['head'])) {
+        $budgetDetails->whereHas('head', function($q) use($filters) {
+          if(isset($filters['periode'])) {
+            $q->where('periode', $filters['periode']);
+          }
+          if(isset($filters['head'])) {
+            $q->where('id', $filters['head']);
+          }
+        });
+      }
+
+      if(isset($filters['code'])) {
+        if(isset($filters['type'])) {
+          if($filters['type'] == 'account') {
+            $budgetDetails->where('code_of_account', $filters['code']);
+          } else if($filters['type'] == 'class') {
+            $budgetDetails->whereHas('parameter_code.group.category.class', function($q) use($filters) {
+              $q->where('code', $filters['code']);
+            });
+          } else if($filters['type'] == 'category') {
+            $budgetDetails->whereHas('parameter_code.group.category', function($q) use($filters) {
+              $q->where('code', $filters['code']);
+            });
+          } else if($filters->type == 'group') {
+            $budgetDetails->whereHas('parameter_code.group', function($q) use($filters) {
+              $q->where('code', $filters['code']);
+            });
+          }
+        }
+      }
+    }
+
+    return [
+      'data' => $budgetDetails->get()
+    ];
   }
 
 

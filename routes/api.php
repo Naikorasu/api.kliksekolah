@@ -102,7 +102,9 @@ Route::group([
           Route::post('delete', 'FundRequestsController@delete');
           Route::post('submit', 'FundRequestsController@submit');
           Route::post('{status}', 'FundRequestsController@updateStatus')->where('status', '(approve|reject)');
+          Route::post('budget-details', 'FundRequestsController@loadAvailableBudgetDetails');
         });
+
         Route::group([
             'prefix' => 'realization'
         ], function() {
