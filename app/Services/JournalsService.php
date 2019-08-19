@@ -35,7 +35,7 @@ class JournalsService extends BaseService {
             $journalDetail->journalCashBankDetails()->forceDelete();
           }
 
-          $isCredit = $data->type == 'KAS_MASUK';
+          $isCredit = $data->type == 'KAS_MASUK' || $data->type == 'BANK_MASUK';
 
         } else if ($type == 'PEMBAYARAN') {
           $journal = $journal->with('journalPaymentDetails')->findOrFail($data->id);
@@ -48,6 +48,9 @@ class JournalsService extends BaseService {
       } catch (ModelNotFoundException $exception) {
         throw new DataNotFoundException($exception->message());
       }
+    }
+    if($type == 'KAS' || $type == 'BANK') {
+      $isCredit = $data->type == 'KAS_MASUK' || $data->type == 'BANK_MASUK';
     }
 
     if(!isset($journal)) {
@@ -68,7 +71,6 @@ class JournalsService extends BaseService {
       $this->saveJournalPaymentDetails($data, $journal);
 
     }
-
     if($type == 'KAS' || $type == 'BANK') {
       foreach($data->details['standard'] as $index => $detail) {
         $fields = (object) $detail;
@@ -145,15 +147,13 @@ class JournalsService extends BaseService {
           'standard' => [],
           'reconciliation' => []
         ];
-
-        $data->type = 'KAS_MASUK';
+        $data->is_credit = $data->journalCashBankDetails->type == 'KAS_MASUK' || $data->journalCashBankDetails->type == 'BANK_MASUK';
 
         foreach($data->journal_details as $index => $detail) {
           $journalCashBankDetails = $detail->journal_cash_bank_details;
           if(isset($journalCashBankDetails->type)) {
             $data->type = $journalCashBankDetails->type;
           }
-
           if($journalCashBankDetails->journal_detail_type == 'reconciliation') {
             array_push($data->details['reconciliation'], [
                 'code_of_account' => $detail->code_of_account,
@@ -351,6 +351,8 @@ class JournalsService extends BaseService {
       if(isset($entityUnit)) {
         $unit = SchoolUnits::find($entityUnit->unit_id);
       }
+    
+      $isCredit = $journal->journalDetails[0]->journalCashBankDetails->type == 'KAS_MASUK' || $journal->journalDetails[0]->journalCashBankDetails->type == 'BANK_MASUK';
 
       $total = 0;
       $details = [];
@@ -382,7 +384,7 @@ class JournalsService extends BaseService {
         'title' => $journal->description,
         'total' => $total,
         'details' => $details,
-        'isCredit' => isset($journal->journalDetails[0]->credit),
+        'isCredit' => $isCredit,
         'unit' => [
           'name' => (isset($unit)) ? $unit->name : 'PUSAT',
           'address' => ''
