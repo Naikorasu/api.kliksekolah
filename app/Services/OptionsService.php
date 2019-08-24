@@ -18,51 +18,53 @@ class OptionsService extends BaseService {
   //add code of account for budgetrequest, budget approval
   //Realisasi harus tarik dari budget detail yang sudah ada budget Request
 
-  public function getCodeOfAccounts($filters, $withRealization = false, $codes = null, $categories = null, $groups = null, $classes = null) {
-    $conditions = $this->buildFilters($filters);
+  public function getCodeOfAccounts($keyword = null, $withRealization = false, $codes = null, $categories = null, $groups = null, $classes = null) {
     try {
       if($withRealization == true) {
-        $collection = CodeClass::options()->whereHas(
-          'category.group.account.budgetDetail', function($q) {
+        $collection = CodeAccount::whereHas(
+          'budgetDetail', function($q) {
               $q->whereHas('fundRequest', function($q) {
                 $q->where('is_approved',true);
               });
           });
       } else {
-        $collection = CodeClass::options();
+        $collection = CodeAccount::whereNotNull('code');
       }
 
-      $collection->with(
-        ['category' => function($q) use($categories, $groups, $codes) {
-          if(isset($categories)) {
-            $q->whereIn('code', $categories);
+      if($codes) {
+        $collection = CodeAccount::whereIn('code', $codes);
+      }
+
+      if(isset($keyword)){
+        $collection->where(function($q) use($keyword) {
+          $q->where('title','like','%'.$keyword.'%')->orWhere('code','like','%'.$keyword.'%');
+        });
+        //dd($collection->toSql());
+      }
+
+      $collection->whereHas(
+        'group', function($q) use($categories, $groups, $classes) {
+          if(isset($groups)) {
+            $q->whereIn('code', $groups);
           }
-          $q->with(
-            ['group' => function($q) use($groups, $codes) {
-              if(isset($groups)) {
-                $q->whereIn('code', $groups);
+          $q->whereHas(
+            'category', function($q) use($categories, $classes) {
+              if(isset($categories)) {
+                $q->whereIn('code', $categories);
               }
-              $q->with(
-                ['account' => function($q) use($codes) {
-                  if(isset($codes)) {
-                    $q->whereIn('code', $codes);
+              $q->whereHas(
+                'class', function($q) use($classes) {
+                  if(isset($classes)) {
+                    $q->whereIn('code', $classes);
                   }
-                }]
+                }
               );
-            }]
+            }
           );
-        }]
+        }
       );
 
-      if(isset($classes)) {
-        if(is_array($classes)) {
-          $collection->whereIn('code', $classes);
-        } else {
-          $collection->where('code', 'like', $classes.'%');
-        }
-      }
-
-      return $collection->where($conditions)->get();
+      return $collection->get();
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
@@ -107,18 +109,21 @@ class OptionsService extends BaseService {
   }
 
   public function getBudgets($filters, $keyword = '') {
-    $conditions = $this->buildFilters($filters);
+    $conditions = [];
+    if(isset($filters['periode'])) {
+      $conditions = [
+        ['periode', '=', $filters['periode']]
+      ];
+    }
     try {
       $collection = Budgets::options($keyword)->where($conditions)->get();
 
-      $options = [];
-      foreach($collection as $option) {
-        array_push($options, [
-          "id" => $option->id,
-          "title" => $option->desc
-        ]);
-      }
-      return $options;
+      return $collection->transform(function($item) {
+        return [
+          'id' => $item->id,
+          'title' => $item->desc
+        ];
+      });
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }

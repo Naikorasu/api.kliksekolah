@@ -104,6 +104,13 @@ class FundRequestsController extends Controller
       ], 200);
     }
 
+    public function loadAvailableCoa(Request $request) {
+      $data = $this->fundRequestService->loadAvailableCoa($request->head);
+
+      return response()->json([
+        'data' => $data
+      ], 200);
+    }
 
     public function submit(Request $request) {
       $request->validate([

@@ -22,7 +22,7 @@ class OptionsController extends Controller
     }
 
     public function code_of_account(Request $request, $type=null) {
-      $data = $this->optionsService->getCodeOfAccounts($request->filters, isset($type), $request->codes, $request->categories, $request->groups, $request->classes);
+      $data = $this->optionsService->getCodeOfAccounts($request->keyword, isset($type), $request->codes, $request->categories, $request->groups, $request->classes);
       return $this->returnOption($request, $data);
     }
 

@@ -103,6 +103,7 @@ Route::group([
           Route::post('submit', 'FundRequestsController@submit');
           Route::post('{status}', 'FundRequestsController@updateStatus')->where('status', '(approve|reject)');
           Route::post('budget-details', 'FundRequestsController@loadAvailableBudgetDetails');
+          Route::post('coa', 'FundRequestsController@loadAvailableCoa');
         });
 
         Route::group([

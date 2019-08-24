@@ -173,6 +173,16 @@ class FundRequestsService extends BaseService {
     return $fundRequest;
   }
 
+  public function loadAvailableCoa($head) {
+    $headUniqueId = Budget::select('unique_id')->find($head);
+
+    $coa = CodeAccount::whereHas('budgetDetail', function($q) (use $head) {
+      $q->where('head', $headUniqueId);
+    })->get();
+
+    return $coa;
+  }
+
   public function loadAvailableBudgetDetails($filters) {
     $budgetDetails = BudgetDetails::with('head','parameter_code')->orderBy('code_of_account');
     if(isset($filters)) {
