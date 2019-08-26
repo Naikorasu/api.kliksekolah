@@ -18,7 +18,7 @@ class OptionsService extends BaseService {
   //add code of account for budgetrequest, budget approval
   //Realisasi harus tarik dari budget detail yang sudah ada budget Request
 
-  public function getCodeOfAccounts($keyword = null, $withRealization = false, $codes = null, $categories = null, $groups = null, $classes = null) {
+  public function getCodeOfAccounts($keyword = null, $withRealization = false, $codes = null, $categories = null, $groups = null, $classes = null, $excludes = array()) {
     try {
       if($withRealization == true) {
         $collection = CodeAccount::whereHas(
@@ -39,23 +39,35 @@ class OptionsService extends BaseService {
         $collection->where(function($q) use($keyword) {
           $q->where('title','like','%'.$keyword.'%')->orWhere('code','like','%'.$keyword.'%');
         });
-        //dd($collection->toSql());
+      }
+
+      if(array_key_exists('codes', $excludes) && isset($excludes['codes'])) {
+        $q->whereNotIn('code',$excludes['codes']);
       }
 
       $collection->whereHas(
-        'group', function($q) use($categories, $groups, $classes) {
+        'group', function($q) use($categories, $groups, $classes, $excludes) {
           if(isset($groups)) {
             $q->whereIn('code', $groups);
           }
+          if(array_key_exists('groups', $excludes) && isset($excludes['groups'])) {
+            $q->whereNotIn('code',$excludes['groups']);
+          }
           $q->whereHas(
-            'category', function($q) use($categories, $classes) {
+            'category', function($q) use($categories, $classes, $excludes) {
               if(isset($categories)) {
                 $q->whereIn('code', $categories);
               }
+              if(array_key_exists('categories', $excludes) && isset($excludes['categories'])) {
+                $q->whereNotIn('code',$excludes['categories']);
+              }
               $q->whereHas(
-                'class', function($q) use($classes) {
+                'class', function($q) use($classes, $excludes) {
                   if(isset($classes)) {
                     $q->whereIn('code', $classes);
+                  }
+                  if(array_key_exists('classes', $excludes) && isset($excludes['classes'])) {
+                    $q->whereNotIn('code',$excludes['classes']);
                   }
                 }
               );

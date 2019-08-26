@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Auth;
 use App\FundRequests;
 use App\BudgetDetails;
+use App\Budgets;
+use App\CodeAccount;
 use App\Services\BudgetDetailsService;
 use App\EntityUnits;
 
@@ -174,9 +176,9 @@ class FundRequestsService extends BaseService {
   }
 
   public function loadAvailableCoa($head) {
-    $headUniqueId = Budget::select('unique_id')->find($head);
+    $headUniqueId = Budgets::select('unique_id')->find($head);
 
-    $coa = CodeAccount::whereHas('budgetDetail', function($q) (use $head) {
+    $coa = CodeAccount::whereHas('budgetDetail', function($q) use($headUniqueId) {
       $q->where('head', $headUniqueId);
     })->get();
 
