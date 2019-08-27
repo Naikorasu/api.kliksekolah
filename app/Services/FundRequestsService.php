@@ -179,7 +179,7 @@ class FundRequestsService extends BaseService {
     $budget = Budgets::select('unique_id')->find($head);
 
     $coa = CodeAccount::whereHas('budgetDetail', function($q) use($budget) {
-      $q->where('head', $budget->unique_id);
+      $q->where('head', $budget->unique_idg);
     })->get();
 
     return $coa;
@@ -221,7 +221,7 @@ class FundRequestsService extends BaseService {
     }
 
     return [
-      'data' => $budgetDetails->get()
+      'data' => $budgetDetails->first()
     ];
   }
 
