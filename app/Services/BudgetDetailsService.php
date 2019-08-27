@@ -126,14 +126,17 @@ class BudgetDetailsService extends BaseService {
 
     $estimation = $totalIncome - $totalExpense;
     $balance = 0;
-    $status = 'DEFISIT';
+    $status = 'UNDEFINED';
 
     if($totalIncome >= $totalExpense) {
         $status = 'SURPLUS';
+        $estimation_surplus_defisit = $estimation;
         $balance = $estimation;
     }
     else {
-        $balance = abs($estimation);
+        $status = 'DEFISIT';
+        $estimation_surplus_defisit = "(".number_format(abs($estimation)).")";
+        $balance = "(".number_format(abs($estimation)).")";
     }
 
     $data = array(
@@ -150,8 +153,8 @@ class BudgetDetailsService extends BaseService {
         'total_pengeluaran_bos' => $totalExpenseBos,
         'total_pengeluaran_internal' => $totalExpenseIntern,
         'status_surplus_defisit' => $status,
-        'estimasi_surplus_defisit' => $estimation,
-        'saldo' => "(".number_format($balance).")",
+        'estimasi_surplus_defisit' => $estimation_surplus_defisit,
+        'saldo' => $balance,
     );
 
     return $data;
