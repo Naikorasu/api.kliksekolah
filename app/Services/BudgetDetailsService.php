@@ -132,6 +132,9 @@ class BudgetDetailsService extends BaseService {
         $status = 'SURPLUS';
         $balance = $estimation;
     }
+    else {
+        $balance = abs($estimation);
+    }
 
     $data = array(
         'pengeluaran' => $expenses,
@@ -148,7 +151,7 @@ class BudgetDetailsService extends BaseService {
         'total_pengeluaran_internal' => $totalExpenseIntern,
         'status_surplus_defisit' => $status,
         'estimasi_surplus_defisit' => $estimation,
-        'saldo' => $balance,
+        'saldo' => "(".number_format($balance).")",
     );
 
     return $data;
