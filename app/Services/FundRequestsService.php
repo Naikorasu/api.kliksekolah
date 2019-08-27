@@ -186,7 +186,7 @@ class FundRequestsService extends BaseService {
   }
 
   public function loadAvailableBudgetDetails($filters) {
-    $budgetDetails = BudgetDetails::with('head','parameter_code')->orderBy('code_of_account');
+    $budgetDetails = BudgetDetails::remains()->with('head','parameter_code')->orderBy('code_of_account');
     if(isset($filters)) {
       if(isset($filters['periode']) || isset($filters['head'])) {
         $budgetDetails->whereHas('head', function($q) use($filters) {
