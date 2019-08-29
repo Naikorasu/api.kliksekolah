@@ -62,6 +62,10 @@ class FundRequestsService extends BaseService {
   }
 
   public function save($id = null, $data) {
+    $unit_code = 0;
+    $schoolUnit = Auth::user()->schoolUnit;
+    $counter = EntityUnits::where('entity_type', 'App\FundRequests');
+    
     if(isset($id)) {
       try{
         $fundRequest = FundRequests::status(false, false)->findOrFail($id);
@@ -100,10 +104,6 @@ class FundRequestsService extends BaseService {
 
     $fundRequest->save();
     $fundRequest->fundRequestDetails()->createMany($fundRequestDetails);
-
-    $unit_code = 0;
-    $schoolUnit = Auth::user()->schoolUnit;
-    $counter = EntityUnits::where('entity_type', 'App\FundRequests');
 
     // if(isset($schoolUnit)) {
     //   $unit_code = $schoolUnit->unit_code;
