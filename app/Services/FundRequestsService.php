@@ -61,6 +61,11 @@ class FundRequestsService extends BaseService {
     return $fundRequests;
   }
 
+  public function get($id) {
+    $fundRequest = FundRequests::with('fundRequestDetails','fundRequestDetails.budgetDetail', 'head')->find($id);
+    return $fundRequest;
+  }
+
   public function save($id = null, $data) {
     $unit_code = 0;
     $schoolUnit = Auth::user()->schoolUnit;

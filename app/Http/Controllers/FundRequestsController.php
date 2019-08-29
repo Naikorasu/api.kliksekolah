@@ -29,7 +29,7 @@ class FundRequestsController extends Controller
         'id' => 'required'
       ]);
 
-      $fundRequest = FundRequests::with('budgetDetail', 'budgetDetail.parameter_code', 'budgetDetail.head')->find($request->id);
+      $fundRequest = $this->fundRequestService->get($request->id);
 
       return response()->json([
         'data' => $fundRequest
