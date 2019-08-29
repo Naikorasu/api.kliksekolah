@@ -65,7 +65,7 @@ class FundRequestsService extends BaseService {
     $unit_code = 0;
     $schoolUnit = Auth::user()->schoolUnit;
     $counter = EntityUnits::where('entity_type', 'App\FundRequests');
-    
+
     if(isset($id)) {
       try{
         $fundRequest = FundRequests::status(false, false)->findOrFail($id);
@@ -85,7 +85,7 @@ class FundRequestsService extends BaseService {
 
     $fundRequest->budget_detail_unique_id = '';
     $fundRequest->user_id = Auth::user()->id;
-    $fundRequest->description = $details->description;
+    $fundRequest->description = $data->description;
     $fundRequestDetails = [];
     $totalAmount = 0;
 
