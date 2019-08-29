@@ -65,6 +65,7 @@ class FundRequestsService extends BaseService {
     if(isset($id)) {
       try{
         $fundRequest = FundRequests::status(false, false)->findOrFail($id);
+        $fundRequest->fundRequestDetails()->forceDelete();
       } catch (ModelNotFoundException $exception) {
         throw new DataNotFoundException($exception->getMessage());
       }
