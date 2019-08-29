@@ -101,7 +101,7 @@ class FundRequestsService extends BaseService {
         ]);
       }
     }
-
+    $fundRequest->amount = $totalAmount;
     $fundRequest->save();
     $fundRequest->fundRequestDetails()->createMany($fundRequestDetails);
 
