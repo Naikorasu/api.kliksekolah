@@ -63,16 +63,15 @@ class FundRequestsService extends BaseService {
 
   public function get($id) {
     $fundRequest = FundRequests::with('fundRequestDetails','fundRequestDetails.budgetDetail', 'fundRequestDetails.budgetDetail.parameter_code', 'head')->find($id);
-    $fundRequest->fundRequestDetails->map(function($item) {
+    $fundRequest->details = $fundRequest->fundRequestDetails->map(function($item) {
       return [
         'amount' => $item['amount'],
-        'parameter_code' => $item['budget_detail']['parameter_code'],
+        'parameter_code' => $item['budget_detail']->parameter_code,
         'budget_detail_id' => $item['budget_detail']['id'],
         'total' => $item['budget_detail']['total'],
         'remains' => $item['budget_detail']['remains']
       ];
     });
-    $fundRequest->details = $fundRequest->fundRequestDetails;
 
     return $fundRequest;
   }
