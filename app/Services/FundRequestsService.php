@@ -97,7 +97,7 @@ class FundRequestsService extends BaseService {
         array_push($fundRequestDetails, [
           'budget_detail_unique_id' => $budgetDetail->id,
           'amount' => $detail['amount'],
-          'description' => $detail['description']
+          'description' => null
         ]);
       }
     }
