@@ -101,7 +101,7 @@ class FundRequestsService extends BaseService {
     $fundRequest->budget_detail_unique_id = '';
     $fundRequest->user_id = Auth::user()->id;
     $fundRequest->description = $data->description;
-    $fundRequest->head = $data->head;
+    $fundRequest->head = $data->head['id'];
     $fundRequest->periode = $data->periode;
     $fundRequestDetails = [];
     $totalAmount = 0;
