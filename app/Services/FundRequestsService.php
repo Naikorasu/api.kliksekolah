@@ -83,7 +83,7 @@ class FundRequestsService extends BaseService {
     $fundRequest->user_id = Auth::user()->id;
     $fundRequest->description = $details->description;
     $fundRequestDetails = [];
-    $totalAmount = 0
+    $totalAmount = 0;
 
     if(isset($data->details)) {
       foreach($data->details as $detail) {
