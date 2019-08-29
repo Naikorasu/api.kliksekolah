@@ -67,7 +67,9 @@ class FundRequestsService extends BaseService {
       return [
         'amount' => $item['amount'],
         'parameter_code' => $item['budget_detail']['parameter_code'],
-        'budget_detail_id' => $item['budget_detail']['id']
+        'budget_detail_id' => $item['budget_detail']['id'],
+        'total' => $item['budget_detail']['total'],
+        'remains' => $item['budget_detail']['remains']
       ];
     });
     $fundRequest->details = $fundRequest->fundRequestDetails;
