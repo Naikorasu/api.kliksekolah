@@ -56,6 +56,10 @@ class Budgets extends Model
         return $this->hasMany('App\BudgetDetails', 'head', 'unique_id');
     }
 
+    public function fundRequest() {
+      return $this->hasMany('App\FundRequests', 'head', 'id');
+    }
+
     public function school_unit() {
       return $this->morphMany('App\EntityUnits', 'entity');
     }

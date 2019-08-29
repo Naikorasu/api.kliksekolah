@@ -13,6 +13,8 @@ class FundRequests extends Model
     protected $fillable = [
       'budget_detail_unique_id',
       'amount',
+      'head',
+      'periode',
       'is_approved',
       'submitted',
       'user_id'
@@ -41,10 +43,11 @@ class FundRequests extends Model
         $q->select(DB::raw('SUM(amount) as total_amount'));
       }]);
     }
-/**
- * [budgetDetail description]
- * @return [type] [description]
- */
+
+    public function head() {
+      return $this->belongsTo('App\Budgets', 'head', 'id');
+    }
+
     public function budgetDetail() {
       return $this->belongsTo(BudgetDetails::Class,'budget_detail_unique_id','unique_id');
     }
