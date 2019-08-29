@@ -105,12 +105,12 @@ class FundRequestsService extends BaseService {
     $schoolUnit = Auth::user()->schoolUnit;
     $counter = EntityUnits::where('entity_type', 'App\FundRequests');
 
-    if(isset($schoolUnit)) {
-      $unit_code = $schoolUnit->unit_code;
-      $counter->where('prm_school_units', $schoolUnit->id);
-    }
-
-    $this->updateEntityUnit($fundRequest);
+    // if(isset($schoolUnit)) {
+    //   $unit_code = $schoolUnit->unit_code;
+    //   $counter->where('prm_school_units', $schoolUnit->id);
+    // }
+    //
+    // $this->updateEntityUnit($fundRequest);
     return $fundRequest->load('fundRequestDetails','fundRequestDetails.budgetDetail','budgetDetail');
   }
 
