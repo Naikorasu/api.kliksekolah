@@ -68,6 +68,7 @@ class FundRequestsService extends BaseService {
         'amount' => $item['amount'],
         'parameter_code' => $item['budgetDetail']['parameter_code'],
         'budget_detail_id' => $item['budgetDetail']['id'],
+        'unique_id' => $item['budgetDetail']['unique_id'],
         'total' => $item['budgetDetail']['total'],
         'remains' => $item['budgetDetail']['remains']
       ];
@@ -108,7 +109,7 @@ class FundRequestsService extends BaseService {
 
     if(isset($data->details)) {
       foreach($data->details as $idx => $detail) {
-        $budgetDetail = $this->budgetDetailService->get($detail['unique_id'], true);
+        $budgetDetail = $this->budgetDetailService->get($detail['budget_detail_id'], true);
         $this->validateAmount($budgetDetail->remains, $budgetDetail->amount, 0);
         $totalAmount = $totalAmount + $budgetDetail->amount;
         array_push($fundRequestDetails, [
