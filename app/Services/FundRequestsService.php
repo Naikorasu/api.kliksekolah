@@ -63,6 +63,7 @@ class FundRequestsService extends BaseService {
 
   public function get($id) {
     $fundRequest = FundRequests::with('fundRequestDetails','fundRequestDetails.budgetDetail', 'head')->find($id);
+    $fundRequest->details = $fundRequest->fundRequestDetails;
     return $fundRequest;
   }
 
