@@ -90,8 +90,8 @@ class FundRequestsService extends BaseService {
     $totalAmount = 0;
 
     if(isset($data->details)) {
-      foreach($data->details as $detail) {
-        $budgetDetail = $this->budgetDetailService->get($detail->unique_id, true);
+      foreach($data->details as $idx => $detail) {
+        $budgetDetail = $this->budgetDetailService->get($detail['unique_id'], true);
         $this->validateAmount($budgetDetail->remains, $budgetDetail->amount, 0);
         $totalAmount = $totalAmount + $budgetDetail->amount;
         array_push($fundRequestDetails, [
