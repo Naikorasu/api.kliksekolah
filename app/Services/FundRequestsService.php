@@ -64,6 +64,7 @@ class FundRequestsService extends BaseService {
   public function get($id) {
     $fundRequest = FundRequests::with('fundRequestDetails','fundRequestDetails.budgetDetail', 'fundRequestDetails.budgetDetail.parameter_code', 'head')->find($id);
     $fundRequest->details = $fundRequest->fundRequestDetails->map(function($item) {
+      dd($item);
       return [
         'amount' => $item['amount'],
         'parameter_code' => $item['budget_detail']['parameter_code'],
