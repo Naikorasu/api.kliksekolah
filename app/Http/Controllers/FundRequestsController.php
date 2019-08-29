@@ -44,11 +44,10 @@ class FundRequestsController extends Controller
     public function add(Request $request)
     {
       $request->validate([
-        'budget_detail_unique_id' => 'required',
-        'amount' => 'required'
+        'details' => 'array|required'
       ]);
 
-      $data = $this->fundRequestService->add($request->budget_detail_unique_id, $request);
+      $data = $this->fundRequestService->save(null, $request);
 
       return response()->json([
           'message' => 'Successfully Add Fund Request',
@@ -60,11 +59,10 @@ class FundRequestsController extends Controller
     public function edit(Request $request) {
       $request->validate([
           'id' => 'required|integer',
-          'budget_detail_unique_id' => 'required',
-          'amount' => 'required'
+          'details' => 'array|required'
       ]);
 
-      $data = $this->fundRequestService->edit($request->id, $request->details);
+      $data = $this->fundRequestService->save($request->id, $request);
 
       return response()->json([
           'message' => 'Successfully Updated Fund Request',
