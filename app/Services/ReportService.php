@@ -75,11 +75,20 @@ class ReportService extends BaseService {
     $dateFrom = 'DATE_FORMAT(journals.date, "%Y%m") >= "' .  (isset($from) ?  $from : date('Ym')) . '"';
     $dateTo = 'DATE_FORMAT(journals.date, "%Y%m") <= "' .  (isset($to) ?  $to : date('Ym')) . '"';
 
-    $journalDetails = JournalDetails::whereHas('journal', function($q) use($dateFrom, $dateTo) {
-      $q->whereRaw($dateFrom)->whereRaw($dateTo);
-    })->whereHas('parameter_code', function($q) use($codeGroup) {
-      $q->where('group', $codeGroup);
-    })->get();
+    $journalDetails = JournalDetails::with('journal')
+      ->whereHas('journal', function($q) use($dateFrom, $dateTo) {
+        $q->whereRaw($dateFrom)->whereRaw($dateTo);
+      })->whereHas('parameter_code', function($q) use($codeGroup) {
+        $q->where('group', $codeGroup);
+      })->get();
+
+    $journalDetails->map(function($item) {
+      return {
+        'code_of_account' => item['parameter_code'],
+        'debit' => $item['debit'],
+        'credit' => $item['credit'],
+      }
+    });
 
     return $journalDetails;
   }
