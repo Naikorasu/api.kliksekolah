@@ -82,15 +82,15 @@ class ReportService extends BaseService {
         $q->where('group', $codeGroup);
       })->get();
 
-    $journalDetails->map(function($item) {
+
+
+    return $journalDetails->map(function($item) {
       return [
         'code_of_account' => $item['parameter_code'],
         'debit' => $item['debit'],
         'credit' => $item['credit']
       ];
-    });
-
-    return $journalDetails;
+    });;
   }
 
   public function balance() {
