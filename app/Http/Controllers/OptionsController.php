@@ -26,6 +26,11 @@ class OptionsController extends Controller
       return $this->returnOption($request, $data);
     }
 
+    public function code_group(Request $request) {
+      $data = $this->optionsService->getCodeGroup();
+      return $this->returnOption($request, $data);
+    }
+
     public function periode(Request $request, $type=null) {
       $data = $this->optionsService->getPeriodes($request->filters, isset($type));
       return $this->returnOption($request, $data);

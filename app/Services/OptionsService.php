@@ -82,6 +82,11 @@ class OptionsService extends BaseService {
     }
   }
 
+  public getCodeGroup() {
+    $codeGroups = CodeGroups::get();
+    return $codeGroups;
+  }
+
   public function getPeriodes($filters, $withRealization = false) {
     $conditions = $this->buildFilters($filters);
 
