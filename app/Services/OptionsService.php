@@ -83,7 +83,7 @@ class OptionsService extends BaseService {
     }
   }
 
-  public getCodeGroup() {
+  public function getCodeGroup() {
     $codeGroups = CodeGroup::get();
     return $codeGroups;
   }
