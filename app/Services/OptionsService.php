@@ -9,6 +9,7 @@ use App\CodeAccount;
 use App\SchoolUnits;
 use App\FundRequests;
 use App\CodeClass;
+use App\CodeGroup;
 
 use App\BudgetDetails;
 use App\Budgets;
@@ -83,7 +84,7 @@ class OptionsService extends BaseService {
   }
 
   public getCodeGroup() {
-    $codeGroups = CodeGroups::get();
+    $codeGroups = CodeGroup::get();
     return $codeGroups;
   }
 
