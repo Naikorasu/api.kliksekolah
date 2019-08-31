@@ -83,11 +83,11 @@ class ReportService extends BaseService {
       })->get();
 
     $journalDetails->map(function($item) {
-      return {
+      return [
         'code_of_account' => $item['parameter_code'],
         'debit' => $item['debit'],
         'credit' => $item['credit']
-      }
+      ];
     });
 
     return $journalDetails;
