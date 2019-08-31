@@ -29,6 +29,14 @@ class ReportController extends Controller
       ]);
     }
 
+    public function monthly(Request $request) {
+      $data = $this->reportService->monthly($request->code_group, $request->from, $request->to);
+
+      return response()->json([
+        'data' => $data
+      ]);
+    }
+
     public function profitLoss(Request $request) {
       $data = $this->reportService->profitLoss($request->from, $request->to);
 

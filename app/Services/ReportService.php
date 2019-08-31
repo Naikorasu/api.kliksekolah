@@ -70,6 +70,20 @@ class ReportService extends BaseService {
     ];
   }
 
+  public function monthly($codeGroup, $from = null, $to = null) {
+
+    $dateFrom = 'DATE_FORMAT(journals.date, "%Y%m") >= "' .  (isset($from) ?  $from : date('Ym')) . '"';
+    $dateTo = 'DATE_FORMAT(journals.date, "%Y%m") <= "' .  (isset($to) ?  $to : date('Ym')) . '"';
+
+    $journalDetails = JournalDetails::whereHas('journal', function($q) use($dateFrom, $dateTo) {
+      $q->whereRaw($dateFrom)->whereRaw($dateTo);
+    })->whereHas('parameter_code', function($q) use($codeGroup) {
+      $q->where('group', $codeGroup);
+    })->get();
+
+    return $journalDetails;
+  }
+
   public function balance() {
     $categories = CodeClass::
     select(
