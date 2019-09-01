@@ -82,8 +82,6 @@ class ReportService extends BaseService {
         $q->where('group', $codeGroup);
       })->get();
 
-
-
     return $journalDetails->map(function($item) {
       return [
         'code_of_account' => $item['parameter_code'],
