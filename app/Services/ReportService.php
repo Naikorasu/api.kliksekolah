@@ -81,7 +81,7 @@ class ReportService extends BaseService {
       })->whereHas('parameter_code', function($q) use($codeGroup) {
         $q->where('group', $codeGroup);
       })->get();
-    dd($codeGroup, $from, $to, $journalDetails, $dateFrom, $dateTo);
+
     return $journalDetails->map(function($item) {
       return [
         'code_of_account' => $item['parameter_code'],
