@@ -31,6 +31,7 @@ class BudgetDetailRelocationsService extends BaseService {
     $budgetRelocations = BudgetRelocations::totalPengajuan()->orderBy('created_at','DESC')->where($conditions)->get();
     $data = $budgetRelocations->transform(function($budgetRelocation) {
       return [
+        'id' => $budgetRelocation->id,
         'no_pengajuan' => $budgetRelocation->nomor_pengajuan,
         'created_at' => $budgetRelocation->created_at,
         'description' => $budgetRelocation->description,
