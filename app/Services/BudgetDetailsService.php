@@ -46,9 +46,6 @@ class BudgetDetailsService extends BaseService {
           if(isset($filters['periode'])) {
             $q->where('periode',$filters['periode']);
           }
-          if(isset($filters['head'])) {
-            $q->where('id',$filters['head']);
-          }
         });
       }
     }
