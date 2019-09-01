@@ -41,10 +41,13 @@ class BudgetDetailsService extends BaseService {
     $query = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->orderBy('created_at')->remains();
 
     if(isset($filters)) {
-      if(array_key_exists('periode', $filters)) {
+      if(array_key_exists('periode', $filters) || array_key_exists('head', $filters)) {
         $query->whereHas('head', function($q) use($filters) {
           if(isset($filters['periode'])) {
             $q->where('periode',$filters['periode']);
+          }
+          if(isset($filters['head'])) {
+            $q->where('id',$filters['head']);
           }
         });
       }
