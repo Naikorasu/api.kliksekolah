@@ -32,7 +32,7 @@ class OptionsController extends Controller
     }
 
     public function rapbuCoa(Request $request) {
-      $data = $this->optionsService->getRAPBUCoa($request->head);
+      $data = $this->optionsService->getRAPBUCoa($request->head, $request->keyword);
       return $this->returnOption($request, $data);
     }
 
