@@ -91,8 +91,8 @@ class OptionsService extends BaseService {
     });
 
     if(isset($keyword)) {
-      $coa->whereLike('code','%'.$keyword.'%');
-      $coa->whereLike('title','%'.$keyword.'%');
+      $coa->where('code', 'like', '%'.$keyword.'%');
+      $coa->orWhere('title', 'like', '%'.$keyword.'%');
     }
 
     return $coa->get();
