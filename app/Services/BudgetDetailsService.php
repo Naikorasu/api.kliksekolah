@@ -36,9 +36,10 @@ class BudgetDetailsService extends BaseService {
         $codeOfAccountType = array_key_exists('type', $filters) ? $filters['type'] : null;
       }
     }
-    $conditions = $this->buildFilters($filters);
 
-    $query = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->orderBy('created_at')->remains();
+    //$conditions = $this->buildFilters($filters);
+
+    $query = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->orderBy('created_at')->remains();
 
     if(isset($filters)) {
       if(array_key_exists('periode', $filters) || array_key_exists('head', $filters)) {
