@@ -85,7 +85,12 @@ class OptionsService extends BaseService {
 
   public function getCodeGroup() {
     $codeGroups = CodeGroup::get();
-    return $codeGroups;
+    return $codeGroups->map(function($item) => {
+      return [
+        'label' => $item['title'],
+        'value' => $item['code']
+      ];
+    });
   }
 
   public function getPeriodes($filters, $withRealization = false) {
