@@ -36,7 +36,7 @@ class BudgetRelocations extends Model
     }
 
     public function head() {
-      return $this->belongsTo(Budgets::class, 'head', 'unique_id');
+      return $this->belongsTo(Budgets::class, 'head', 'id');
     }
 
     public function school_unit() {
