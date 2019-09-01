@@ -83,14 +83,19 @@ class OptionsService extends BaseService {
     }
   }
 
-  public function getRAPBUCoa($head) {
+  public function getRAPBUCoa($head, $keyword = null) {
     $budget = Budgets::select('unique_id')->find($head);
 
     $coa = CodeAccount::whereHas('budgetDetail', function($q) use($budget) {
       $q->where('head', $budget['unique_id']);
-    })->get();
+    });
 
-    return $coa;
+    if(isset($keyword)) {
+      $coa->whereLike('code','%'.$keyword.'%');
+      $coa->whereLike('title','%'.$keyword.'%');
+    }
+
+    return $coa->get();
   }
 
   public function getCodeGroup($keyword = null) {
