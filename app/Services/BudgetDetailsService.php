@@ -46,6 +46,10 @@ class BudgetDetailsService extends BaseService {
           if(isset($filters['periode'])) {
             $q->where('periode',$filters['periode']);
           }
+          if(isset($filters['head'])) {
+            $q->where('unique_id', '=', $filters['head']);
+            $q->orWhere('id', '=', $filters['head']);
+          }
         });
       }
     }
