@@ -12,6 +12,7 @@ use App\Exceptions\ApprovalException;
 use App\Exceptions\DataNotFoundException;
 use App\Exceptions\DataSaveFailureException;
 use App\Exceptions\FundRequestsExceedRemainsException;
+use App\Budgets;
 use App\BudgetDetails;
 use App\BudgetRelocations;
 use App\BudgetRelocationRecipients;
@@ -67,7 +68,7 @@ class BudgetDetailRelocationsService extends BaseService {
     $budgetRelocation->user_id = Auth::user()->id;
     $budgetRelocation->account = $account;
     $budgetRelocation->description = $description;
-    $budgetRelocation->head = $head;
+    $budgetRelocation->head = $head['id'];
     $budgetRelocation->save();
 
     $budgetDetailRelocationSources = [];
