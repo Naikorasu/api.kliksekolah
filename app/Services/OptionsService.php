@@ -87,7 +87,7 @@ class OptionsService extends BaseService {
     $budget = Budgets::select('unique_id')->find($head);
 
     $coa = CodeAccount::whereHas('budgetDetail', function($q) use($budget) {
-      $q->where('head', $budget->unique_id);
+      $q->where('head', $budget['unique_id']);
     })->get();
 
     return $coa;
