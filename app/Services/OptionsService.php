@@ -83,11 +83,14 @@ class OptionsService extends BaseService {
     }
   }
 
-  public function getCodeGroup() {
+  public function getCodeGroup($keyword = null) {
+    if(isset($keyword)) {
+      $codeGroups = CodeGroup::whereLike('title', '%'.$keyword.'%');
+    }
     $codeGroups = CodeGroup::get();
     return $codeGroups->map(function($item) {
       return [
-        'label' => $item['title'],
+        'label' => $item['code'] .' - '. $item['title'],
         'value' => $item['code']
       ];
     });

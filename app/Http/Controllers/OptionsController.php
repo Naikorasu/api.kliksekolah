@@ -27,7 +27,7 @@ class OptionsController extends Controller
     }
 
     public function code_group(Request $request) {
-      $data = $this->optionsService->getCodeGroup();
+      $data = $this->optionsService->getCodeGroup($request->keyword);
       return $this->returnOption($request, $data);
     }
 
