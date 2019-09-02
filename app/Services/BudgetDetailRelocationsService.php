@@ -57,12 +57,12 @@ class BudgetDetailRelocationsService extends BaseService {
     if(isset($id)) {
       try {
         $budgetRelocation = BudgetRelocations::findOrFail($id);
-        $head = Budgets::find($head);
       } catch (ModelNotFoundException $exception) {
         throw new DataNotFoundException($exception->getMessage());
       }
     } else {
       $budgetRelocation = new BudgetRelocations();
+      $head = Budgets::find($head);
       $budgetRelocation->nomor_pengajuan = 'PA'.date('m').date('Y').date('H').date('i').date('s');
     }
 
