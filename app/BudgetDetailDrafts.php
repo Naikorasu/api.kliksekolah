@@ -37,4 +37,8 @@ class BudgetDetailDrafts extends Model
     public function revisions() {
       return $this->hasMany(BudgetDraftRevisions::class , 'budget_detail_draft_id', 'id');
     }
+
+    public function head() {
+      return $this->belongsTo('App\Budgets', 'head', 'id');
+    }
 }
