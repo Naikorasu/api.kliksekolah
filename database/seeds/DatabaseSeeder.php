@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             // ParameterTableSeeder::class,
             // PrmSchoolUnitsTableSeeder::class,
             // UserRolesTableSeeder::class
-            PrmPerwakilanSeeder::class
+            PrmPerwakilanSeeder::class,
             PrmSchoolUnitLinkPerwakilanSeeder::class
         ]);
     }
