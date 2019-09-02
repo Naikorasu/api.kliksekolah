@@ -57,6 +57,7 @@ class BudgetDetailRelocationsService extends BaseService {
     if(isset($id)) {
       try {
         $budgetRelocation = BudgetRelocations::findOrFail($id);
+        $head = Budgets::find($head);
       } catch (ModelNotFoundException $exception) {
         throw new DataNotFoundException($exception->getMessage());
       }
