@@ -15,9 +15,11 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             //BudgetsTableSeeder::class,
-            ParameterTableSeeder::class,
-            PrmSchoolUnitsTableSeeder::class,
-            UserRolesTableSeeder::class
+            // ParameterTableSeeder::class,
+            // PrmSchoolUnitsTableSeeder::class,
+            // UserRolesTableSeeder::class
+            PrmPerwakilanSeeder::class
+            PrmSchoolUnitLinkPerwakilanSeeder::class
         ]);
     }
 }
