@@ -62,14 +62,15 @@ class BudgetDetailRelocationsService extends BaseService {
       }
     } else {
       $budgetRelocation = new BudgetRelocations();
-      $head = Budgets::find($head);
       $budgetRelocation->nomor_pengajuan = 'PA'.date('m').date('Y').date('H').date('i').date('s');
     }
+
+    $budget = Budgets::find($head);
 
     $budgetRelocation->user_id = Auth::user()->id;
     $budgetRelocation->account = $account;
     $budgetRelocation->description = $description;
-    $budgetRelocation->head = $head['id'];
+    $budgetRelocation->head = $budget['id'];
     $budgetRelocation->save();
 
     $budgetDetailRelocationSources = [];
