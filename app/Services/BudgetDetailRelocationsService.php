@@ -76,15 +76,19 @@ class BudgetDetailRelocationsService extends BaseService {
     $budgetDetailRelocationSources = [];
     $budgetDetailRelocationRecipients = [];
 
+    $totalRelocatedAmount = 0;
+
     foreach($sources as $index => $source) {
       $source['budget_relocation_id'] = $budgetRelocation->id;
       $sources[$index] = $source =  new BudgetRelocationSources($source);
       $this->validateAmount($source->budget_detail_unique_id, $source->relocated_amount);
+      $totalRelocatedAmount += $source->relocated_amount;
     }
 
     $budgetRelocation->budgetRelocationSources()->forceDelete();
     $budgetRelocation->budgetRelocationSources()->saveMany($sources);
 
+    $totalAllocatedAmount = 0;
     foreach ($recipients as $index => $recipient) {
       $recipient = array_merge(['head'=>$budget['id'], 'user_id'=>Auth::user()->id, 'account'=>$account], (array) $recipient);
 
@@ -95,6 +99,16 @@ class BudgetDetailRelocationsService extends BaseService {
         'description' => isset($budgetDetailDraft->descripton) ? $budgetDetailDraft->description : '',
         'is_draft' => true
       ]);
+
+      if($budgetDetailDraft->total > $totalRelocatedAmount) {
+        throw new FundRequestsExceedRemainsException($totalRelocatedAmount, $budgetDetailDraft->total);
+      }
+      
+      $totalAllocatedAmount = $budgetDetailDraft->total;
+    }
+
+    if($totalAllocatedAmount > $totalRelocatedAmount) {
+      throw new FundRequestsExceedRemainsException($totalRelocatedAmount, $totalAllocatedAmount);
     }
 
     $budgetRelocation->budgetRelocationRecipients()->forceDelete();
