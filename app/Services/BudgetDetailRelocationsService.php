@@ -86,7 +86,7 @@ class BudgetDetailRelocationsService extends BaseService {
     $budgetRelocation->budgetRelocationSources()->saveMany($sources);
 
     foreach ($recipients as $index => $recipient) {
-      $recipient = array_merge(['head'=>$head['id'], 'user_id'=>Auth::user()->id, 'account'=>$account], (array) $recipient);
+      $recipient = array_merge(['head'=>$budget['id'], 'user_id'=>Auth::user()->id, 'account'=>$account], (array) $recipient);
 
       $budgetDetailDraft = BudgetDetailDrafts::updateOrCreate($recipient,$recipient);
       $recipients[$index] =  new BudgetRelocationRecipients([
