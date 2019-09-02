@@ -72,6 +72,7 @@ class BudgetDetailRelocationsService extends BaseService {
     $budgetRelocation->head = $head['id'];
     $budgetRelocation->save();
 
+    dd($head);
     $budgetDetailRelocationSources = [];
     $budgetDetailRelocationRecipients = [];
 
