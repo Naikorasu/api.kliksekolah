@@ -161,7 +161,7 @@ class FundRequestsService extends BaseService {
     $budget = Budgets::select('unique_id')->find($head);
 
     $coa = CodeAccount::whereHas('budgetDetail', function($q) use($budget) {
-      $q->where('head', $budget->unique_id);
+      $q->where('head', $budget['unique_id']);
     })->where(function($q) use ($keyword) {
       if(isset($keyword)) {
         $q->whereLike('title', '%'.$keyword.'%');
