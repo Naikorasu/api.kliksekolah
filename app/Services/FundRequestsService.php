@@ -166,7 +166,7 @@ class FundRequestsService extends BaseService {
     })->where(function($q) use ($keyword) {
       if(isset($keyword)) {
         $q->where('title', 'like', '%'.$keyword.'%');
-        $q->orWhere('code', 'like', '%'.$keyword.'%');
+        $q->orWhere('code', 'like', $keyword.'%');
       }
     })->get();
 
