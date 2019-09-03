@@ -157,11 +157,16 @@ class FundRequestsService extends BaseService {
     return $fundRequest;
   }
 
-  public function loadAvailableCoa($head) {
+  public function loadAvailableCoa($head, $keyword = null) {
     $budget = Budgets::select('unique_id')->find($head);
 
     $coa = CodeAccount::whereHas('budgetDetail', function($q) use($budget) {
       $q->where('head', $budget->unique_id);
+    })->where(function($q) use ($keyword) {
+      if(isset($keyword)) {
+        $q->whereLike('title', '%'.$keyword.'%');
+        $q->orWhereLike('code', '%'.$keyword.'%');
+      }
     })->get();
 
     return $coa;
