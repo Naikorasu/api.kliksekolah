@@ -103,7 +103,7 @@ class FundRequestsController extends Controller
     }
 
     public function loadAvailableCoa(Request $request) {
-      $data = $this->fundRequestService->loadAvailableCoa($request->head);
+      $data = $this->fundRequestService->loadAvailableCoa($request->head, $request->keyword);
 
       return response()->json([
         'data' => $data
