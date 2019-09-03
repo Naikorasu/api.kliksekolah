@@ -331,7 +331,7 @@ class JournalsService extends BaseService {
       $unit = '000';
     }
 
-    $journalNumber = $code.str_pad($year, 2, '0', STR_PAD_LEFT).$counter.$unitCode;
+    $journalNumber = $code.$year.$month.str_pad($counter, 2, '0', STR_PAD_LEFT).$unitCode;
     return $journalNumber;
   }
 
