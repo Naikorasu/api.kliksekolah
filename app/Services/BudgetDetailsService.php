@@ -146,8 +146,8 @@ class BudgetDetailsService extends BaseService {
 
     if($totalIncome >= $totalExpense) {
         $status = 'SURPLUS';
-        $estimation_surplus_defisit = $estimation;
-        $balance = $estimation;
+        $estimation_surplus_defisit = number_format(abs($estimation));
+        $balance = number_format(abs($estimation));
     }
     else {
         $status = 'DEFISIT';
