@@ -15,7 +15,8 @@ class JournalCashBankDetails extends Model
       'tax_value',
       'type',
       'npwp',
-      'name'
+      'name',
+      'bankAccount'
     ];
 
     public function journalDetail() {
@@ -28,5 +29,9 @@ class JournalCashBankDetails extends Model
 
     public function fundRequest() {
       return $this->hasOne('App\FundRequests');
+    }
+
+    public function bankAccount() {
+      return $this->hasOne('App\CodeAccount', 'bankAccount', 'code');
     }
 }

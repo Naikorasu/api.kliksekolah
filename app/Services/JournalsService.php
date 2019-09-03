@@ -153,6 +153,9 @@ class JournalsService extends BaseService {
           if(isset($journalCashBankDetails->type)) {
             $data->type = $journalCashBankDetails->type;
           }
+          if($type == 'BANK') {
+            $data->rekening = $journalCashBankDetails->bankAccount;
+          }
           if($journalCashBankDetails->journal_detail_type == 'reconciliation') {
             array_push($data->details['reconciliation'], [
                 'code_of_account' => $detail->code_of_account,
@@ -276,7 +279,8 @@ class JournalsService extends BaseService {
         'tax_number' => isset($data->tax_number) ? $data->tax_number :null,
         'tax_value' => isset($data->tax_value) ? $data->tax_value : null,
         'npwp' => isset($data->npwp) ? $data->npwp : null,
-        'type' => $type
+        'type' => $type,
+        'bankAccount' => isset($data->rekening) ? $data->rekening : null
       ]
     );
     $journalDetail->journalCashBankDetails()->save($journalCashBankDetails);
