@@ -25,7 +25,7 @@ class ReportService extends BaseService {
     } else if ($type == 'bank') {
       $journals->where('journal_type', 'BANK');
     }
-    
+
     if(isset($from)) {
       if(!isset($to)) {
         $to = date('Y-m-d');
@@ -273,7 +273,7 @@ class ReportService extends BaseService {
           $q->where('date', '<=', $to);
         }
 
-        $q->where('is_posted', true);
+        $q->where('is_posted', 1);
       })
       ->with('journal','parameter_code')->get();
 
