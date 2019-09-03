@@ -23,7 +23,7 @@ class CodeAccountingController extends Controller
 
         $data_class = CodeClass::with('category', 'category.group', 'category.group.account');
         if (isset($code)) {
-            $data_class = CodeClass::whereNotNull('code');
+            $data_class = CodeClass::whereNotNull('code')
             ->where('code', 'like', $code.'%')
             ->orWhereHas('category.group.account', function($q) use($code) {
               $q->where('code','like', $code.'%');
