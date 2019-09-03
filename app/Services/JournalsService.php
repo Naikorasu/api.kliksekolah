@@ -298,7 +298,7 @@ class JournalsService extends BaseService {
     $d = date_parse_from_format("y-m-d", $date);
     $month = $d['month'];
     $year = $d['year'];
-    $counter = str_pad(strval(Journals::counter($type, $isCredit,$month, $year) + 1), 3,'0',STR_PAD_LEFT);
+    $counter = str_pad(strval(Journals::counter($type, $isCredit,$month, $year)->get()->count() + 1), 3,'0',STR_PAD_LEFT);
     $code = '';
 
     switch($type) {

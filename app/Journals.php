@@ -27,7 +27,7 @@ class Journals extends Model
           } else {
             $q->where('debit', '<>', 'null');
           }
-        })->count();
+        });
 
     }
 
