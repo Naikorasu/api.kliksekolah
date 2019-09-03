@@ -31,6 +31,11 @@ class OptionsController extends Controller
       return $this->returnOption($request, $data);
     }
 
+    public function bank_account(Request $request) {
+      $data = $this->optionsService->getBankAccounts();
+      return $this->returnOption($request, $data);
+    }
+
     public function rapbuCoa(Request $request) {
       $data = $this->optionsService->getRAPBUCoa($request->head, $request->keyword);
       return $this->returnOption($request, $data);

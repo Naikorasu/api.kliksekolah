@@ -83,6 +83,12 @@ class OptionsService extends BaseService {
     }
   }
 
+  public function getBankAccounts() {
+    $bankAccount = CodeAccount::where('group','12000')->get();
+    return $bankAccount;
+  }
+
+
   public function getRAPBUCoa($head, $keyword = null) {
     $budget = Budgets::select('unique_id')->find($head);
 

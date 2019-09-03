@@ -51,6 +51,7 @@ Route::group([
 
       Route::post('code-of-account/{type?}','OptionsController@code_of_account');
       Route::post('code-group','OptionsController@code_group');
+      Route::post('bank-account','OptionsController@bank_account');
       Route::post('rapbu-coa','OptionsController@rapbuCoa');
       Route::post('periode/{type?}','OptionsController@periode');
       Route::post('fund-request','OptionsController@fundRequest');
