@@ -75,13 +75,13 @@ class JournalsService extends BaseService {
       foreach($data->details['standard'] as $index => $detail) {
         $fields = (object) $detail;
         $journalDetail = $this->saveJournalDetail($journal, $fields, $isCredit);
-        $this->saveJournalCashBankDetails($fields, $journalDetail, $data->type, 'standard');
+        $this->saveJournalCashBankDetails($fields, $journalDetail, $data, 'standard');
       }
 
       foreach($data->details['reconciliation'] as $index => $detail) {
         $fields = (object) $detail;
         $journalDetail = $this->saveJournalDetail($journal, $fields, $isCredit);
-        $this->saveJournalCashBankDetails($data, $journalDetail, $data->type, 'reconciliation');
+        $this->saveJournalCashBankDetails($data, $journalDetail, $data, 'reconciliation');
       }
     } else if($type == 'PEMBAYARAN') {
       $coa = '41301';
@@ -270,7 +270,7 @@ class JournalsService extends BaseService {
     return $journalDetail;
   }
 
-  public function saveJournalCashBankDetails($data, $journalDetail, $type, $journal_detail_type) {
+  public function saveJournalCashBankDetails($data, $journalDetail, $journalData, $journal_detail_type) {
     $journalCashBankDetails = new JournalCashBankDetails(
       [
         'unit_id' => isset($data->unit_id) ? $data->unit_id : null,
@@ -279,8 +279,8 @@ class JournalsService extends BaseService {
         'tax_number' => isset($data->tax_number) ? $data->tax_number :null,
         'tax_value' => isset($data->tax_value) ? $data->tax_value : null,
         'npwp' => isset($data->npwp) ? $data->npwp : null,
-        'type' => $type,
-        'bankAccount' => isset($data->rekening) ? $data->rekening : null
+        'type' => $journalData->type,
+        'bankAccount' => isset($journalData->rekening) ? $journalData->rekening : null
       ]
     );
     $journalDetail->journalCashBankDetails()->save($journalCashBankDetails);
