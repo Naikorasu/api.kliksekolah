@@ -71,7 +71,8 @@ class FundRequestsService extends BaseService {
         'unique_id' => $item['budgetDetail']['unique_id'],
         'total' => $item['budgetDetail']['total'],
         'remains' => $item['budgetDetail']['remains'],
-        'description' => $item['budgetDetail']['description']
+        'description' => $item['budgetDetail']['description'],
+        'head' => $item['head']
       ];
     });
 
