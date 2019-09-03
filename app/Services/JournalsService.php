@@ -176,7 +176,7 @@ class JournalsService extends BaseService {
             ]);
           }
         }
-        if($data->details['standard'].length > 0) {
+        if(count($data->details['standard']) > 0) {
           $data->tipe = 'standard';
         } else {
           $data->tipe = 'rekonsiliasi';
