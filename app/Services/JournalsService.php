@@ -352,7 +352,7 @@ class JournalsService extends BaseService {
   public function preview($id, $type) {
     $journal = Journals::where('journal_type', $type)->with('journalDetails', 'user');
     if($type == 'KAS' || $type == 'BANK'){
-      $journal = $journal->with('journalDetails.journalCashBankDetails','school_unit.school_unit')->findOrFail($id);
+      $journal = $journal->with('journalDetails.journalCashBankDetails','journalDetails.parameter_code', 'school_unit.school_unit')->findOrFail($id);
       $entityUnit = EntityUnits::where('entity_type', 'App\Journals')->find($journal->id);
       $unit = null;
       if(isset($entityUnit)) {
