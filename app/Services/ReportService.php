@@ -20,6 +20,12 @@ class ReportService extends BaseService {
     $balance = 0;
     $journals = Journals::with('journalDetails')->orderBy('date','DESC');
 
+    if($type == 'kas') {
+      $journals->where('journal_type', 'KAS');
+    } else if ($type == 'bank') {
+      $journals->where('journal_type', 'BANK');
+    }
+    
     if(isset($from)) {
       if(!isset($to)) {
         $to = date('Y-m-d');
