@@ -177,9 +177,9 @@ class JournalsService extends BaseService {
           }
         }
         if(count($data->details['standard']) > 0) {
-          $data->tipe = 'standard';
+          $data->tipe = 1;
         } else {
-          $data->tipe = 'rekonsiliasi';
+          $data->tipe = 2;
         }
       } else if ($type == 'PEMBAYARAN') {
         $journal = $journal->with('journalPaymentDetails')->findOrFail($id);
