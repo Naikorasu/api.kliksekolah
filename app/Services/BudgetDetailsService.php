@@ -53,6 +53,17 @@ class BudgetDetailsService extends BaseService {
           }
         });
       }
+      if(isset($filters['listType'])) {
+        if($filters['listType'] === 'INCOME') {
+          $query->whereHas('parameter_code.group.category'. function($q) => {
+            $q->whereIn('class', ['50000','10000']);
+          });
+        } else if($filters['listType'] === 'OUTCOME') {
+          $query->whereHas('parameter_code.group.category'. function($q) => {
+            $q->whereIn('class', ['40000']);
+          });
+        }
+      }
     }
     //dd($query->toSql());
     try {
