@@ -84,7 +84,7 @@ class OptionsService extends BaseService {
   }
 
   public function getBankAccounts() {
-    $bankAccount = CodeAccount::where('group','11200')->get();
+    $bankAccount = CodeAccount::whereIn('group',[11200, 11300, 11400])->get();
     return $bankAccount;
   }
 
