@@ -43,7 +43,7 @@ class OptionsService extends BaseService {
       }
 
       if(array_key_exists('codes', $excludes) && isset($excludes['codes'])) {
-        $q->whereNotIn('code',$excludes['codes']);
+        $collection->whereNotIn('code',$excludes['codes']);
       }
 
       $collection->whereHas(
