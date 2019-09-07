@@ -197,8 +197,10 @@ class JournalsService extends BaseService {
         $journal->details = $journal->journalDetails;
         $journal->details->map(function($detail) {
           $detail->nominal = $detail->debit;
+          $detail->isCredit = false;
           if($detail->debit == 0 || $detail->debit == null) {
             $detail->nominal = $detail->credit;
+            $detail->isCredit = true;
           }
           return $detail;
         });
