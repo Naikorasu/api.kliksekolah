@@ -129,7 +129,8 @@ class JournalsService extends BaseService {
     } else {
       foreach($data->details as $index => $detail) {
         $fields = (object) $detail;
-        $this->saveJournalDetail($journal, $fields, $isCredit);
+        $coa = CodeAccount::where('code', $fields->code_of_account)->first();
+        $this->saveJournalDetail($journal, $fields, $coa->type == 'K');
       }
     }
 
@@ -194,7 +195,13 @@ class JournalsService extends BaseService {
       } else {
         $journal = $journal->findOrFail($id);
         $journal->details = $journal->journalDetails;
-
+        $journal->details->map(function($detail) {
+          $detail->nominal = $detail->debit;
+          if($detail->debit == 0 || $detail->debit == null) {
+            $detail->nominal = $detail->credit;
+          }
+          return $detail;
+        });
         return $journal;
       }
        return $data;
