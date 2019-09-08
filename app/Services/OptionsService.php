@@ -102,7 +102,7 @@ class OptionsService extends BaseService {
 
     $coa = CodeAccount::whereHas('budgetDetail', function($q) use($budget) {
       $q->where('head', $budget['unique_id']);
-    })->where('code', '!=', '12902');
+    })->where('code', '!=', '12902')->where('code', 'not like', '4%');
 
     if(isset($keyword)) {
       $coa->where('code', 'like', '%'.$keyword.'%');
