@@ -85,9 +85,15 @@ class OptionsService extends BaseService {
     }
   }
 
-  public function getBankAccounts() {
-    $bankAccount = CodeAccount::whereIn('group',[11200, 11300, 11400])->where('code', '!=', '12902')->get();
-    return $bankAccount;
+  public function getBankAccounts($keyword) {
+    $bankAccount = CodeAccount::whereIn('group',[11200, 11300, 11400])->where('code', '!=', '12902');
+    if(isset($keyword)) {
+      $bankAccount->where(function($q) use($keyword) {
+        $q->where('title', 'like', '%'.$keyword.'%');
+        $q->orWhere('code', 'like', '%'.$keyword.'%');
+      });
+    }
+    return $bankAccount->get();
   }
 
 

@@ -32,7 +32,7 @@ class OptionsController extends Controller
     }
 
     public function bank_account(Request $request) {
-      $data = $this->optionsService->getBankAccounts();
+      $data = $this->optionsService->getBankAccounts($request->keyword);
       return $this->returnOption($request, $data);
     }
 
