@@ -36,6 +36,8 @@ class OptionsService extends BaseService {
         $collection = CodeAccount::whereIn('code', $codes);
       }
 
+      $collection->where('code', '!=', '12902');
+
       if(isset($keyword)){
         $collection->where(function($q) use($keyword) {
           $q->where('title','like','%'.$keyword.'%')->orWhere('code','like','%'.$keyword.'%');
@@ -84,7 +86,7 @@ class OptionsService extends BaseService {
   }
 
   public function getBankAccounts() {
-    $bankAccount = CodeAccount::whereIn('group',[11200, 11300, 11400])->get();
+    $bankAccount = CodeAccount::whereIn('group',[11200, 11300, 11400])->where('code', '!=', '12902')->get();
     return $bankAccount;
   }
 
@@ -94,7 +96,7 @@ class OptionsService extends BaseService {
 
     $coa = CodeAccount::whereHas('budgetDetail', function($q) use($budget) {
       $q->where('head', $budget['unique_id']);
-    });
+    })->where('code', '!=', '12902');
 
     if(isset($keyword)) {
       $coa->where('code', 'like', '%'.$keyword.'%');

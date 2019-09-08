@@ -168,7 +168,7 @@ class FundRequestsService extends BaseService {
         $q->where('title', 'like', '%'.$keyword.'%');
         $q->orWhere('code', 'like', $keyword.'%');
       }
-    })->get();
+    })->where('code', '!=', '12902')->get();
 
     return $coa;
   }
