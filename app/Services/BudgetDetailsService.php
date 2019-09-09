@@ -148,8 +148,8 @@ class BudgetDetailsService extends BaseService {
         $totalExpenseIntern += $result->intern;
     }
 
-    $estimation = $totalIncome - $totalExpense;
-    $balance = $totalIncome - ($);
+    $estimation = $totalIncome - $totalCost;
+    $balance = $totalIncome - ($totalCost + $totalInventories);
     $status = 'UNDEFINED';
 
     if($totalIncome >= $totalExpense) {
