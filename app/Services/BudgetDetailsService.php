@@ -110,9 +110,12 @@ class BudgetDetailsService extends BaseService {
 
     $incomes = [];
     $expenses = [];
+    $inventories = []
 
     $totalIncome = 0;
     $totalExpense = 0;
+    $totalInventories = 0;
+    $totalCost = 0;
     $totalIncomeYPL = 0;
     $totalExpenseYPL = 0;
     $totalIncomeCommittee = 0;
@@ -131,17 +134,22 @@ class BudgetDetailsService extends BaseService {
         $totalIncomeBos += $result->bos;
         $totalIncomeIntern += $result->intern;
       } else {
-        array_push($expenses,$result);
+        if(Str::startsWith($result->code_of_account,'13')) {
+          array_push($inventories,$result);
+          $totalInventories += $result->total;
+        } else {
+          array_push($expenses,$result);
+          $totalCost += $result->total;
+        }
         $totalExpense += $result->total;
         $totalExpenseYPL += $result->ypl;
         $totalExpenseCommittee += $result->committee;
         $totalExpenseBos += $result->bos;
         $totalExpenseIntern += $result->intern;
-      }
     }
 
     $estimation = $totalIncome - $totalExpense;
-    $balance = 0;
+    $balance = $totalIncome - ($);
     $status = 'UNDEFINED';
 
     if($totalIncome >= $totalExpense) {
@@ -158,8 +166,11 @@ class BudgetDetailsService extends BaseService {
     $data = array(
         'pengeluaran' => $expenses,
         'pendapatan' => $incomes,
+        'inventaris' => $inventories,
         'total_pendapatan' => $totalIncome,
         'total_pengeluaran' => $totalExpense,
+        'total_inventaris' => $totalInventories,
+        'total_beban' => $otalCost,
         'total_pendapatan_ypl' => $totalIncomeYPL,
         'total_pendapatan_komite' => $totalIncomeCommittee,
         'total_pendapatan_bos' => $totalIncomeBos,
