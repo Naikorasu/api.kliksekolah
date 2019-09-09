@@ -146,6 +146,7 @@ class BudgetDetailsService extends BaseService {
         $totalExpenseCommittee += $result->committee;
         $totalExpenseBos += $result->bos;
         $totalExpenseIntern += $result->intern;
+      }
     }
 
     $estimation = $totalIncome - $totalCost;
@@ -181,7 +182,7 @@ class BudgetDetailsService extends BaseService {
         'total_pengeluaran_internal' => $totalExpenseIntern,
         'status_surplus_defisit' => $status,
         'estimasi_surplus_defisit' => $estimation_surplus_defisit,
-        'saldo' => $balance,
+        'saldo' => $balance
     );
 
     return $data;
