@@ -110,7 +110,7 @@ class BudgetDetailsService extends BaseService {
 
     $incomes = [];
     $expenses = [];
-    $inventories = []
+    $inventories = [];
 
     $totalIncome = 0;
     $totalExpense = 0;
