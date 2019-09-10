@@ -54,7 +54,7 @@ class ReportService extends BaseService {
 
             array_push($data, [
               'journal_number' => $journal['journal_number'],
-              'date' => $journal['date'],
+              'date' => date('d-m-Y', $journal['date']),
               'nbm' => $nbm,
               'nbk' => $nbk,
               'credit' => $detail['credit'],
