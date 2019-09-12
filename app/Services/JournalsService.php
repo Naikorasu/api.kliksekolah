@@ -31,7 +31,9 @@ class JournalsService extends BaseService {
       try {
         $journal = Journals::with('journalDetails')->where('journal_type',$type);
         if($type == 'KAS' || $type == 'BANK') {
-          $journal = $journal->with('journalDetails.journalCashBankDetails')->findOrFail($data->id);
+          $journal = $journal->with('journalDetails.journalCashBankDetails'
+          , 'journalDetails.journalCashBankDetails.tax'
+          , 'journalDetails.journalCashBankDetails.tax.taxFields')->findOrFail($data->id);
 
           foreach($journal->journalDetails as $journalDetail) {
             $journalDetail->journalCashBankDetails()->tax()->taxFields()->forceDelete();
