@@ -464,7 +464,8 @@ class JournalsService extends BaseService {
         }
       }
 
-      $tax->save()->taxFields()->insertMany($fields);
+      $savedTax = $tax->save();
+      $savedTax->taxFields()->insertMany($fields);
     }
   }
 }
