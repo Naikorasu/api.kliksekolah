@@ -156,7 +156,7 @@ class JournalsService extends BaseService {
           'journalDetails.journalCashBankDetails',
           'journalDetails.journalCashBankDetails.schoolUnit',
           'journalDetails.journalCashBankDetails.tax',
-          'journalDetails.journalCashBankDetails.tax.tax_fields'
+          'journalDetails.journalCashBankDetails.tax.taxFields'
         )
         ->findOrFail($id)->toJson();
         $data = json_decode($data);
