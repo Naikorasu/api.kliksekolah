@@ -144,7 +144,13 @@ class JournalsService extends BaseService {
       }
     }
 
-    return $journal->load('journalPaymentDetails','journalDetails', 'journalDetails.journalCashBankDetails');
+    return $journal->load(
+      'journalPaymentDetails',
+      'journalDetails',
+      'journalDetails.journalCashBankDetails',
+      'journalDetails.journalCashBankDetails.tax',
+      'journalDetails.journalCashBankDetails.tax.taxFields'
+    );
   }
 
   public function get($id, $type) {
@@ -187,10 +193,12 @@ class JournalsService extends BaseService {
             $tax = [];
             if(isset($journalCashBankDetails->tax)) {
               $tax = $journalCashBankDetails->tax;
-              $tax->fields = [];
-              if(isset($journalCashBankDetails->tax->taxFields)) {
-                foreach($journalCashBankDetails->tax->taxFields as $field) {
-                  $tax['fields'][$field->field_name] = $field->value;
+              $tax->tax = $tax->type;
+              $tax->fields = (object) array();
+              if(isset($journalCashBankDetails->tax->tax_fields)) {
+                foreach($journalCashBankDetails->tax->tax_fields as $field) {
+                  $fieldName = $field->field_name;
+                  $tax->fields->{$fieldName} = $field->value;
                 }
               }
             }
@@ -457,15 +465,15 @@ class JournalsService extends BaseService {
 
       $tax->save();
 
-      $fields = [];
       if(isset($data['fields'])) {
+        $fields = [];
         foreach($data['fields'] as $key => $value) {
           array_push($fields, new TaxFields([
             'field_name' => $key,
             'value' => $value,
           ]));
         }
-        $tax->taxFields()->createMany($fields);
+        $tax->taxFields()->saveMany($fields);
       }
     }
   }
