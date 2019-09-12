@@ -156,12 +156,12 @@ class BudgetDetailsService extends BaseService {
     if($estimation > 0) {
         $status = 'SURPLUS';
         $estimation_surplus_defisit = number_format(abs($estimation));
-        $balance = number_format(abs($estimation));
+        $balance = number_format(abs($balance));
     }
     else {
         $status = 'DEFISIT';
         $estimation_surplus_defisit = "(".number_format(abs($estimation)).")";
-        $balance = "(".number_format(abs($estimation)).")";
+        $balance = "(".number_format(abs($balance)).")";
     }
 
     $data = array(
