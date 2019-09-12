@@ -465,7 +465,7 @@ class JournalsService extends BaseService {
             'value' => $value,
           ]));
         }
-        $tax->taxFields()->insertMany($fields);
+        $tax->taxFields()->createMany($fields);
       }
     }
   }
