@@ -10,6 +10,8 @@ use App\JournalPaymentDetails;
 use App\JournalDetails;
 use App\User;
 use App\Exceptions\DataNotFoundException;
+use App\TaxFields;
+use App\Tax;
 use App\CodeAccount;
 use App\EntityUnits;
 use App\SchoolUnits;
@@ -32,6 +34,8 @@ class JournalsService extends BaseService {
           $journal = $journal->with('journalDetails.journalCashBankDetails')->findOrFail($data->id);
 
           foreach($journal->journalDetails as $journalDetail) {
+            $journalDetail->journalCashBankDetails()->tax()->taxFields()->forceDelete();
+            $journalDetail->journalCashBankDetails()->tax()->forceDelete();
             $journalDetail->journalCashBankDetails()->forceDelete();
           }
 
@@ -293,6 +297,9 @@ class JournalsService extends BaseService {
       ]
     );
     $journalDetail->journalCashBankDetails()->save($journalCashBankDetails);
+    if($journal_detail_type == 'standard' && isset($journalDetail->tax)) {
+      $this->saveTax($journalDetail->tax, $journalDetail->id());
+    }
   }
 
   public function saveJournalPaymentDetails($data, $journal) {
@@ -414,5 +421,26 @@ class JournalsService extends BaseService {
     $journal->is_posted = true;
     $journal->save();
     return $journal;
+  }
+
+  public function saveTax($data = null, $journalCashBankDetailsId = null) {
+    if(isset($data)) {
+      $tax = new Tax([
+        'tax_deduction' => $data->tax_deduction,
+        'type' => $data->tax,
+        'recipient' => $data->recipient,
+      ]);
+      $fields = [];
+      if(isset($data->fields)) {
+        foreach($data->fields as $key => $value) {
+          array_push($fields, new TaxFields([
+            'field_name' => $key,
+            'value' => $value,
+          ]));
+        }
+      }
+
+      $tax->save()->taxFields()->insertMany($fields);
+    }
   }
 }

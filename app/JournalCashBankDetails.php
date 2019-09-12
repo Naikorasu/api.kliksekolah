@@ -34,4 +34,8 @@ class JournalCashBankDetails extends Model
     public function bankAccount() {
       return $this->hasOne('App\CodeAccount', 'bankAccount', 'code');
     }
+
+    public function tax() {
+      return $this->hasOne('App\Tax');
+    }
 }
