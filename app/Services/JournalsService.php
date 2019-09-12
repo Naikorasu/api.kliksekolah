@@ -38,8 +38,10 @@ class JournalsService extends BaseService {
           )->findOrFail($data->id);
 
           foreach($journal->journalDetails as $journalDetail) {
-            $journalDetail->journalCashBankDetails->tax->taxFields()->forceDelete();
-            $journalDetail->journalCashBankDetails->tax()->forceDelete();
+            if(isset($journalDetail->journalCashBankDetails->tax)) {
+              $journalDetail->journalCashBankDetails->tax->taxFields()->forceDelete();
+              $journalDetail->journalCashBankDetails->tax()->forceDelete();
+            }
             $journalDetail->journalCashBankDetails()->forceDelete();
           }
 
