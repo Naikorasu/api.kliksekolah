@@ -179,7 +179,7 @@ class JournalsService extends BaseService {
             ]);
           } else {
             $tax = [];
-            if(isset($journalCashBankDetails['tax'])) {
+            if(isset($journalCashBankDetails->tax)) {
               $tax = $journalCashBankDetails->tax;
               $tax['fields'] = [];
               if(isset($journalCashBankDetails->tax->taxFields)) {
