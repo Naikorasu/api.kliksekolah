@@ -146,7 +146,13 @@ class JournalsService extends BaseService {
     $data = [];
     try {
       if($type == 'KAS' || $type == 'BANK') {
-        $data = $journal->with('journalDetails.journalCashBankDetails', 'journalDetails.journalCashBankDetails.schoolUnit')->findOrFail($id)->toJson();
+        $data = $journal->with(
+          'journalDetails.journalCashBankDetails',
+          'journalDetails.journalCashBankDetails.schoolUnit',
+          'journalDetails.journalCashBankDetails.tax',
+          'journalDetails.journalCashBankDetail.tax.tax.fields'
+        )
+        ->findOrFail($id)->toJson();
         $data = json_decode($data);
         $data->details = [
           'standard' => [],
@@ -172,6 +178,16 @@ class JournalsService extends BaseService {
                 'description' => $detail->description
             ]);
           } else {
+            $tax = [];
+            if(isset($journalCashBankDetails->tax)) {
+              $tax = $journalCashBankDetails->tax;
+              $tax['fields'] = [];
+              if(isset($journalCashBankDetails->tax->taxFields)) {
+                foreach($journalCashBankDetails->tax->taxFields as $field) {
+                  $tax['fields'][$field->field_name] = $field->value;
+                }
+              }
+            }
             array_push($data->details['standard'], [
                 'code_of_account' => $detail->code_of_account,
                 'nominal' => (isset($detail->credit)) ? $detail->credit : $detail->debit,
@@ -180,7 +196,8 @@ class JournalsService extends BaseService {
                 'npwp' => $journalCashBankDetails->npwp,
                 'name' => $journalCashBankDetails->name,
                 'parameter_code' => $detail->parameter_code,
-                'description' => $detail->description
+                'description' => $detail->description,
+                'tax' => $tax
             ]);
           }
         }
