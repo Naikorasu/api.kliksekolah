@@ -171,7 +171,7 @@ class BudgetDetailsService extends BaseService {
         'total_pendapatan' => $totalIncome,
         'total_pengeluaran' => $totalExpense,
         'total_inventaris' => $totalInventories,
-        'total_beban' => $otalCost,
+        'total_beban' => $totalCost,
         'total_pendapatan_ypl' => $totalIncomeYPL,
         'total_pendapatan_komite' => $totalIncomeCommittee,
         'total_pendapatan_bos' => $totalIncomeBos,
