@@ -137,7 +137,7 @@ class BudgetDetailsService extends BaseService {
         if(Str::startsWith($result->code_of_account,'13')) {
           array_push($inventories,$result);
           $totalInventories += $result->total;
-        } else {
+        } else if(Str::startsWith($result->code_of_account,'5')) {
           array_push($expenses,$result);
           $totalCost += $result->total;
         }
