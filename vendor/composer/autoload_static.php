@@ -574,6 +574,8 @@ class ComposerStaticInit70f86058477796cc8791554fb9c01655
         'App\\Services\\ReportService' => __DIR__ . '/../..' . '/app/Services/ReportService.php',
         'App\\Services\\UserService' => __DIR__ . '/../..' . '/app/Services/UsersService.php',
         'App\\Services\\WorkflowService' => __DIR__ . '/../..' . '/app/Services/WorkflowService.php',
+        'App\\Tax' => __DIR__ . '/../..' . '/app/Tax.php',
+        'App\\TaxFields' => __DIR__ . '/../..' . '/app/TaxFields.php',
         'App\\Test' => __DIR__ . '/../..' . '/app/Test.php',
         'App\\User' => __DIR__ . '/../..' . '/app/User.php',
         'App\\UserGroups' => __DIR__ . '/../..' . '/app/UserGroups.php',

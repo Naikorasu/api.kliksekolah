@@ -100,6 +100,8 @@ return array(
     'App\\Services\\ReportService' => $baseDir . '/app/Services/ReportService.php',
     'App\\Services\\UserService' => $baseDir . '/app/Services/UsersService.php',
     'App\\Services\\WorkflowService' => $baseDir . '/app/Services/WorkflowService.php',
+    'App\\Tax' => $baseDir . '/app/Tax.php',
+    'App\\TaxFields' => $baseDir . '/app/TaxFields.php',
     'App\\Test' => $baseDir . '/app/Test.php',
     'App\\User' => $baseDir . '/app/User.php',
     'App\\UserGroups' => $baseDir . '/app/UserGroups.php',
