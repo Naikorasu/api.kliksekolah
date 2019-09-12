@@ -153,7 +153,7 @@ class BudgetDetailsService extends BaseService {
     $balance = $totalIncome - ($totalCost + $totalInventories);
     $status = 'UNDEFINED';
 
-    if($totalIncome >= $totalExpense) {
+    if($estimation > 0) {
         $status = 'SURPLUS';
         $estimation_surplus_defisit = number_format(abs($estimation));
         $balance = number_format(abs($estimation));
