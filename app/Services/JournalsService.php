@@ -150,7 +150,7 @@ class JournalsService extends BaseService {
           'journalDetails.journalCashBankDetails',
           'journalDetails.journalCashBankDetails.schoolUnit',
           'journalDetails.journalCashBankDetails.tax',
-          'journalDetails.journalCashBankDetail.tax.tax.fields'
+          'journalDetails.journalCashBankDetails.tax.tax_fields'
         )
         ->findOrFail($id)->toJson();
         $data = json_decode($data);
@@ -179,7 +179,7 @@ class JournalsService extends BaseService {
             ]);
           } else {
             $tax = [];
-            if(isset($journalCashBankDetails->tax)) {
+            if(isset($journalCashBankDetails['tax'])) {
               $tax = $journalCashBankDetails->tax;
               $tax['fields'] = [];
               if(isset($journalCashBankDetails->tax->taxFields)) {
