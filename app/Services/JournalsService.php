@@ -454,6 +454,9 @@ class JournalsService extends BaseService {
         'type' => $data['tax'],
         'recipient' => $data['recipient'],
       ]);
+
+      $tax->save();
+
       $fields = [];
       if(isset($data['fields'])) {
         foreach($data['fields'] as $key => $value) {
@@ -462,10 +465,8 @@ class JournalsService extends BaseService {
             'value' => $value,
           ]));
         }
+        $tax->taxFields()->insertMany($fields);
       }
-
-      $savedTax = $tax->save();
-      $savedTax->taxFields()->insertMany($fields);
     }
   }
 }
