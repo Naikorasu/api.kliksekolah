@@ -449,13 +449,13 @@ class JournalsService extends BaseService {
   public function saveTax($data = null, $journalCashBankDetailsId = null) {
     if(isset($data)) {
       $tax = new Tax([
-        'tax_deduction' => $data->tax_deduction,
-        'type' => $data->tax,
-        'recipient' => $data->recipient,
+        'tax_deduction' => $data['tax_deduction'],
+        'type' => $data['tax'],
+        'recipient' => $data['recipient'],
       ]);
       $fields = [];
-      if(isset($data->fields)) {
-        foreach($data->fields as $key => $value) {
+      if(isset($data['fields'])) {
+        foreach($data['fields'] as $key => $value) {
           array_push($fields, new TaxFields([
             'field_name' => $key,
             'value' => $value,
