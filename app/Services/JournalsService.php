@@ -321,7 +321,7 @@ class JournalsService extends BaseService {
     );
     $journalDetail->journalCashBankDetails()->save($journalCashBankDetails);
     if($journal_detail_type == 'standard' && isset($data->tax)) {
-      $this->saveTax($data->tax, $journalDetail->id());
+      $this->saveTax($data->tax, $journalDetail->journalCashBankDetails->id);
     }
   }
 
