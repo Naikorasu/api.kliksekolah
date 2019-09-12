@@ -449,6 +449,7 @@ class JournalsService extends BaseService {
   public function saveTax($data = null, $journalCashBankDetailsId = null) {
     if(isset($data)) {
       $tax = new Tax([
+        'journal_cash_bank_details_id' => $journalCashBankDetailsId,
         'tax_deduction' => $data['tax_deduction'],
         'type' => $data['tax'],
         'recipient' => $data['recipient'],
