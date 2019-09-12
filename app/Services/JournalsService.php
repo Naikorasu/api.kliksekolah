@@ -187,7 +187,7 @@ class JournalsService extends BaseService {
             $tax = [];
             if(isset($journalCashBankDetails->tax)) {
               $tax = $journalCashBankDetails->tax;
-              $tax['fields'] = [];
+              $tax->fields = [];
               if(isset($journalCashBankDetails->tax->taxFields)) {
                 foreach($journalCashBankDetails->tax->taxFields as $field) {
                   $tax['fields'][$field->field_name] = $field->value;
