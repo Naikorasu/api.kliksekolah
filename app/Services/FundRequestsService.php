@@ -159,10 +159,17 @@ class FundRequestsService extends BaseService {
   }
 
   public function loadAvailableCoa($head, $keyword = null) {
+    $currentMonth = date('n');
+
     $budget = Budgets::select('unique_id')->find($head);
 
-    $coa = CodeAccount::whereHas('budgetDetail', function($q) use($budget) {
+    $coa = CodeAccount::whereHas('budgetDetail', function($q) use($budget, $currentMonth) {
       $q->where('head', $budget['unique_id']);
+      if($currentMonth < 7) {
+        $q->where('semester', 2);
+      } else {
+        $q->where('semester', 1);
+      }
     })->where(function($q) use ($keyword) {
       if(isset($keyword)) {
         $q->where('title', 'like', '%'.$keyword.'%');
