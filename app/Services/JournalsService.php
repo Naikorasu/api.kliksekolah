@@ -413,6 +413,8 @@ class JournalsService extends BaseService {
       $isCredit = $journal->journalDetails[0]->journalCashBankDetails->type == 'KAS_MASUK' || $journal->journalDetails[0]->journalCashBankDetails->type == 'BANK_MASUK';
 
       $total = 0;
+      $totalTax = 0;
+      $totalNett = 0;
       $details = [];
 
       if(isset($journal->journalDetails)) {
@@ -430,6 +432,11 @@ class JournalsService extends BaseService {
           } else {
             $total = $total + $detail->debit;
           }
+          if(isset($detail->journalCashBankDetails) && isset($detail->journalCashBankDetails->tax)) {
+            $tax = $detail->journalCashBankDetails->tax;
+            $totalTax = $totalTax + $tax->tax_deduction;
+          }
+          $totalNett = $total - $totalTax;
         }
       }
 
@@ -442,6 +449,8 @@ class JournalsService extends BaseService {
         'booked_by' => (isset($journal->user)) ? $journal->user->name : '(                   )',
         'title' => $journal->description,
         'total' => $total,
+        'total_tax' => $totalTax,
+        'total_nett' => $totalNett,
         'details' => $details,
         'isCredit' => $isCredit,
         'unit' => [
