@@ -399,7 +399,11 @@ class JournalsService extends BaseService {
   public function preview($id, $type) {
     $journal = Journals::where('journal_type', $type)->with('journalDetails', 'user');
     if($type == 'KAS' || $type == 'BANK'){
-      $journal = $journal->with('journalDetails.journalCashBankDetails','journalDetails.parameter_code', 'school_unit.school_unit')->findOrFail($id);
+      $journal = $journal->with('journalDetails.journalCashBankDetails',
+      'journalDetails.parameter_code',
+      'school_unit.school_unit',
+      'journalDetails.journalCashBankDetails.tax',
+      'journalDetails.journalCashBankDetails.tax.taxFields')->findOrFail($id);
       $entityUnit = EntityUnits::where('entity_type', 'App\Journals')->find($journal->id);
       $unit = null;
       if(isset($entityUnit)) {
@@ -417,7 +421,8 @@ class JournalsService extends BaseService {
             'code_of_account' => $detail->code_of_account,
             'amount' => (isset($detail->credit)) ? $detail->credit : $detail->debit,
             'parameter_code' => $detail->parameter_code,
-            'description' => $detail->description
+            'description' => $detail->description,
+            'tax' => $detail->journalCashBankDetails->tax
           ]);
 
           if($detail->credit) {
