@@ -479,7 +479,7 @@ class JournalsService extends BaseService {
         $journalDetails = $journal->journalDetails;
         foreach($journalDetails as $idx => $detail) {
           if(isset($detail->tax)) {
-            $taxJournal = new Journal([
+            $taxJournal = new Journals([
               'journal_type' => 'TAX',
               'journal_source' => 'KAS',
               'journal_number' => ''
@@ -506,8 +506,8 @@ class JournalsService extends BaseService {
             ]);
           }
 
-          $cashJournal = new Journal() ;
-          $cashJournal = new Journal([
+          $cashJournal = new Journals() ;
+          $cashJournal = new Journals([
             'journal_type' => 'CASH',
             'journal_source' => 'KAS',
             'journal_number' => ''
