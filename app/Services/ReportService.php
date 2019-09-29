@@ -251,11 +251,6 @@ class ReportService extends BaseService {
   }
 
   public function loadGeneralLedgerByAccount($account, $from = null, $to = null) {
-    $yoy_balance = YoYBalance::where([
-      ['year', '=', (isset($from)) ? date('Y', strtotime($from)) : date('Y')-1],
-      ['code_of_account', '=', $account->code]
-    ])->first();
-
     $items = JournalDetails::
       where('code_of_account',$account->code)
       ->whereHas('journal', function($q) use($from, $to) {
@@ -273,60 +268,39 @@ class ReportService extends BaseService {
       })
       ->with('journal','parameter_code')->get();
 
-    $starting_balance = isset($yoy_balance) ? $yoy_balance : 0;
-
-    $totals = [
-      'starting' => $starting_balance,
-      'final' => null,
+    $cash = [
+      'starting_balance' => 0,
       'debit' => 0,
-      'credit' => 0
+      'credit' => 0,
+      'final' => 0
     ];
 
-    $rows = [];
+    $bank = [
+      'starting_balance' => 0,
+      'debit' => 0,
+      'credit' => 0,
+      'final' => 0
+    ];
 
     foreach($items as $item) {
-      if(isset($totals['final'])) {
-        $totals['starting'] = $totals['final'];
+      if($item->journal->source == 'KAS') {
+        $cash['debit'] += floatval($item->debit);
+        $cash['credit'] += floatval($item->credit);
+      } else {
+        $bank['debit'] += floatval($item->debit);
+        $bank['credit'] += floatval($item->credit);
       }
-
-      if(isset($item->credit)) {
-        if(isset($totals['final'])) {
-          $totals['final'] = $totals['final'] + floatval($item->credit);
-        } else {
-          $totals['final'] = $totals['starting'] + floatval($item->credit);
-        }
-        $totals['credit'] += floatval($item->credit);
-      }
-
-      if(isset($item->debit)) {
-        if(isset($totals['final'])) {
-          $totals['final'] = $totals['final'] - floatval($item->debit);
-        } else {
-          $totals['final'] = $totals['starting'] - floatval($item->debit);
-        }
-
-        $totals['debit'] += floatval($item->debit);
-      }
-
-      array_push($rows, [
-        'journal_type' => $item->journal->journal_source,
-        'description' => $item->description,
-        'starting_balance' => $totals['starting'],
-        'final_balance' => $totals['final'],
-        'debit' => $item->debit,
-        'credit' => $item->credit
-      ]);
     };
+
+    $cash['final'] => $cash['credit'] - $cash['debit'];
+    $bank['final'] => $bank['credit'] - $bank['debit'];
 
     return [
       'account_code' => $account->code,
       'account_title' => $account->title,
       'account_type' => $account->type,
-      'starting_balance_total' => $starting_balance,
-      'final_balance_total' => $totals['final'],
-      'debit_total' => $totals['debit'],
-      'credit_total' => $totals['credit'],
-      'items' => $rows
+      'cash' => $cash,
+      'bank' => $bank
     ];
   }
 

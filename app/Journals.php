@@ -9,6 +9,7 @@ class Journals extends Model
     protected $fillable = [
       'journal_type',
       'date',
+      'source',
       'journal_number',
       'accepted_by',
       'submitted_by',
