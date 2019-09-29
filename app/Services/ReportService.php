@@ -253,11 +253,11 @@ class ReportService extends BaseService {
   public function loadGeneralLedgerByAccount($account, $from = null, $to = null) {
     $yoy_balance = YoYBalance::where([
       ['year', '=', (isset($from)) ? date('Y', strtotime($from)) : date('Y')-1],
-      ['code_of_account', '=', $code_of_account]
+      ['code_of_account', '=', $account->code]
     ])->first();
 
     $items = JournalDetails::
-      where('code_of_account',$code_of_account)
+      where('code_of_account',$account->code)
       ->whereHas('journal', function($q) use($from, $to) {
         if(isset($from)) {
           $q->where('date', '>=', date(strtotime($from), 'Y'));
@@ -319,9 +319,9 @@ class ReportService extends BaseService {
     };
 
     return [
-      'account_code' => $account['code'],
-      'account_title' => $account['title'],
-      'account_type' => $account['type'],
+      'account_code' => $account->code,
+      'account_title' => $account->title,
+      'account_type' => $account->type,
       'starting_balance_total' => $starting_balance,
       'final_balance_total' => $totals['final'],
       'debit_total' => $totals['debit'],
