@@ -482,7 +482,11 @@ class JournalsService extends BaseService {
             $taxJournal = new Journals([
               'journal_type' => 'TAX',
               'journal_source' => 'KAS',
-              'journal_number' => ''
+              'journal_number' => '',
+              'date' => $journal->date,
+              'user_id' => Auth::user()->id,
+              'accepted_by' => '',
+              'submitted_by' => ''
             ]);
             $taxJournal->save();
 
@@ -502,7 +506,7 @@ class JournalsService extends BaseService {
             $taxJournal->journalDetails()->create([
               'code_of_account' => $coa,
               'description' => $journal->journal_number,
-              'credit' => $detail->tax->tax_deduction,
+              'credit' => $detail->tax->tax_deduction
             ]);
           }
 
