@@ -510,11 +510,14 @@ class JournalsService extends BaseService {
             ]);
           }
 
-          $cashJournal = new Journals() ;
           $cashJournal = new Journals([
             'journal_type' => 'CASH',
             'journal_source' => 'KAS',
-            'journal_number' => ''
+            'journal_number' => '',
+            'date' => $journal->date,
+            'user_id' => Auth::user()->id,
+            'accepted_by' => '',
+            'submitted_by' => ''
           ]);
 
           $cashJournal->save();
