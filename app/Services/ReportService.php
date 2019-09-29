@@ -340,7 +340,7 @@ class ReportService extends BaseService {
     }
 
     foreach($accounts as $account) {
-      array_push($data, loadGeneralLedgerByAccount($account, $from, $to));
+      array_push($data, $this->loadGeneralLedgerByAccount($account, $from, $to));
     }
 
     return $data;
