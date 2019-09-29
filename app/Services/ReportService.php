@@ -309,7 +309,7 @@ class ReportService extends BaseService {
       }
 
       array_push($rows, [
-        'journal_type' => $item->journal->journal_type,
+        'journal_type' => $item->journal->journal_source,
         'description' => $item->description,
         'starting_balance' => $totals['starting'],
         'final_balance' => $totals['final'],
