@@ -250,11 +250,7 @@ class ReportService extends BaseService {
     ];
   }
 
-  public function generalLedger($code_of_account, $from=null, $to=null) {
-    $data = [];
-
-    $account = CodeAccount::where('code', $code_of_account)->first();
-
+  public function loadGeneralLedgerByAccount($account, $from = null, $to = null) {
     $yoy_balance = YoYBalance::where([
       ['year', '=', (isset($from)) ? date('Y', strtotime($from)) : date('Y')-1],
       ['code_of_account', '=', $code_of_account]
@@ -332,5 +328,21 @@ class ReportService extends BaseService {
       'credit_total' => $totals['credit'],
       'items' => $rows
     ];
+  }
+
+  public function generalLedger($code_of_account = null, $from = null, $to = null) {
+    $data = [];
+
+    if(isset($code_of_account)) {
+      $accounts = CodeAccount::where('code', $code_of_account)->get();
+    } else {
+      $accounts = CodeAccount::get();
+    }
+
+    foreach($accounts as $account) {
+      array_push($data, loadGeneralLedgerByAccount($account, $from, $to));
+    }
+
+    return $data;
   }
 }
