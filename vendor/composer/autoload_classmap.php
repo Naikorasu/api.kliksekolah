@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'App\\Auth' => $baseDir . '/app/Auth.php',
+    'App\\BankAccounts' => $baseDir . '/app/BankAccounts.php',
     'App\\BudgetAccounts' => $baseDir . '/app/BudgetAccounts.php',
     'App\\BudgetDetailDrafts' => $baseDir . '/app/BudgetDetailDrafts.php',
     'App\\BudgetDetails' => $baseDir . '/app/BudgetDetails.php',
@@ -4170,6 +4171,7 @@ return array(
     'TijsVerkoyen\\CssToInlineStyles\\Css\\Rule\\Rule' => $vendorDir . '/tijsverkoyen/css-to-inline-styles/src/Css/Rule/Rule.php',
     'UserGroupsTableSeeder' => $baseDir . '/database/seeds/UserGroupsTableSeeder.php',
     'UserRolesTableSeeder' => $baseDir . '/database/seeds/UserRolesTableSeeder.php',
+    'UserUnitSeeder' => $baseDir . '/database/seeds/UserUnitSeeder.php',
     'UsersTableSeeder' => $baseDir . '/database/seeds/UsersTableSeeder.php',
     'Webmozart\\Assert\\Assert' => $vendorDir . '/webmozart/assert/src/Assert.php',
     'Whoops\\Exception\\ErrorException' => $vendorDir . '/filp/whoops/src/Whoops/Exception/ErrorException.php',

@@ -481,6 +481,7 @@ class ComposerStaticInit70f86058477796cc8791554fb9c01655
 
     public static $classMap = array (
         'App\\Auth' => __DIR__ . '/../..' . '/app/Auth.php',
+        'App\\BankAccounts' => __DIR__ . '/../..' . '/app/BankAccounts.php',
         'App\\BudgetAccounts' => __DIR__ . '/../..' . '/app/BudgetAccounts.php',
         'App\\BudgetDetailDrafts' => __DIR__ . '/../..' . '/app/BudgetDetailDrafts.php',
         'App\\BudgetDetails' => __DIR__ . '/../..' . '/app/BudgetDetails.php',
@@ -4644,6 +4645,7 @@ class ComposerStaticInit70f86058477796cc8791554fb9c01655
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Rule\\Rule' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Rule/Rule.php',
         'UserGroupsTableSeeder' => __DIR__ . '/../..' . '/database/seeds/UserGroupsTableSeeder.php',
         'UserRolesTableSeeder' => __DIR__ . '/../..' . '/database/seeds/UserRolesTableSeeder.php',
+        'UserUnitSeeder' => __DIR__ . '/../..' . '/database/seeds/UserUnitSeeder.php',
         'UsersTableSeeder' => __DIR__ . '/../..' . '/database/seeds/UsersTableSeeder.php',
         'Webmozart\\Assert\\Assert' => __DIR__ . '/..' . '/webmozart/assert/src/Assert.php',
         'Whoops\\Exception\\ErrorException' => __DIR__ . '/..' . '/filp/whoops/src/Whoops/Exception/ErrorException.php',

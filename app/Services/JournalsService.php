@@ -66,6 +66,7 @@ class JournalsService extends BaseService {
     if(!isset($journal)) {
       $journal = new Journals();
       $journal->journal_type = $type;
+      $journal->source = $type;
       $journal->journal_number = $this->generateJournalNumber($type, $isCredit, $data->date);
       $journal->accepted_by = $receivedBy;
       $journal->submitted_by = $submittedBy;
@@ -465,6 +466,67 @@ class JournalsService extends BaseService {
     $journal = Journals::find($id);
     $journal->is_posted = true;
     $journal->save();
+
+    if($journal->journal_type == 'KAS' || $journal->journal_type == 'BANK') {
+      $journal->load(
+      'journalDetails',
+      'journalDetails.journalCashBankDetails',
+      'journalDetails.journalCashBankDetails.tax',
+      'journalDetails.journalCashBankDetails.tax.taxFields');
+
+
+      if($journal->journal_type == 'KAS') {
+        $journalDetails = $journal->journalDetails;
+        foreach($journalDetails as $idx => $detail) {
+          if(isset($detail->tax)) {
+            $taxJournal = new Journal([
+              'journal_type' => 'TAX',
+              'journal_source' => 'KAS',
+              'journal_number' => ''
+            ]);
+            $taxJournal->save();
+
+            $coa = '21101';
+            if ($detail->tax->type == 'pph23') {
+              $coa = '21106';
+            } else if ($detail->tax->type == 'pphp4a2') {
+              if($detail->tax->recipient == 'PNGKONS') {
+                $coa = '21102';
+              } else if($detail->tax->recipient == 'PLKKONS') {
+                $coa = '21103';
+              } else if($detail->tax->recipient == 'PRCKONS') {
+                $coa = '21104';
+              }
+            }
+
+            $taxJournal->journalDetails()->create([
+              'code_of_account' => $coa,
+              'description' => $journal->journal_number,
+              'credit' => $detail->tax->tax_deduction,
+            ]);
+          }
+
+          $cashJournal = new Journal() ;
+          $cashJournal = new Journal([
+            'journal_type' => 'CASH',
+            'journal_source' => 'KAS',
+            'journal_number' => ''
+          ]);
+
+          $cashJournal->save();
+          $cashJournal->journalDetails()->create([
+            'code_of_account' => '11101',
+            'description' => $journal->journal_number,
+            'debit' => (isset($detail->credit) && $detail->credit > 0) ? $detail->credit : null,
+            'credit' => (isset($detail->debit) && $detail->debit > 0) ? $detail->debit : null,
+          ]);
+        }
+      }
+
+    } else if($journal->journal_type == 'BANK') {
+
+    }
+
     return $journal;
   }
 
