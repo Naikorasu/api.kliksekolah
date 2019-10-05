@@ -40,7 +40,7 @@ class BudgetDetailsController extends Controller
   }
 
   public function save_revisions(Request $request) {
-    $data = $this->budgetDetailService->saveRevision($request);
+    $data = $this->budgetDetailService->saveRevision($request->revisions);
 
     return response()->json([
         'message' => 'Successfully saved RAPBU revisions',
@@ -52,10 +52,20 @@ class BudgetDetailsController extends Controller
     $data = $this->budgetDetailService->submitApproval($request);
 
     return response()->json([
-        'message' => 'Successfully saved RAPBU revisions',
+        'message' => 'Successfully submitted RAPBU for approval',
         'data' => $data,
     ], 200);
   }
+
+  public function reject_approval(Request $request) {
+    $data = $this->budgetDetailService->rejectApproval($request);
+
+    return response()->json([
+        'message' => 'The approval has been rejected',
+        'data' => $data,
+    ], 200);
+  }
+
 
   public function add_detail(Request $request)
   {

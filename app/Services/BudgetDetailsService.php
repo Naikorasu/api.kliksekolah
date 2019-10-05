@@ -110,6 +110,7 @@ class BudgetDetailsService extends BaseService {
     }
     $conditions = $this->buildFilters($filters);
 
+    $budget = Budgets::with('workflow')->where('unique_id', $filters['head'])->first();
 
     if($user->user_groups_id == 2) {
       $results = BudgetDetails::addSelect(DB::raw(('*, IF(revision1 is NULL, total, revision1) as revision1')))->parameterCode($codeOfAccountValue, $codeOfAccountType)->rAPBU()->where($conditions)->orderBy('created_at', 'DESC')->get();
@@ -200,7 +201,8 @@ class BudgetDetailsService extends BaseService {
         'total_pengeluaran_internal' => $totalExpenseIntern,
         'status_surplus_defisit' => $status,
         'estimasi_surplus_defisit' => $estimation_surplus_defisit,
-        'saldo' => $balance
+        'saldo' => $balance,
+        'workflow' => $budget->workflow,
     );
 
     return $data;
@@ -278,11 +280,11 @@ class BudgetDetailsService extends BaseService {
 
       //Korektor Perwakilan
       if($user->user_groups_id == 2) {
-        $budgetDetail->revision1 = $item->revision1;
+        $budgetDetail->revision1 = $item['revision1'];
       }
       //Manager Keuangan
       if($user->user_groups_id == 8) {
-        $budgetDetail->revision2 = $item->revision2;
+        $budgetDetail->revision2 = $item['revision2'];
       }
 
       $budgetDetail->save();
@@ -296,7 +298,21 @@ class BudgetDetailsService extends BaseService {
     }
 
     $budget = Budgets::where('unique_id',$data->head)->first();
-    $this->updateWorkflow($budget);
+
+    if($user->user_groups_id != 9) {
+      $this->updateWorkflow($budget);
+    } else {
+      $budget->approved = true;
+      $budget->save();
+      $this->updateWorkflow($budget, true);
+    }
+  }
+
+  public function rejectApproval($data) {
+    $user = Auth::user();
+
+    $budget = Budgets::where('unique_id',$data->head)->first();
+    $this->updateWorkflow($budget, false, true);
   }
 
 }

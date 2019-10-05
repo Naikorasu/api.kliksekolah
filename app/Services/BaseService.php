@@ -108,21 +108,21 @@ class BaseService{
     } else {
       switch($userGroup->name) {
           case 'Kepala Sekolah':
-            $prevRole = 'Keuangan Sekolah';
+            $nextRole = 'Keuangan Sekolah';
             break;
           case 'Korektor Perwakilan':
-            $prevRole = 'Kepala Sekolah';
+            $nextRole = 'Kepala Sekolah';
             break;
           case 'Manager Keuangan':
-            $prevRole = 'Korektor Perwakilan';
+            $nextRole = 'Korektor Perwakilan';
             break;
           case 'Bendahara':
-            $prevRole = 'Korektor Perwakilan';
+            $nextRole = 'Manager Keuangan';
             break;
           default:
-            $prevRole = 'Bendahara';
+            $nextRole = 'Bendahara';
       }
-      $nextRole = $userGroup->name;
+      $prevRole = $userGroup->name;
     }
 
     $workflow = [

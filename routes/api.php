@@ -80,6 +80,7 @@ Route::group([
             Route::post('rapbu','BudgetDetailsController@list_detail_rapbu');
             Route::post('rapbu/save','BudgetDetailsController@save_revisions');
             Route::post('rapbu/submit','BudgetDetailsController@submit_approval');
+            Route::post('rapbu/reject','BudgetDetailsController@reject_approval');
             Route::post('add','BudgetDetailsController@add_detail');
             Route::post('edit','BudgetDetailsController@edit_detail');
             Route::post('delete','BudgetDetailsController@delete_detail');
