@@ -24,13 +24,12 @@ class BudgetsService extends BaseService {
 
     try {
       $unit_id = Auth::user()->prm_school_units_id;
-      $query = Budgets::where($conditions)->orderBy('created_at', 'DESC')->with('account');
+      $query = Budgets::where($conditions)->orderBy('created_at', 'DESC')->with('account', 'workflow');
 
       if(!isset($unit_id)) {
         return $query->paginate(5);
       } else {
         return $query->withUnitId($unit_id)->paginate(5);
-
       }
     } catch(ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());

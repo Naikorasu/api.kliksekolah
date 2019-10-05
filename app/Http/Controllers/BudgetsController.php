@@ -62,7 +62,7 @@ class BudgetsController extends Controller
             'head_unique_id' => 'required',
         ]);
 
-        $budget = Budgets::find($request->head_unique_id);
+        $budget = Budgets::where('unique_id',$request->head_unique_id)->first();
 
         $deleted_account = BudgetAccounts::where('head', $budget['unique_id'])->forceDelete();
         $deleted_detail = BudgetDetails::where('head', $budget['unique_id'])->forceDelete();

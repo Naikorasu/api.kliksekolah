@@ -40,7 +40,7 @@ class BudgetDetailsController extends Controller
   }
 
   public function save_revisions(Request $request) {
-    $data = $this->budgetDetailService->saveRAPBURevision($request);
+    $data = $this->budgetDetailService->saveRevision($request);
 
     return response()->json([
         'message' => 'Successfully saved RAPBU revisions',

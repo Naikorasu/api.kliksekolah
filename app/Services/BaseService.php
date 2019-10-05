@@ -125,11 +125,11 @@ class BaseService{
       $nextRole = $userGroup->name;
     }
 
-    $workflow = new Workflows([
+    $workflow = [
       'prev_role' => $prevRole,
       'next_role' => $nextRole,
       'is_done' => $is_done
-    ]);
+    ];
 
 
     $model->workflow()->updateOrCreate(

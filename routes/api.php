@@ -78,8 +78,8 @@ Route::group([
         ],function() {
             Route::post('list/{type?}','BudgetDetailsController@list_detail');
             Route::post('rapbu','BudgetDetailsController@list_detail_rapbu');
-            Route::post('rapbu/save','BudgetDetailsController@submit_approval');
-            Route::post('rapbu/submit','BudgetDetailsController@save_revisions');
+            Route::post('rapbu/save','BudgetDetailsController@save_revisions');
+            Route::post('rapbu/submit','BudgetDetailsController@submit_approval');
             Route::post('add','BudgetDetailsController@add_detail');
             Route::post('edit','BudgetDetailsController@edit_detail');
             Route::post('delete','BudgetDetailsController@delete_detail');
