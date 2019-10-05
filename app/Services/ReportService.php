@@ -292,8 +292,8 @@ class ReportService extends BaseService {
       }
     };
 
-    $cash['final'] => $cash['credit'] - $cash['debit'];
-    $bank['final'] => $bank['credit'] - $bank['debit'];
+    $cash['final'] = $cash['credit'] - $cash['debit'];
+    $bank['final'] = $bank['credit'] - $bank['debit'];
 
     return [
       'account_code' => $account->code,

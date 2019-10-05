@@ -62,7 +62,7 @@ class OptionsController extends Controller
     }
 
     public function unit(Request $request) {
-      $data = $this->optionsService->getUnit($request->filters);
+      $data = $this->optionsService->getUnit($request->filters, $request->keyword);
       return $this->returnOption($request, $data);
     }
 }

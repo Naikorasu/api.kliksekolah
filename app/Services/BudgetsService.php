@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Auth;
 use App\Exceptions\DataNotFoundException;
+use App\BudgetDetailDrafts;
 use App\BudgetAccounts;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -96,6 +97,8 @@ class BudgetsService extends BaseService {
         $budget_account = New BudgetAccounts($data_account);
         $budget_account->save();
     }
+
+    $this->updateEntityUnit($budget_head);
 
     return $budget_head;
   }

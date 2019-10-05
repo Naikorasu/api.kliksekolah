@@ -104,6 +104,6 @@ class AuthController extends Controller
      */
     public function profile(Request $request)
     {
-        return response()->json($request->user()->load('userGroup','userRoles'));
+        return response()->json($request->user()->load('userGroup','userRoles', 'schoolUnit'));
     }
 }

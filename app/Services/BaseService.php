@@ -8,6 +8,7 @@ use App\User;
 use App\Exceptions\SchoolUnitException;
 use App\SchoolUnits;
 use App\EntityUnits;
+use App\Workflows;
 
 class BaseService{
 
@@ -74,10 +75,7 @@ class BaseService{
   }
 
   protected function updateEntityUnit($model) {
-    $schoolUnitId = 0;
-    if(isset(Auth::user()->schoolUnit)) {
-      $schoolUnitId = Auth::user()->prm_school_units_id;
-    }
+    $schoolUnitId = Auth::user()->prm_school_units_id;
 
     $entityUnit = new EntityUnits([
       'prm_school_units_id' => $schoolUnitId
@@ -87,17 +85,17 @@ class BaseService{
   }
 
   protected function updateWorkflow($model, $is_done = false, $is_rejected = false) {
-    $userRole = Auth::user()->userRoles()->first();
+    $userGroup = Auth::user()->userGroup()->first();
 
     if($is_rejected == false) {
-      switch($userRole->name) {
+      switch($userGroup->name) {
           case 'Keuangan Sekolah':
             $nextRole = 'Kepala Sekolah';
             break;
           case 'Kepala Sekolah':
-            $nextRole = 'Perwakilan';
+            $nextRole = 'Korektor Perwakilan';
             break;
-          case 'Perwakilan':
+          case 'Korektor Perwakilan':
             $nextRole = 'Manager Keuangan';
             break;
           case 'Manager Keuangan':
@@ -106,33 +104,63 @@ class BaseService{
           default:
             $nextRole = 'Bendahara';
       }
-      $prevRole = $userRole->name;
+      $prevRole = $userGroup->name;
     } else {
-      switch($userRole->name) {
+      switch($userGroup->name) {
           case 'Kepala Sekolah':
             $prevRole = 'Keuangan Sekolah';
             break;
-          case 'Perwakilan':
+          case 'Korektor Perwakilan':
             $prevRole = 'Kepala Sekolah';
             break;
           case 'Manager Keuangan':
-            $prevRole = 'Perwakilan';
+            $prevRole = 'Korektor Perwakilan';
             break;
           case 'Bendahara':
-            $prevRole = 'Perwakilan';
+            $prevRole = 'Korektor Perwakilan';
             break;
           default:
             $prevRole = 'Bendahara';
       }
-      $nextRole = $userRole->name;
+      $nextRole = $userGroup->name;
     }
 
-    $workflow = new Workflow([
+    $workflow = new Workflows([
       'prev_role' => $prevRole,
       'next_role' => $nextRole,
       'is_done' => $is_done
     ]);
 
-    $model->workflow()->save($workflow);
+
+    $model->workflow()->updateOrCreate(
+      [
+        'entity_type' => get_class($model),
+        'entity_id' => $model->id
+      ],
+      $workflow
+    );
+  }
+
+  protected function validateUserGroupForSaving($model) {
+    $user = Auth::user()->load('userGroup');
+
+    $model->load('workflow');
+    if($user->userGroup->name == $model->workflow['nextRole']) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  protected function validateUserGroupForSubmit($model) {
+    $user = Auth::user()->load('userGroup');
+
+    $model->load('workflow');
+
+    if($user->userGroup->name == $model->workflow['nextRole']) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

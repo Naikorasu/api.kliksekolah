@@ -204,17 +204,24 @@ class OptionsService extends BaseService {
     }
   }
 
-  public function getUnit($filters) {
+  public function getUnit($filters, $keyword = null) {
     $conditions = $this->buildFilters($filters);
 
+
     try {
-      $collection = SchoolUnits::where($conditions)->get();
+      if(!isset($keyword)) {
+        $collection = SchoolUnits::get();
+      } else {
+        $collection = SchoolUnits::where('name', 'like' ,'%'.$keyword.'%')
+        ->orWhere('unit_code', 'like', '%'.$keyword.'%')->get();
+      }
 
       $options = [];
       foreach($collection as $option) {
         array_push($options, [
           "id" => $option->id,
-          "title" => $option->title
+          "title" => $option->name,
+          "attributes" => $option,
         ]);
       }
       return $options;

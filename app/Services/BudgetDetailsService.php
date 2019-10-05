@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Exceptions\DataNotFoundException;
+use App\Budgets;
 use App\BudgetDetails;
 
 class BudgetDetailsService extends BaseService {
@@ -96,6 +98,8 @@ class BudgetDetailsService extends BaseService {
   }
 
   public function getRAPBUList($filters=[]) {
+    $user = Auth::user();
+
     $codeOfAccountValue = null;
     $codeOfAccountType = null;
     if(isset($filters)) {
@@ -106,11 +110,19 @@ class BudgetDetailsService extends BaseService {
     }
     $conditions = $this->buildFilters($filters);
 
-    $results = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->rAPBU()->orderBy('created_at', 'DESC')->get();
+
+    if($user->user_groups_id == 2) {
+      $results = BudgetDetails::addSelect(DB::raw(('*, IF(revision1 is NULL, total, revision1) as revision1')))->parameterCode($codeOfAccountValue, $codeOfAccountType)->rAPBU()->where($conditions)->orderBy('created_at', 'DESC')->get();
+    } else if ($user->user_groups_id == 8) {
+      $results = BudgetDetails::addSelect(DB::raw(('*, IF(revision2 is NULL, IF(revision1 is NULL, total, revision1), revision2) as revision2')))->parameterCode($codeOfAccountValue, $codeOfAccountType)->rAPBU()->where($conditions)->orderBy('created_at', 'DESC')->get();
+    } else {
+      $results = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->rAPBU()->where($conditions)->orderBy('created_at', 'DESC')->get();
+    }
 
     $incomes = [];
     $expenses = [];
     $inventories = [];
+    $revisions = [];
 
     $totalIncome = 0;
     $totalExpense = 0;
@@ -147,6 +159,11 @@ class BudgetDetailsService extends BaseService {
         $totalExpenseBos += $result->bos;
         $totalExpenseIntern += $result->intern;
       }
+
+      $revisions[$result->id] = [
+        'revision1' => $result->revision1,
+        'revision2' => $result->revision2
+      ];
     }
 
     $estimation = $totalIncome - $totalCost;
@@ -168,6 +185,7 @@ class BudgetDetailsService extends BaseService {
         'pengeluaran' => $expenses,
         'pendapatan' => $incomes,
         'inventaris' => $inventories,
+        'revisions' => $revisions,
         'total_pendapatan' => $totalIncome,
         'total_pengeluaran' => $totalExpense,
         'total_inventaris' => $totalInventories,
@@ -189,22 +207,34 @@ class BudgetDetailsService extends BaseService {
   }
 
   public function save($data, $head, $account, $accountType, $id=null) {
-    if($id) {
-      try {
-        $budgetDetail = BudgetDetails::findOrFail($id);
-        $budgetDetail->update($data);
-      } catch (ModelNotFoundException $exception) {
-        throw new DataNotFoundException($exception->getMessage());
-      }
-    } else {
+    $budget = Budgets::where('unique_id', $head)->first();
 
-      $budgetDetail = new BudgetDetails($data);
-      $budgetDetail->unique_id = $this->generateUniqueId($accountType, $budgetDetail->code_of_account);
-      $budgetDetail->head = $head;
-      $budgetDetail->account = $account;
-      $budgetDetail->save();
+    try {
+      if(!$this->validateUserGroupForSaving($budget)) {
+        throw new ModelNotFoundException('Budget Detail had been submitted.');
+      }
+
+      if($id) {
+        try {
+          $budgetDetail = BudgetDetails::with('head')->findOrFail($id);
+
+
+        } catch (ModelNotFoundException $exception) {
+          throw new DataNotFoundException($exception->getMessage());
+        }
+      } else {
+
+        $budgetDetail = new BudgetDetails($data);
+        $budgetDetail->unique_id = $this->generateUniqueId($accountType, $budgetDetail->code_of_account);
+        $budgetDetail->head = $head;
+        $budgetDetail->account = $account;
+        $budgetDetail->save();
+      }
+      $budgetDetail->load('parameter_code');
+    } catch (ModelNotFoundException $exception) {
+      throw new DataNotFoundException($exception->getMessage());
     }
-    $budgetDetail->load('parameter_code');
+
     return $budgetDetail;
   }
 
@@ -239,7 +269,34 @@ class BudgetDetailsService extends BaseService {
     }
 
     return $budgetDetail;
+  }
 
+  public function saveRevision($data) {
+    $user = Auth::user();
+    foreach($data as $budgetDetailId => $item) {
+      $budgetDetail = BudgetDetails::find($budgetDetailId);
+
+      //Korektor Perwakilan
+      if($user->user_groups_id == 2) {
+        $budgetDetail->revision1 = $item->revision1;
+      }
+      //Manager Keuangan
+      if($user->user_groups_id == 8) {
+        $budgetDetail->revision2 = $item->revision2;
+      }
+
+      $budgetDetail->save();
+    }
+  }
+
+  public function submitApproval($data) {
+    $user = Auth::user();
+    if($user->user_groups_id == 2 || $user->user_groups_id == 8) {
+      $this->saveRevision($data->revisions);
+    }
+
+    $budget = Budgets::where('unique_id',$data->head)->first();
+    $this->updateWorkflow($budget);
   }
 
 }

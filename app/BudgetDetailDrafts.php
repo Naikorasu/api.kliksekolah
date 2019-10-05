@@ -26,6 +26,8 @@ class BudgetDetailDrafts extends Model
         'bos',
         'total',
         'desc',
+        'revision1',
+        'revision2',
         'user_id'
     ];
 
