@@ -123,6 +123,19 @@ class FundRequestsController extends Controller
       ], 200);
     }
 
+    public function reject(Request $request) {
+      $request->validate([
+        'id' => 'required|integer'
+      ]);
+
+      $data = $this->fundRequestService->reject($request->id);
+
+      return response()->json([
+        'message' => 'Successfully submitted the fund request',
+        'data' => $data
+      ], 200);
+    }
+
     public function updateStatus(Request $request, $status) {
       $request->validate([
           'id' => 'required|integer'

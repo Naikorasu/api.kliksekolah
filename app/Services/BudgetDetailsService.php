@@ -304,7 +304,16 @@ class BudgetDetailsService extends BaseService {
     } else {
       $budget->approved = true;
       $budget->save();
+      $this->setAPBU($budget);
       $this->updateWorkflow($budget, true);
+    }
+  }
+
+  public function setAPBU($budget) {
+    $budget->load('budgetDetails');
+    foreach($budget->budgetDetails as $budgetDetail) {
+      $budgetDetail->total = $budgetDetail->revision2;
+      $budgetDetail->save();
     }
   }
 

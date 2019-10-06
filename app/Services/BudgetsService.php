@@ -22,31 +22,38 @@ class BudgetsService extends BaseService {
   public function getList($filters=[], $unit_id = null) {
 
     $conditions = $this->buildFilters($filters);
+    $user = Auth::user();
 
     try {
       if(!isset($unit_id)) {
-        $user = Auth::user();
         $unit_id = $user->prm_school_units_id;
         if(!isset($unit_id) && isset($user->prm_perwakilan_id)) {
           $unit_id = SchoolUnits::select('id')->where('prm_perwakilan_id', $user->prm_perwakilan_id)->get();
         }
       }
-      $query = Budgets::where($conditions)->orderBy('created_at', 'DESC')->with('account', 'workflow');
 
-      if(!isset($unit_id)) {
-        return $query->paginate(5);
-      } else {
-        return $query->withUnitId($unit_id)->paginate(5);
-      }
+
+      $query = Budgets::withUnitId($unit_id)
+        ->where($conditions)
+        ->orderBy('created_at', 'DESC')
+        ->with('account', 'workflow')
+        ->paginate(5);
+
+      return $query;
     } catch(ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
   }
 
   public function save($data, $unit_id = null) {
-    $user = $data->user();
+    $user = Auth::user()->load('userGroup');
     $user_email = $user->email;
 
+    if($user->userGroup->name != 'Keuangan Sekolah'
+      && $user->userGroup->name != 'Manager Keuangan'
+      && $user->userGroup->name != 'Korektor Perwakilan') {
+        throw new Exception('User not allowed to save');
+    }
     $unique_id_head = $this->generateUniqueId($user_email . ";" . "HEAD;");
 
     $data_head = array(

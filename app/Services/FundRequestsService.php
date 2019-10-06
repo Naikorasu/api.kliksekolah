@@ -297,5 +297,16 @@ class FundRequestsService extends BaseService {
     return $fundRequest->load('workflow');
   }
 
+  public function reject($id) {
+    try {
+      $fundRequest = FundRequests::findOrFail($id);
+    } catch (ModelNotFoundException $exception) {
+      throw new DataNotFoundException($exception->getMessage());
+    }
+
+    $this->updateWorkflow($fundRequest, false, true);
+
+    return $fundRequest->load('workflow');
+  }
 
 }

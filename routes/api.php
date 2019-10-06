@@ -107,6 +107,7 @@ Route::group([
           Route::post('edit', 'FundRequestsController@edit');
           Route::post('delete', 'FundRequestsController@delete');
           Route::post('submit', 'FundRequestsController@submit');
+          Route::post('reject', 'FundRequestsController@reject');
           Route::post('{status}', 'FundRequestsController@updateStatus')->where('status', '(approve|reject)');
           Route::post('budget-details', 'FundRequestsController@loadAvailableBudgetDetails');
           Route::post('code-of-account', 'FundRequestsController@loadAvailableCoa');
