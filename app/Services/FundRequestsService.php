@@ -50,27 +50,14 @@ class FundRequestsService extends BaseService {
     }
 
 
-    if(isset($user->userGroup)) {
-      $fundRequests = FundRequests::withUnitId($unit_id)
-        ->with('workflow')
-        ->whereHas('workflow', function($q) use($user) {
-          $q->where('next_role', $user->userGroup->name);
-        })
-        ->select('id', 'created_at', 'nomor_permohonan', 'description')
-        ->totalAmount()
-        ->where($conditions)
-        ->orderBy('created_at', 'DESC')
-        ->paginate(5);
-    } else {
-      $fundRequests = FundRequests::withUnitId($unit_id)
-        ->with('workflow')
-        ->select('id', 'created_at', 'nomor_permohonan', 'description')
-        ->totalAmount()
-        ->where($conditions)
-        ->orderBy('created_at', 'DESC')
-        ->paginate(5);
+    $fundRequests = FundRequests::withUnitId($unit_id)
+      ->with('workflow')
+      ->select('id', 'created_at', 'nomor_permohonan', 'description')
+      ->totalAmount()
+      ->where($conditions)
+      ->orderBy('created_at', 'DESC')
+      ->paginate(5);
 
-    }
 
     $fundRequests->getCollection()->transform(function($fundRequest) {
       return [
