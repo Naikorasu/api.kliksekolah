@@ -39,16 +39,38 @@ class FundRequestsService extends BaseService {
 
   public function list($filters=[], $unit_id = null) {
     $conditions = $this->buildFilters($filters);
+    $user = Auth::user();
+    $user->load('userGroup');
 
     if(!isset($unit_id)) {
-      $user = Auth::user();
       $unit_id = $user->prm_school_units_id;
       if(!isset($unit_id) && isset($user->prm_perwakilan_id)) {
         $unit_id = SchoolUnits::select('id')->where('prm_perwakilan_id', $user->prm_perwakilan_id)->get();
       }
     }
 
-    $fundRequests = FundRequests::withUnitId($unit_id)->with('workflow')->select('id', 'created_at', 'nomor_permohonan', 'description')->totalAmount()->where($conditions)->orderBy('created_at', 'DESC')->paginate(5);
+
+    if(isset($user->userGroup)) {
+      $fundRequests = FundRequests::withUnitId($unit_id)
+        ->with('workflow')
+        ->whereHas('workflow', function($q) use($user) {
+          $q->where('next_role', $user->userGroup->name);
+        })
+        ->select('id', 'created_at', 'nomor_permohonan', 'description')
+        ->totalAmount()
+        ->where($conditions)
+        ->orderBy('created_at', 'DESC')
+        ->paginate(5);
+    } else {
+      $fundRequests = FundRequests::withUnitId($unit_id)
+        ->with('workflow')
+        ->select('id', 'created_at', 'nomor_permohonan', 'description')
+        ->totalAmount()
+        ->where($conditions)
+        ->orderBy('created_at', 'DESC')
+        ->paginate(5);
+
+    }
 
     $fundRequests->getCollection()->transform(function($fundRequest) {
       return [
@@ -265,7 +287,7 @@ class FundRequestsService extends BaseService {
 
   public function submit($id) {
     try {
-      $fundRequest = FundRequests::status(false,false)->findOrFail($id);
+      $fundRequest = FundRequests::findOrFail($id);
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
