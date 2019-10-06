@@ -159,7 +159,7 @@ class BaseService{
 
     $model->load('workflow');
 
-    if($user->userGroup->name == $model->workflow['nextRole']) {
+    if(!isset($model->workflow) || $user->userGroup->name == $model->workflow['nextRole']) {
       return true;
     } else {
       return false;
