@@ -163,7 +163,7 @@ class OptionsService extends BaseService {
     }
   }
 
-  public function getBudgets($filters, $keyword = '') {
+  public function getBudgets($filters, $keyword = '', $unit_id) {
     $conditions = [];
     if(isset($filters['periode'])) {
       $conditions = [
@@ -171,7 +171,7 @@ class OptionsService extends BaseService {
       ];
     }
     try {
-      $collection = Budgets::options($keyword)->where($conditions)->get();
+      $collection = Budgets::withUnitId($unit_id)->options($keyword)->where($conditions)->get();
 
       return $collection->transform(function($item) {
         return [

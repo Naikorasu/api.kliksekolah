@@ -52,7 +52,7 @@ class OptionsController extends Controller
     }
 
     public function budget(Request $request, $type=null) {
-      $data = $this->optionsService->getBudgets($request->filters, $request->keyword);
+      $data = $this->optionsService->getBudgets($request->filters, $request->keyword, $request->unit_id);
       return $this->returnOption($request, $data);
     }
 

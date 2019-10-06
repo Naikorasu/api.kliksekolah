@@ -30,9 +30,7 @@ class BudgetsController extends Controller
     //BUDGET HEADER
     public function list_head(Request $request)
     {
-        $filters = $request->filters;
-
-        $result = $this->budgetService->getList($request->filters);
+        $result = $this->budgetService->getList($request->filters, $request->unit_id);
 
         return response()->json($result, 200);
     }
@@ -45,7 +43,7 @@ class BudgetsController extends Controller
             'desc' => 'string',
         ]);
 
-        $data = $this->budgetService->save($request);
+        $data = $this->budgetService->save($request, $request->unit_id);
 
         return response()->json([
             'message' => 'Successfully Add Budgets Head Data',

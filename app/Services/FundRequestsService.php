@@ -37,10 +37,18 @@ class FundRequestsService extends BaseService {
     }
   }
 
-  public function list($filters=[]) {
+  public function list($filters=[], $unit_id = null) {
     $conditions = $this->buildFilters($filters);
 
-    $fundRequests = FundRequests::select('id', 'created_at', 'nomor_permohonan', 'description')->totalAmount()->where($conditions)->orderBy('created_at', 'DESC')->paginate(5);
+    if(!isset($unit_id)) {
+      $user = Auth::user();
+      $unit_id = $user->prm_school_units_id;
+      if(!isset($unit_id) && isset($user->prm_perwakilan_id)) {
+        $unit_id = SchoolUnits::select('id')->where('prm_perwakilan_id', $user->prm_perwakilan_id)->get();
+      }
+    }
+
+    $fundRequests = FundRequests::withUnitId($unit_id)->with('workflow')->select('id', 'created_at', 'nomor_permohonan', 'description')->totalAmount()->where($conditions)->orderBy('created_at', 'DESC')->paginate(5);
 
     $fundRequests->getCollection()->transform(function($fundRequest) {
       return [
@@ -54,7 +62,8 @@ class FundRequestsService extends BaseService {
           'description' => $fundRequest->description,
           'nomor_permohonan' => $fundRequest->nomor_permohonan,
           'created_at' => $fundRequest->created_at
-        ]
+        ],
+        'workflow' => $fundRequest->workflow
       ];
     });
 
@@ -62,7 +71,7 @@ class FundRequestsService extends BaseService {
   }
 
   public function get($id) {
-    $fundRequest = FundRequests::with('fundRequestDetails','fundRequestDetails.budgetDetail', 'fundRequestDetails.budgetDetail.parameter_code', 'head')->find($id);
+    $fundRequest = FundRequests::with('fundRequestDetails','fundRequestDetails.budgetDetail', 'fundRequestDetails.budgetDetail.parameter_code', 'head', 'workflow', 'school_unit')->find($id);
     $fundRequest->details = $fundRequest->fundRequestDetails->map(function($item) {
       return [
         'amount' => $item['amount'],
@@ -79,7 +88,7 @@ class FundRequestsService extends BaseService {
     return $fundRequest;
   }
 
-  public function save($id = null, $data) {
+  public function save($id = null, $data, $unit_id) {
     $unit_code = 0;
     $schoolUnit = Auth::user()->schoolUnit;
     $counter = EntityUnits::where('entity_type', 'App\FundRequests');
@@ -125,12 +134,8 @@ class FundRequestsService extends BaseService {
     $fundRequest->save();
     $fundRequest->fundRequestDetails()->createMany($fundRequestDetails);
 
-    // if(isset($schoolUnit)) {
-    //   $unit_code = $schoolUnit->unit_code;
-    //   $counter->where('prm_school_units', $schoolUnit->id);
-    // }
-    //
-    // $this->updateEntityUnit($fundRequest);
+    $this->updateEntityUnit($fundRequest, $unit_id);
+
     return $fundRequest->load('fundRequestDetails','fundRequestDetails.budgetDetail','budgetDetail');
   }
 
@@ -265,10 +270,9 @@ class FundRequestsService extends BaseService {
       throw new DataNotFoundException($exception->getMessage());
     }
 
+    $this->updateWorkflow($fundRequest);
 
-    $fundRequest->update(['submitted' => true]);
-
-    return $fundRequest;
+    return $fundRequest->load('workflow');
   }
 
 

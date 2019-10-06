@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Builder;
+use App\Perwakilan;
 
 class User extends Authenticatable
 {
@@ -19,7 +20,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'user_groups_id', 'prm_school_units_id'
+        'name', 'email', 'password', 'user_groups_id', 'prm_school_units_id', 'prm_perwakilan_id'
     ];
 
     /**
@@ -46,6 +47,10 @@ class User extends Authenticatable
 
     public function schoolUnit() {
       return $this->hasOne(SchoolUnits::class, 'id', 'prm_school_units_id');
+    }
+
+    public function perwakilan() {
+      return $this->hasOne(Perwakilan::class, 'id', 'prm_perwakilan_id');
     }
 
     public function userRoles() {

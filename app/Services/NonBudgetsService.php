@@ -5,14 +5,26 @@ namespace App\Services;
 use Auth;
 use DateTime;
 use App\NonBudgets;
+use App\SchoolUnits;
 use App\Exceptions\DataNotFoundException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class NonBudgetsService extends BaseService {
 
-  public function list($filters) {
+  public function list($filters, $unit_id = null) {
     $conditions = $this->buildFilters($filters);
-    return NonBudgets::where($conditions)->orderBy('created_at','DESC')->paginate(5);
+
+    if(!isset($unit_id)) {
+      $user = Auth::user();
+
+      $unit_id = $user->prm_school_units_id;
+
+      if(!isset($unit_id) && isset($user->prm_perwakilan_id)) {
+        $unit_id = SchoolUnits::select('id')->where('prm_perwakilan_id', $user->prm_perwakilan_id)->get();
+      }
+    };
+
+    return NonBudgets::where($conditions)->withUnitId($unit_id)->orderBy('created_at','DESC')->paginate(5);
   }
 
   public function get($id,$submitted=false,$approved=false) {
@@ -27,7 +39,7 @@ class NonBudgetsService extends BaseService {
     }
   }
 
-  public function save($data) {
+  public function save($data, $unit_id = null) {
     $data['date'] = ($data['date']) ? date('Y-m-d', (DateTime::createFromFormat('Y-m-d',$data['date']))->getTimestamp()) : date('Y-m-d');
     $data['user_id'] = Auth::user()->id;
 
@@ -38,6 +50,8 @@ class NonBudgetsService extends BaseService {
       $nonBudget = new NonBudgets($data);
       $nonBudget->save();
     }
+
+    $this->updateEntityUnit($nonBudget, $unit_id);
 
     return $nonBudget;
   }

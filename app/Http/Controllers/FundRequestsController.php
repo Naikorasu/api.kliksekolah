@@ -18,7 +18,7 @@ class FundRequestsController extends Controller
     }
 
     public function list(Request $request) {
-      $fundRequest = $this->fundRequestService->list($request->filters);
+      $fundRequest = $this->fundRequestService->list($request->filters, $request->unit_id);
 
       return response()->json($fundRequest, 200);
 
@@ -47,7 +47,7 @@ class FundRequestsController extends Controller
         'details' => 'array|required'
       ]);
 
-      $data = $this->fundRequestService->save($request->id, $request);
+      $data = $this->fundRequestService->save($request->id, $request, $request->unit_id);
 
       return response()->json([
           'message' => 'Successfully Add Fund Request',
@@ -62,7 +62,7 @@ class FundRequestsController extends Controller
           'details' => 'array|required'
       ]);
 
-      $data = $this->fundRequestService->save($request->id, $request);
+      $data = $this->fundRequestService->save($request->id, $request, $request->unit_id);
 
       return response()->json([
           'message' => 'Successfully Updated Fund Request',

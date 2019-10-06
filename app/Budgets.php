@@ -36,6 +36,11 @@ class Budgets extends Model
     }
 
     public function scopeWithUnitId($query, $unit_id) {
+      if(is_array($unit_id)) {
+        return $query->whereHas('school_unit',function($q) use($unit_id) {
+          $q->whereIn('prm_school_units_id', $unit_id);
+        });
+      }
       return $query->whereHas('school_unit', function($q) use($unit_id) {
         $q->where('prm_school_units_id', '=', $unit_id);
       });

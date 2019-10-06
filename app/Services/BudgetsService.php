@@ -6,6 +6,7 @@ use Auth;
 use App\Exceptions\DataNotFoundException;
 use App\BudgetDetailDrafts;
 use App\BudgetAccounts;
+use App\SchoolUnits;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use App\Budgets;
@@ -18,12 +19,18 @@ class BudgetsService extends BaseService {
    * @param  \Exception  $exception
    * @return void
    */
-  public function getList($filters=[]) {
+  public function getList($filters=[], $unit_id = null) {
 
     $conditions = $this->buildFilters($filters);
 
     try {
-      $unit_id = Auth::user()->prm_school_units_id;
+      if(!isset($unit_id)) {
+        $user = Auth::user();
+        $unit_id = $user->prm_school_units_id;
+        if(!isset($unit_id) && isset($user->prm_perwakilan_id)) {
+          $unit_id = SchoolUnits::select('id')->where('prm_perwakilan_id', $user->prm_perwakilan_id)->get();
+        }
+      }
       $query = Budgets::where($conditions)->orderBy('created_at', 'DESC')->with('account', 'workflow');
 
       if(!isset($unit_id)) {
@@ -36,7 +43,7 @@ class BudgetsService extends BaseService {
     }
   }
 
-  public function save($data) {
+  public function save($data, $unit_id = null) {
     $user = $data->user();
     $user_email = $user->email;
 
@@ -50,10 +57,6 @@ class BudgetsService extends BaseService {
     );
     $budget_head = New Budgets($data_head);
     $budget_head->save();
-
-    if(isset(Auth::user()->prm_school_units_id)) {
-      $this->updateEntityUnit($budget_head);
-    }
 
     for ($y = 0; $y <= 4; $y++) {
 
@@ -97,7 +100,7 @@ class BudgetsService extends BaseService {
         $budget_account->save();
     }
 
-    $this->updateEntityUnit($budget_head);
+    $this->updateEntityUnit($budget_head, $unit_id);
 
     return $budget_head;
   }

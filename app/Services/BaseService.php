@@ -74,8 +74,10 @@ class BaseService{
     }
   }
 
-  protected function updateEntityUnit($model) {
-    $schoolUnitId = Auth::user()->prm_school_units_id;
+  protected function updateEntityUnit($model, $schoolUnitId = null) {
+    if(!isset($schoolUnitId)) {
+      $schoolUnitId = Auth::user()->prm_school_units_id;
+    }
 
     $entityUnit = new EntityUnits([
       'prm_school_units_id' => $schoolUnitId
@@ -145,7 +147,7 @@ class BaseService{
     $user = Auth::user()->load('userGroup');
 
     $model->load('workflow');
-    if($user->userGroup->name == $model->workflow['nextRole']) {
+    if(!isset($model->workflow) || $user->userGroup->name == $model->workflow['nextRole']) {
       return true;
     } else {
       return false;

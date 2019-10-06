@@ -12,4 +12,12 @@ class Perwakilan extends Model
       'code',
       'name'
     ];
+
+    public function users() {
+      return $this->belongsTo('App\User', 'prm_perwakilan_id');
+    }
+
+    public function schoolUnits() {
+      return $this->hasMany('App\SchoolUnits', 'prm_perwakilan_id', 'id');
+    }
 }

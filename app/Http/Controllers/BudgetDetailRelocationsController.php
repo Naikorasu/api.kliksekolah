@@ -33,7 +33,7 @@ class BudgetDetailRelocationsController extends Controller
   public function list(Request $request) {
     $filters = (isset($request->filters)) ? $request->filters : [];
 
-    $budgetRelocation = $this->budgetDetailRelocationService->list($filters);
+    $budgetRelocation = $this->budgetDetailRelocationService->list($filters, $request->unit_id);
 
     if($budgetRelocation) {
       return response()->json([
@@ -60,7 +60,7 @@ class BudgetDetailRelocationsController extends Controller
         'recipients' => 'required|array'
     ]);
 
-    $data = $this->budgetDetailRelocationService->save($request->sources, $request->recipients, $request->head, $request->account, $request->description, $request->id);
+    $data = $this->budgetDetailRelocationService->save($request->sources, $request->recipients, $request->head, $request->account, $request->description, $request->id, $request->unit_id);
 
     return response()->json([
       'message' => 'Successfully saved budget relocation',

@@ -27,9 +27,18 @@ class BudgetDetailRelocationsService extends BaseService {
     $this->budgetDetailService = $budgetDetailService;
   }
 
-  public function list($filters=[]) {
+  public function list($filters=[], $unit_id = null) {
     $conditions = $this->buildFilters($filters);
-    $budgetRelocations = BudgetRelocations::with('head')->totalPengajuan()->orderBy('created_at','DESC')->where($conditions)->get();
+
+    if(!isset($unit_id)) {
+      $user = Auth::user();
+      $unit_id = $user->prm_school_units_id;
+      if(!isset($unit_id) && isset($user->prm_perwakilan_id)) {
+        $unit_id = SchoolUnits::select('id')->where('prm_perwakilan_id', $user->prm_perwakilan_id)->get();
+      }
+    }
+
+    $budgetRelocations = BudgetRelocations::withUnitId($unit_id)->with('head')->totalPengajuan()->orderBy('created_at','DESC')->where($conditions)->get();
     $data = $budgetRelocations->transform(function($budgetRelocation) {
       return [
         'id' => $budgetRelocation->id,
@@ -53,7 +62,7 @@ class BudgetDetailRelocationsService extends BaseService {
     }
   }
 
-  public function save($sources, $recipients, $head, $account, $description = '', $id=null) {
+  public function save($sources, $recipients, $head, $account, $description = '', $id=null, $unit_id = null) {
     if(isset($id)) {
       try {
         $budgetRelocation = BudgetRelocations::findOrFail($id);
@@ -113,6 +122,8 @@ class BudgetDetailRelocationsService extends BaseService {
 
     $budgetRelocation->budgetRelocationRecipients()->forceDelete();
     $budgetRelocation->budgetRelocationRecipients()->saveMany($recipients);
+
+    $this->updateEntityUnit($budgetRelocation, $unit_id);
 
     return $budgetRelocation->load('budgetRelocationSources','budgetRelocationRecipients');
   }

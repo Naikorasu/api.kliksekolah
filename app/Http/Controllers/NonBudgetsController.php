@@ -18,7 +18,7 @@ class NonBudgetsController extends Controller
     public function list(Request $request) {
       $filters = $request->filters;
 
-      $data = $this->nonBudgetService->list($filters);
+      $data = $this->nonBudgetService->list($filters, $request->unit_id);
       return response()->json($data,200);
     }
 
@@ -39,7 +39,7 @@ class NonBudgetsController extends Controller
         'activity' => 'required'
       ]);
 
-      $data = $this->nonBudgetService->save($request->all());
+      $data = $this->nonBudgetService->save($request->all(), $request->unit_id);
       return response()->json([
         'message' => 'Successfully saved non budget request.',
         'data' => $data,
@@ -54,7 +54,7 @@ class NonBudgetsController extends Controller
         'activity' => 'required'
       ]);
 
-      $data = $this->nonBudgetService->save($request->all());
+      $data = $this->nonBudgetService->save($request->all(), $request->unit_id);
       return response()->json([
         'message' => 'Successfully saved non budget request.',
         'data' => $data,
