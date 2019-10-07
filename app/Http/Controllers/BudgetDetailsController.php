@@ -39,8 +39,8 @@ class BudgetDetailsController extends Controller
       ], 200);
   }
 
-  public function save_revisions(Request $request) {
-    $data = $this->budgetDetailService->saveRevision($request->revisions);
+  public function save_recommendations(Request $request) {
+    $data = $this->budgetDetailService->saveRecommendation($request->recommendations);
 
     return response()->json([
         'message' => 'Successfully saved RAPBU revisions',

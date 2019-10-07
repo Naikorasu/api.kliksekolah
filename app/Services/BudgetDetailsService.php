@@ -113,18 +113,12 @@ class BudgetDetailsService extends BaseService {
 
     $budget = Budgets::with('workflow')->where('unique_id', $filters['head'])->first();
 
-    if($user->user_groups_id == 2) {
-      $results = BudgetDetails::addSelect(DB::raw(('*, IF(revision1 is NULL, total, revision1) as revision1')))->parameterCode($codeOfAccountValue, $codeOfAccountType)->rAPBU()->where($conditions)->orderBy('created_at', 'DESC')->get();
-    } else if ($user->user_groups_id == 8) {
-      $results = BudgetDetails::addSelect(DB::raw(('*, IF(revision2 is NULL, IF(revision1 is NULL, total, revision1), revision2) as revision2')))->parameterCode($codeOfAccountValue, $codeOfAccountType)->rAPBU()->where($conditions)->orderBy('created_at', 'DESC')->get();
-    } else {
-      $results = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->rAPBU()->where($conditions)->orderBy('created_at', 'DESC')->get();
-    }
+    $results = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->rAPBU()->where($conditions)->orderBy('created_at', 'DESC')->get();
 
     $incomes = [];
     $expenses = [];
     $inventories = [];
-    $revisions = [];
+    $recommendations = [];
 
     $totalIncome = 0;
     $totalExpense = 0;
@@ -182,9 +176,11 @@ class BudgetDetailsService extends BaseService {
         $totalCostIntern += $result->intern;
       }
 
-      $revisions[$result->id] = [
-        'revision1' => $result->revision1,
-        'revision2' => $result->revision2
+      $recommendations[$result->id] = [
+        'recommendation_ypl' => $result->recommendation_ypl,
+        'recommendation_committee' => $result->recommendation_committee,
+        'recommendation_intern' => $result->recommendation_intern,
+        'recommendation_bos' => $result->recommendation_bos
       ];
     }
 
@@ -211,7 +207,7 @@ class BudgetDetailsService extends BaseService {
         'pengeluaran' => $expenses,
         'pendapatan' => $incomes,
         'inventaris' => $inventories,
-        'revisions' => $revisions,
+        'recommendations' => $recommendations,
         'total_pendapatan' => $totalIncome,
         'total_pengeluaran' => $totalExpense,
         'total_inventaris' => $totalInventories,
@@ -314,18 +310,25 @@ class BudgetDetailsService extends BaseService {
     return $budgetDetail;
   }
 
-  public function saveRevision($data) {
+  public function saveRecommendation($data) {
     $user = Auth::user();
     foreach($data as $budgetDetailId => $item) {
       $budgetDetail = BudgetDetails::find($budgetDetailId);
 
       //Korektor Perwakilan
-      if($user->user_groups_id == 2) {
-        $budgetDetail->revision1 = $item['revision1'];
-      }
-      //Manager Keuangan
-      if($user->user_groups_id == 8) {
-        $budgetDetail->revision2 = $item['revision2'];
+      if($user->user_groups_id == 2 || $user->user_groups_id == 8) {
+        if(array_key_exists('recommendation_ypl', $item)) {
+          $budgetDetail->recommendation_ypl = $item['recommendation_ypl'];
+        }
+        if(array_key_exists('recommendation_committee', $item)) {
+          $budgetDetail->recommendation_committee = $item['recommendation_committee'];
+        }
+        if(array_key_exists('recommendation_intern', $item)) {
+          $budgetDetail->recommendation_intern = $item['recommendation_intern'];
+        }
+        if(array_key_exists('recommendation_bos', $item)) {
+          $budgetDetail->recommendation_bos = $item['recommendation_bos'];
+        }
       }
 
       $budgetDetail->save();
@@ -335,7 +338,7 @@ class BudgetDetailsService extends BaseService {
   public function submitApproval($data) {
     $user = Auth::user();
     if($user->user_groups_id == 2 || $user->user_groups_id == 8) {
-      $this->saveRevision($data->revisions);
+      $this->saveRecommendation($data->recommendations);
     }
 
     $budget = Budgets::where('unique_id',$data->head)->first();
@@ -345,16 +348,7 @@ class BudgetDetailsService extends BaseService {
     } else {
       $budget->approved = true;
       $budget->save();
-      $this->setAPBU($budget);
       $this->updateWorkflow($budget, true);
-    }
-  }
-
-  public function setAPBU($budget) {
-    $budget->load('budgetDetails');
-    foreach($budget->budgetDetails as $budgetDetail) {
-      $budgetDetail->total = $budgetDetail->revision2;
-      $budgetDetail->save();
     }
   }
 

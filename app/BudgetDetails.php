@@ -31,6 +31,10 @@ class BudgetDetails extends Model
         'bos',
         'total',
         'desc',
+        'recommendation_bos',
+        'recommendation_ypl',
+        'recommendation_intern',
+        'recommendation_committee'
     ];
 
     public function scopeParameterCode($query, $value=null, $type=null) {
