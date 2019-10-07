@@ -162,7 +162,7 @@ class FundRequestsService extends BaseService {
 
   public function delete($id) {
     try {
-      $fundRequest = FundRequests::status(false, true)->findOrFail($id);
+      $fundRequest = FundRequests::findOrFail($id);
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
