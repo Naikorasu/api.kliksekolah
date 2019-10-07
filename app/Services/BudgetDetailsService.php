@@ -146,6 +146,10 @@ class BudgetDetailsService extends BaseService {
     $totalExpenseBos = 0;
     $totalInventoriesBos = 0;
     $totalCostBos = 0;
+    $estimationYPL = 0;
+    $estimationCommittee = 0;
+    $estimationBos = 0;
+    $estimationIntern = 0;
 
     foreach($results as $result) {
       if(Str::startsWith($result->code_of_account,'4')) {
@@ -184,19 +188,23 @@ class BudgetDetailsService extends BaseService {
       ];
     }
 
-    $estimation = $totalIncome - $totalCost;
-    $balance = $totalIncome - ($totalCost + $totalInventories);
+    $estimation = $totalIncome - $totalExpense;
+    $estimationYPL = $totalIncomeYPL - $totalExpenseYPL;
+    $estimationCommittee = $totalIncomeCommittee - $totalExpenseCommittee;
+    $estimationBos = $totalIncomeBos - $totalExpenseBos;
+    $estimationIntern = $totalIncomeIntern - $totalExpenseIntern;
+    $balance = $totalIncome - $totalCost;
+    $balanceYPL = $totalIncomeYPL - $totalCostYPL;
+    $balanceCommittee = $totalIncomeCommittee - $totalCostCommittee;
+    $balanceBos = $totalIncomeBos - $totalCostBos;
+    $balanceIntern = $totalIncomeIntern - $totalCostIntern;
     $status = 'UNDEFINED';
 
     if($estimation > 0) {
         $status = 'SURPLUS';
-        $estimation_surplus_defisit = number_format(abs($estimation));
-        $balance = number_format(abs($balance));
     }
     else {
         $status = 'DEFISIT';
-        $estimation_surplus_defisit = "(".number_format(abs($estimation)).")";
-        $balance = "(".number_format(abs($balance)).")";
     }
 
     $data = array(
@@ -225,8 +233,16 @@ class BudgetDetailsService extends BaseService {
         'total_inventaris_bos' => $totalInventoriesBos,
         'total_inventaris_internal' => $totalInventoriesIntern,
         'status_surplus_defisit' => $status,
-        'estimasi_surplus_defisit' => $estimation_surplus_defisit,
+        'estimasi_surplus_defisit' => $estimation,
+        'estimasi_ypl' => $estimationYPL,
+        'estimasi_komite' => $estimationCommittee,
+        'estimasi_bos' => $estimationBos,
+        'estimasi_intern' => $estimationIntern,
         'saldo' => $balance,
+        'saldo_ypl' => $balanceYPL,
+        'saldo_komite' => $balanceCommittee,
+        'saldo_bos' => $balanceBos,
+        'saldo_intern' => $balanceIntern,
         'workflow' => $budget->workflow,
     );
 
