@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Auth;
+use Maatwebsite\Excel\Excel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -131,12 +132,16 @@ class BudgetDetailsService extends BaseService {
     $totalCost = 0;
     $totalIncomeYPL = 0;
     $totalExpenseYPL = 0;
+    $totalInventoriesYPL = 0;
     $totalIncomeCommittee = 0;
     $totalExpenseCommittee = 0;
+    $totalInventoriesCommittee = 0;
     $totalIncomeIntern = 0;
     $totalExpenseIntern = 0;
+    $totalInventoriesIntern = 0;
     $totalIncomeBos = 0;
     $totalExpenseBos = 0;
+    $totalInventoriesBos = 0;
 
     foreach($results as $result) {
       if(Str::startsWith($result->code_of_account,'4')) {
@@ -150,15 +155,19 @@ class BudgetDetailsService extends BaseService {
         if(Str::startsWith($result->code_of_account,'13')) {
           array_push($inventories,$result);
           $totalInventories += $result->total;
+          $totalInventoriesYPL += $result->ypl;
+          $totalInventoriesCommittee += $result->committee;
+          $totalInventoriesBos += $result->bos;
+          $totalInventoriesIntern += $result->intern;
         } else if(Str::startsWith($result->code_of_account,'5')) {
           array_push($expenses,$result);
           $totalCost += $result->total;
+          $totalExpense += $result->total;
+          $totalExpenseYPL += $result->ypl;
+          $totalExpenseCommittee += $result->committee;
+          $totalExpenseBos += $result->bos;
+          $totalExpenseIntern += $result->intern;
         }
-        $totalExpense += $result->total;
-        $totalExpenseYPL += $result->ypl;
-        $totalExpenseCommittee += $result->committee;
-        $totalExpenseBos += $result->bos;
-        $totalExpenseIntern += $result->intern;
       }
 
       $revisions[$result->id] = [
@@ -199,6 +208,10 @@ class BudgetDetailsService extends BaseService {
         'total_pengeluaran_komite' => $totalExpenseCommittee,
         'total_pengeluaran_bos' => $totalExpenseBos,
         'total_pengeluaran_internal' => $totalExpenseIntern,
+        'total_inventaris_ypl' => $totalInventoriesYPL,
+        'total_inventaris_komite' => $totalInventoriesCommittee,
+        'total_inventaris_bos' => $totalInventoriesBos,
+        'total_inventaris_internal' => $totalInventoriesIntern,
         'status_surplus_defisit' => $status,
         'estimasi_surplus_defisit' => $estimation_surplus_defisit,
         'saldo' => $balance,
@@ -324,4 +337,11 @@ class BudgetDetailsService extends BaseService {
     $this->updateWorkflow($budget, false, true);
   }
 
+  public function parseFile($file) {
+    try {
+
+    } catch (Exception $exception) {
+      
+    }
+  }
 }

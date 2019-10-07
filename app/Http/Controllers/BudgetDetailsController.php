@@ -125,6 +125,12 @@ class BudgetDetailsController extends Controller
               'error' => $delete,
           ], 401);
       }
+  }
+
+  public function uploadRAPBU(Request $request) {
+    $file = $request->file('rapbu');
+
+    $this->budgetDetailService->parseFile($file);
 
   }
 }

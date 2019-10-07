@@ -138,4 +138,17 @@ class BudgetsService extends BaseService {
 
     return $result;
   }
+
+  public function validateAddBudget($data) {
+    $user = Auth::user()->load('userGroup', 'school_unit');
+    $budgetCount = Budgets::where('periode', $data->periode)->whereHas('school_unit', function($q) {
+      $q->where('prm_school_units_id', $user->prm_school_units_id);
+    })->count();
+
+    if($budgetCount > 0) {
+      return false;
+    }
+
+    return true;
+  }
 }

@@ -54,6 +54,7 @@ Route::group([
       Route::post('bank-account','OptionsController@bank_account');
       Route::post('rapbu-coa','OptionsController@rapbuCoa');
       Route::post('periode/{type?}','OptionsController@periode');
+      Route::post('existing-periode','OptionsController@existingPeriode');
       Route::post('fund-request','OptionsController@fundRequest');
       Route::post('budget','OptionsController@budget');
       Route::post('pph', 'OptionsController@pph');

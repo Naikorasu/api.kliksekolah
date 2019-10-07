@@ -56,6 +56,11 @@ class OptionsController extends Controller
       return $this->returnOption($request, $data);
     }
 
+    public function existingPeriode(Request $request) {
+      $data = $this->optionsService->getExistingPeriodes($request->unit_id);
+      return $this->returnOption($request, $data);
+    }
+
     public function pph(Request $request) {
       $data = $this->optionsService->getPph($request->filters);
       return $this->returnOption($request, $data);

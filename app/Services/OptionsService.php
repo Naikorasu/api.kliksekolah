@@ -171,12 +171,34 @@ class OptionsService extends BaseService {
       ];
     }
     try {
-      $collection = Budgets::withUnitId($unit_id)->options($keyword)->where($conditions)->get();
+      $collection = Budgets::withUnitId($unit_id)
+        ->options($keyword)
+        ->where($conditions)
+        ->where('approved', true)
+        ->get();
 
       return $collection->transform(function($item) {
         return [
           'id' => $item->id,
           'title' => $item->desc
+        ];
+      });
+    } catch (ModelNotFoundException $exception) {
+      throw new DataNotFoundException($exception->getMessage());
+    }
+  }
+
+  public function getExistingPeriodes($unit_id) {
+    try {
+      $collection = Budgets::withUnitId($unit_id)
+        ->select('periode')
+        ->distinct()
+        ->get();
+
+      return $collection->transform(function($item) {
+        return [
+          'value' => $item->periode,
+          'label' => $item->periode
         ];
       });
     } catch (ModelNotFoundException $exception) {
