@@ -133,15 +133,19 @@ class BudgetDetailsService extends BaseService {
     $totalIncomeYPL = 0;
     $totalExpenseYPL = 0;
     $totalInventoriesYPL = 0;
+    $totalCostYPL = 0;
     $totalIncomeCommittee = 0;
     $totalExpenseCommittee = 0;
     $totalInventoriesCommittee = 0;
+    $totalCostCommittee = 0;
     $totalIncomeIntern = 0;
     $totalExpenseIntern = 0;
     $totalInventoriesIntern = 0;
+    $totalCostIntern = 0;
     $totalIncomeBos = 0;
     $totalExpenseBos = 0;
     $totalInventoriesBos = 0;
+    $totalCostBos = 0;
 
     foreach($results as $result) {
       if(Str::startsWith($result->code_of_account,'4')) {
@@ -161,13 +165,17 @@ class BudgetDetailsService extends BaseService {
           $totalInventoriesIntern += $result->intern;
         } else if(Str::startsWith($result->code_of_account,'5')) {
           array_push($expenses,$result);
-          $totalCost += $result->total;
           $totalExpense += $result->total;
           $totalExpenseYPL += $result->ypl;
           $totalExpenseCommittee += $result->committee;
           $totalExpenseBos += $result->bos;
           $totalExpenseIntern += $result->intern;
         }
+        $totalCost += $result->total;
+        $totalCostYPL += $result->ypl;
+        $totalCostCommittee += $result->committee;
+        $totalCostBos += $result->bos;
+        $totalCostIntern += $result->intern;
       }
 
       $revisions[$result->id] = [
@@ -208,6 +216,10 @@ class BudgetDetailsService extends BaseService {
         'total_pengeluaran_komite' => $totalExpenseCommittee,
         'total_pengeluaran_bos' => $totalExpenseBos,
         'total_pengeluaran_internal' => $totalExpenseIntern,
+        'total_beban_ypl' => $totalCostYPL,
+        'total_beban_komite' => $totalCostCommittee,
+        'total_beban_bos' => $totalCostBos,
+        'total_beban_internal' => $totalCostIntern,
         'total_inventaris_ypl' => $totalInventoriesYPL,
         'total_inventaris_komite' => $totalInventoriesCommittee,
         'total_inventaris_bos' => $totalInventoriesBos,
@@ -341,7 +353,7 @@ class BudgetDetailsService extends BaseService {
     try {
 
     } catch (Exception $exception) {
-      
+
     }
   }
 }
