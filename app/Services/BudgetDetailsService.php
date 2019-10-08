@@ -256,8 +256,7 @@ class BudgetDetailsService extends BaseService {
       if($id) {
         try {
           $budgetDetail = BudgetDetails::with('head')->findOrFail($id);
-
-
+          $budgetDetail->update($data);
         } catch (ModelNotFoundException $exception) {
           throw new DataNotFoundException($exception->getMessage());
         }
