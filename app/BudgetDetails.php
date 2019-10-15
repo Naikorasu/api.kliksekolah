@@ -5,7 +5,6 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\Budgets;
-use App\BudgetDraftRevisions;
 use App\BudgetRelocationSources;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -34,7 +33,8 @@ class BudgetDetails extends Model
         'recommendation_bos',
         'recommendation_ypl',
         'recommendation_intern',
-        'recommendation_committee'
+        'recommendation_committee',
+        'budget_detail_drafts_id'
     ];
 
     public function scopeParameterCode($query, $value=null, $type=null) {
@@ -126,5 +126,12 @@ class BudgetDetails extends Model
       return $this->hasMany(BudgetRelocationRecipients::class,'budget_detail_unique_id','unique_id');
     }
 
+    public function budgetDetailDraft() {
+      return $this->hasOne('App\BudgetDetailDrafts', 'unique_id', 'unique_id');
+    }
+
+    public function file() {
+      return $this->morphOne('App\File', 'entity');
+    }
 
 }

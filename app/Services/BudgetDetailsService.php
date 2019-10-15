@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Exceptions\DataNotFoundException;
+use App\BudgetDetailDrafts;
 use App\Budgets;
 use App\BudgetDetails;
 
@@ -41,8 +42,15 @@ class BudgetDetailsService extends BaseService {
     }
 
     //$conditions = $this->buildFilters($filters);
+    if(isset($filters['head'])) {
+      $budget = Budgets::select('approved')->where('unique_id', $filters['head'])->first();
+    }
 
-    $query = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->orderBy('created_at')->remains();
+    if($budget->approved == true) {
+      $query = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->orderBy('created_at')->remains();
+    } else {
+      $query = BudgetDetailDrafts::parameterCode($codeOfAccountValue, $codeOfAccountType)->orderBy('created_at');
+    }
 
     if(isset($filters)) {
       if(array_key_exists('periode', $filters) || array_key_exists('head', $filters)) {
@@ -113,132 +121,192 @@ class BudgetDetailsService extends BaseService {
 
     $budget = Budgets::with('workflow')->where('unique_id', $filters['head'])->first();
 
-    $results = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->rAPBU()->where($conditions)->orderBy('created_at', 'DESC')->get();
+    if($budget->approved == true) {
+      $results = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)
+        ->rAPBU()
+        ->where($conditions)
+        ->with('budgetDetailDraft')
+        ->orderBy('created_at', 'DESC')
+        ->get();
+    } else {
+      $results = BudgetDetailDrafts::parameterCode($codeOfAccountValue, $codeOfAccountType)->rAPBU()->where($conditions)->orderBy('created_at', 'DESC')->get();
+    }
 
-    $incomes = [];
-    $expenses = [];
-    $inventories = [];
-    $recommendations = [];
+    $ganjil = [
+      'pendapatan' => [],
+      'pengeluaran' => [],
+      'inventaris' => [],
+      'total_pendapatan' => 0,
+      'total_pengeluaran' => 0,
+      'total_inventaris' => 0,
+      'total_beban' => 0,
+      'total_pendapatan_ypl' => 0,
+      'total_pengeluaran_ypl' => 0,
+      'total_inventaris_ypl' => 0,
+      'total_beban_ypl' => 0,
+      'total_pendapatan_komite' => 0,
+      'total_pengeluaran_komite' => 0,
+      'total_inventaris_komite' => 0,
+      'total_beban_komite' => 0,
+      'total_pendapatan_intern' => 0,
+      'total_pengeluaran_intern' => 0,
+      'total_inventaris_intern' => 0,
+      'total_beban_intern' => 0,
+      'total_pendapatan_bos' => 0,
+      'total_pengeluaran_bos' => 0,
+      'total_inventaris_bos' => 0,
+      'total_beban_bos' => 0,
+      'total_estimasi_ypl' => 0,
+      'total_estimasi_komite' => 0,
+      'total_estimasi_bos' => 0,
+      'total_estimasi_intern' => 0
+    ];
 
-    $totalIncome = 0;
-    $totalExpense = 0;
-    $totalInventories = 0;
-    $totalCost = 0;
-    $totalIncomeYPL = 0;
-    $totalExpenseYPL = 0;
-    $totalInventoriesYPL = 0;
-    $totalCostYPL = 0;
-    $totalIncomeCommittee = 0;
-    $totalExpenseCommittee = 0;
-    $totalInventoriesCommittee = 0;
-    $totalCostCommittee = 0;
-    $totalIncomeIntern = 0;
-    $totalExpenseIntern = 0;
-    $totalInventoriesIntern = 0;
-    $totalCostIntern = 0;
-    $totalIncomeBos = 0;
-    $totalExpenseBos = 0;
-    $totalInventoriesBos = 0;
-    $totalCostBos = 0;
-    $estimationYPL = 0;
-    $estimationCommittee = 0;
-    $estimationBos = 0;
-    $estimationIntern = 0;
+    $genap = [
+      'pendapatan' => [],
+      'pengeluaran' => [],
+      'inventaris' => [],
+      'total_pendapatan' => 0,
+      'total_pengeluaran' => 0,
+      'total_inventaris' => 0,
+      'total_beban' => 0,
+      'total_pendapatan_ypl' => 0,
+      'total_pengeluaran_ypl' => 0,
+      'total_inventaris_ypl' => 0,
+      'total_beban_ypl' => 0,
+      'total_pendapatan_komite' => 0,
+      'total_pengeluaran_komite' => 0,
+      'total_inventaris_komite' => 0,
+      'total_beban_komite' => 0,
+      'total_pendapatan_intern' => 0,
+      'total_pengeluaran_intern' => 0,
+      'total_inventaris_intern' => 0,
+      'total_beban_intern' => 0,
+      'total_pendapatan_bos' => 0,
+      'total_pengeluaran_bos' => 0,
+      'total_inventaris_bos' => 0,
+      'total_beban_bos' => 0,
+      'total_estimasi_ypl' => 0,
+      'total_estimasi_komite' => 0,
+      'total_estimasi_bos' => 0,
+      'total_estimasi_intern' => 0
+    ];
+
+    $recommendations = [
+      'ypl' => null,
+      'intern' => null,
+      'committee' => null,
+      'bos' => null
+    ];
 
     foreach($results as $result) {
       if(Str::startsWith($result->code_of_account,'4')) {
-        array_push($incomes,$result);
-        $totalIncome += $result->total;
-        $totalIncomeYPL += $result->ypl;
-        $totalIncomeCommittee += $result->committee;
-        $totalIncomeBos += $result->bos;
-        $totalIncomeIntern += $result->intern;
+        if($result->semester == 1) {
+          array_push($ganjil['pendapatan'],$result);
+          $ganjil['total_pendapatan'] += $result->total;
+          $ganjil['total_pendapatan_ypl'] += $result->ypl;
+          $ganjil['total_pendapatan_komite'] += $result->committee;
+          $ganjil['total_pendapatan_bos'] += $result->bos;
+          $ganjil['total_pendapatan_intern'] += $result->intern;
+        } else {
+          array_push($genap['pendapatan'],$result);
+          $genap['total_pendapatan'] += $result->total;
+          $genap['total_pendapatan_ypl'] += $result->ypl;
+          $genap['total_pendapatan_komite'] += $result->committee;
+          $genap['total_pendapatan_bos'] += $result->bos;
+          $genap['total_pendapatan_intern'] += $result->intern;
+        }
       } else {
         if(Str::startsWith($result->code_of_account,'13')) {
-          array_push($inventories,$result);
-          $totalInventories += $result->total;
-          $totalInventoriesYPL += $result->ypl;
-          $totalInventoriesCommittee += $result->committee;
-          $totalInventoriesBos += $result->bos;
-          $totalInventoriesIntern += $result->intern;
+          if($result->semester == 1) {
+            array_push($ganjil['inventaris'],$result);
+            $ganjil['total_inventaris'] += $result->total;
+            $ganjil['total_inventaris_ypl'] += $result->ypl;
+            $ganjil['total_inventaris_komite'] += $result->committee;
+            $ganjil['total_inventaris_bos'] += $result->bos;
+            $ganjil['total_inventaris_intern'] += $result->intern;
+          } else {
+            array_push($genap['inventaris'],$result);
+            $genap['total_inventaris'] += $result->total;
+            $genap['total_inventaris_ypl'] += $result->ypl;
+            $genap['total_inventaris_komite'] += $result->committee;
+            $genap['total_inventaris_bos'] += $result->bos;
+            $genap['total_inventaris_intern'] += $result->intern;
+          }
         } else if(Str::startsWith($result->code_of_account,'5')) {
-          array_push($expenses,$result);
-          $totalExpense += $result->total;
-          $totalExpenseYPL += $result->ypl;
-          $totalExpenseCommittee += $result->committee;
-          $totalExpenseBos += $result->bos;
-          $totalExpenseIntern += $result->intern;
+          if($result->semester == 1) {
+            array_push($ganjil['pengeluaran'],$result);
+            $ganjil['total_pengeluaran'] += $result->total;
+            $ganjil['total_pengeluaran_ypl'] += $result->ypl;
+            $ganjil['total_pengeluaran_komite'] += $result->committee;
+            $ganjil['total_pengeluaran_bos'] += $result->bos;
+            $ganjil['total_pengeluaran_intern'] += $result->intern;
+          } else {
+            array_push($genap['pengeluaran'],$result);
+            $genap['total_pengeluaran'] += $result->total;
+            $genap['total_pengeluaran_ypl'] += $result->ypl;
+            $genap['total_pengeluaran_komite'] += $result->committee;
+            $genap['total_pengeluaran_bos'] += $result->bos;
+            $genap['total_pengeluaran_intern'] += $result->intern;
+          }
         }
-        $totalCost += $result->total;
-        $totalCostYPL += $result->ypl;
-        $totalCostCommittee += $result->committee;
-        $totalCostBos += $result->bos;
-        $totalCostIntern += $result->intern;
+        if($result->semester == 1) {
+          $ganjil['total_beban'] += $result->total;
+          $ganjil['total_beban_ypl'] += $result->ypl;
+          $ganjil['total_beban_komite'] += $result->committee;
+          $ganjil['total_beban_bos'] += $result->bos;
+          $ganjil['total_beban_intern'] += $result->intern;
+        } else {
+          $genap['total_beban'] += $result->total;
+          $genap['total_beban_ypl'] += $result->ypl;
+          $genap['total_beban_komite'] += $result->committee;
+          $genap['total_beban_bos'] += $result->bos;
+          $genap['total_beban_intern'] += $result->intern;
+        }
       }
 
-      $recommendations[$result->id] = [
-        'recommendation_ypl' => $result->recommendation_ypl,
-        'recommendation_committee' => $result->recommendation_committee,
-        'recommendation_intern' => $result->recommendation_intern,
-        'recommendation_bos' => $result->recommendation_bos
-      ];
+      if(isset($result->recommendation_ypl)) {
+        $recommendations['ypl'][$result->id] = $result->recommendation_ypl;
+      }
+      if(isset($result->recommendation_committee)) {
+        $recommendations['committee'][$result->id] = $result->recommendation_committee;
+      }
+      if(isset($result->recommendation_intern)) {
+        $recommendations['intern'][$result->id] = $result->recommendation_intern;
+      }
+      if(isset($result->recommendation_bos)) {
+        $recommendations['bos'][$result->id] = $result->recommendation_bos;
+      }
     }
 
-    $estimation = $totalIncome - $totalExpense;
-    $estimationYPL = $totalIncomeYPL - $totalExpenseYPL;
-    $estimationCommittee = $totalIncomeCommittee - $totalExpenseCommittee;
-    $estimationBos = $totalIncomeBos - $totalExpenseBos;
-    $estimationIntern = $totalIncomeIntern - $totalExpenseIntern;
-    $balance = $totalIncome - $totalCost;
-    $balanceYPL = $totalIncomeYPL - $totalCostYPL;
-    $balanceCommittee = $totalIncomeCommittee - $totalCostCommittee;
-    $balanceBos = $totalIncomeBos - $totalCostBos;
-    $balanceIntern = $totalIncomeIntern - $totalCostIntern;
-    $status = 'UNDEFINED';
+    $ganjil['total_estimasi'] = $ganjil['total_pendapatan'] - $ganjil['total_pengeluaran'];
+    $ganjil['total_estimasi_ypl'] = $ganjil['total_pendapatan_ypl'] - $ganjil['total_pengeluaran_ypl'];
+    $ganjil['total_estimasi_komite'] = $ganjil['total_pendapatan_komite'] - $ganjil['total_pengeluaran_komite'];
+    $ganjil['total_estimasi_bos'] = $ganjil['total_pendapatan_bos'] - $ganjil['total_pengeluaran_bos'];
+    $ganjil['total_estimasi_intern'] = $ganjil['total_pendapatan_intern'] - $ganjil['total_pengeluaran_intern'];
+    $ganjil['total_saldo'] = $ganjil['total_pendapatan'] - $ganjil['total_beban'];
+    $ganjil['total_saldo_ypl'] = $ganjil['total_pendapatan_ypl'] - $ganjil['total_beban_ypl'];
+    $ganjil['total_saldo_komite'] = $ganjil['total_pendapatan_komite'] - $ganjil['total_beban_komite'];
+    $ganjil['total_saldo_bos'] = $ganjil['total_pendapatan_bos'] - $ganjil['total_beban_bos'];
+    $ganjil['total_saldo_intern'] = $ganjil['total_pendapatan_intern'] - $ganjil['total_beban_intern'];
+    $ganjil['status'] = ($ganjil['total_estimasi'] > 0) ? 'SURPLUS' : 'DEFISIT';
 
-    if($estimation > 0) {
-        $status = 'SURPLUS';
-    }
-    else {
-        $status = 'DEFISIT';
-    }
+    $genap['total_estimasi'] = $genap['total_pendapatan'] - $genap['total_pengeluaran'];
+    $genap['total_estimasi_ypl'] = $genap['total_pendapatan_ypl'] - $genap['total_pengeluaran_ypl'];
+    $genap['total_estimasi_komite'] = $genap['total_pendapatan_komite'] - $genap['total_pengeluaran_komite'];
+    $genap['total_estimasi_bos'] = $genap['total_pendapatan_bos'] - $genap['total_pengeluaran_bos'];
+    $genap['total_estimasi_intern'] = $genap['total_pendapatan_intern'] - $genap['total_pengeluaran_intern'];
+    $genap['total_saldo'] = $genap['total_pendapatan'] - $genap['total_beban'];
+    $genap['total_saldo_ypl'] = $genap['total_pendapatan_ypl'] - $genap['total_beban_ypl'];
+    $genap['total_saldo_komite'] = $genap['total_pendapatan_komite'] - $genap['total_beban_komite'];
+    $genap['total_saldo_bos'] = $genap['total_pendapatan_bos'] - $genap['total_beban_bos'];
+    $genap['total_saldo_intern'] = $genap['total_pendapatan_intern'] - $genap['total_beban_intern'];
+    $genap['status'] = ($genap['total_estimasi'] > 0) ? 'SURPLUS' : 'DEFISIT';
 
     $data = array(
-        'pengeluaran' => $expenses,
-        'pendapatan' => $incomes,
-        'inventaris' => $inventories,
+        'ganjil' => $ganjil,
+        'genap' => $genap,
         'recommendations' => $recommendations,
-        'total_pendapatan' => $totalIncome,
-        'total_pengeluaran' => $totalExpense,
-        'total_inventaris' => $totalInventories,
-        'total_beban' => $totalCost,
-        'total_pendapatan_ypl' => $totalIncomeYPL,
-        'total_pendapatan_komite' => $totalIncomeCommittee,
-        'total_pendapatan_bos' => $totalIncomeBos,
-        'total_pendapatan_internal' => $totalIncomeIntern,
-        'total_pengeluaran_ypl' => $totalExpenseYPL,
-        'total_pengeluaran_komite' => $totalExpenseCommittee,
-        'total_pengeluaran_bos' => $totalExpenseBos,
-        'total_pengeluaran_internal' => $totalExpenseIntern,
-        'total_beban_ypl' => $totalCostYPL,
-        'total_beban_komite' => $totalCostCommittee,
-        'total_beban_bos' => $totalCostBos,
-        'total_beban_internal' => $totalCostIntern,
-        'total_inventaris_ypl' => $totalInventoriesYPL,
-        'total_inventaris_komite' => $totalInventoriesCommittee,
-        'total_inventaris_bos' => $totalInventoriesBos,
-        'total_inventaris_internal' => $totalInventoriesIntern,
-        'status_surplus_defisit' => $status,
-        'estimasi_surplus_defisit' => $estimation,
-        'estimasi_ypl' => $estimationYPL,
-        'estimasi_komite' => $estimationCommittee,
-        'estimasi_bos' => $estimationBos,
-        'estimasi_intern' => $estimationIntern,
-        'saldo' => $balance,
-        'saldo_ypl' => $balanceYPL,
-        'saldo_komite' => $balanceCommittee,
-        'saldo_bos' => $balanceBos,
-        'saldo_intern' => $balanceIntern,
         'workflow' => $budget->workflow,
     );
 
@@ -255,14 +323,13 @@ class BudgetDetailsService extends BaseService {
 
       if($id) {
         try {
-          $budgetDetail = BudgetDetails::with('head')->findOrFail($id);
+          $budgetDetail = BudgetDetailDrafts::with('head')->findOrFail($id);
           $budgetDetail->update($data);
         } catch (ModelNotFoundException $exception) {
           throw new DataNotFoundException($exception->getMessage());
         }
       } else {
-
-        $budgetDetail = new BudgetDetails($data);
+        $budgetDetail = new BudgetDetailDrafts($data);
         $budgetDetail->unique_id = $this->generateUniqueId($accountType, $budgetDetail->code_of_account);
         $budgetDetail->head = $head;
         $budgetDetail->account = $account;
@@ -298,9 +365,9 @@ class BudgetDetailsService extends BaseService {
     $budgetDetail;
 
     if($withRemains) {
-      $budgetDetail = BudgetDetails::with('parameter_code')->remains()->where('unique_id', $unique_id)->first();
+      $budgetDetail = BudgetDetailDrafts::with('parameter_code')->remains()->where('unique_id', $unique_id)->first();
     } else {
-      $budgetDetail = BudgetDetails::with('parameter_code')->remains()->where('unique_id', $unique_id)->first();
+      $budgetDetail = BudgetDetailDrafts::with('parameter_code')->remains()->where('unique_id', $unique_id)->first();
     }
     if(!isset($budgetDetail)) {
       throw new DataNotFoundException('Budget Detail Not Found');
@@ -311,26 +378,17 @@ class BudgetDetailsService extends BaseService {
 
   public function saveRecommendation($data) {
     $user = Auth::user();
-    foreach($data as $budgetDetailId => $item) {
-      $budgetDetail = BudgetDetails::find($budgetDetailId);
-
-      //Korektor Perwakilan
-      if($user->user_groups_id == 2 || $user->user_groups_id == 8) {
-        if(array_key_exists('recommendation_ypl', $item)) {
-          $budgetDetail->recommendation_ypl = $item['recommendation_ypl'];
-        }
-        if(array_key_exists('recommendation_committee', $item)) {
-          $budgetDetail->recommendation_committee = $item['recommendation_committee'];
-        }
-        if(array_key_exists('recommendation_intern', $item)) {
-          $budgetDetail->recommendation_intern = $item['recommendation_intern'];
-        }
-        if(array_key_exists('recommendation_bos', $item)) {
-          $budgetDetail->recommendation_bos = $item['recommendation_bos'];
+    //dd($data);
+    foreach($data as $pos => $ids) {
+      if(isset($data[$pos])) {
+        foreach($ids as $budgetDetailId => $value) {
+          $budgetDetail = BudgetDetails::find($budgetDetailId);
+          if($user->user_groups_id == 2 || $user->user_groups_id == 8) {
+            $budgetDetail['recommendation_' . $pos] = $value;
+            $budgetDetail->save();
+          }
         }
       }
-
-      $budgetDetail->save();
     }
   }
 
@@ -347,6 +405,14 @@ class BudgetDetailsService extends BaseService {
     } else {
       $budget->approved = true;
       $budget->save();
+      if(isset($data->selectedBudgetDetails)) {
+        foreach($data->selectedBudgetDetails as $index => $id) {
+          $draft = BudgetDetailDrafts::find($id)->toArray();
+          BudgetDetails::create(
+            $draft
+          );
+        }
+      }
       $this->updateWorkflow($budget, true);
     }
   }
@@ -354,8 +420,12 @@ class BudgetDetailsService extends BaseService {
   public function rejectApproval($data) {
     $user = Auth::user();
 
+    if($user->user_groups_id == 2 || $user->user_groups_id == 8) {
+      $this->saveRecommendation($data->recommendations);
+    }
+
     $budget = Budgets::where('unique_id',$data->head)->first();
-    $this->updateWorkflow($budget, false, true);
+    $this->updateWorkflow($budget, false, true, $data->remarks);
   }
 
   public function parseFile($file) {

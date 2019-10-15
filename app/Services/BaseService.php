@@ -86,7 +86,7 @@ class BaseService{
     $model->school_unit()->save($entityUnit);
   }
 
-  protected function updateWorkflow($model, $is_done = false, $is_rejected = false) {
+  protected function updateWorkflow($model, $is_done = false, $is_rejected = false, $remarks = '') {
     $userGroup = Auth::user()->userGroup()->first();
 
     if($is_rejected == false) {
@@ -130,17 +130,16 @@ class BaseService{
     $workflow = [
       'prev_role' => $prevRole,
       'next_role' => $nextRole,
-      'is_done' => $is_done
+      'is_done' => $is_done,
+      'remarks' => $remarks
     ];
 
-
-    $model->workflow()->updateOrCreate(
-      [
-        'entity_type' => get_class($model),
-        'entity_id' => $model->id
-      ],
-      $workflow
-    );
+    if($userGroup->name == 'Keuangan Sekolah') {
+      $model->workflow()->create($workflow);
+    } else {
+      $existingWorkflow = $model->workflow()->latest()->first();
+      $existingWorkflow->update($workflow);
+    }
   }
 
   protected function validateUserGroupForSaving($model) {

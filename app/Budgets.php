@@ -25,6 +25,16 @@ class Budgets extends Model
         'desc'
     ];
 
+    protected $workflow = [
+      'Keuangan Sekolah',
+      'Kepala Sekolah',
+      'Korektor Perwakilan',
+      'Ketua Perwakilan',
+      'Korektor Pusat',
+      'Manager Keuangan',
+      'Bendahara'
+    ];
+
     public function scopePeriodeOptions($query) {
       return $query->select(DB::raw('distinct(periode) as periode'));
     }

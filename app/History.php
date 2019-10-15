@@ -4,15 +4,13 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Workflows extends Model
+class History extends Model
 {
     protected $fillable = [
       'entity',
       'entity_id',
-      'prev_role',
-      'next_role',
-      'is_done',
-      'remarks'
+      'value',
+      'user_id'
     ];
 
     public function entity() {

@@ -20,6 +20,12 @@ class FundRequests extends Model
       'user_id'
     ];
 
+    public function $workflowRoles = [
+      'Keuangan Sekolah',
+      'Kepala Sekolah',
+      'Korektor Perwakilan',
+      'Ketua Perwakilan'
+    ];
     /**
      * Scope for status (submitted and/or approved)
      * @param  Builder $query      the current query being used
