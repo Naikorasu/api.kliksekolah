@@ -98,8 +98,11 @@ class BaseService{
             $nextRole = 'Korektor Perwakilan';
             break;
           case 'Korektor Perwakilan':
-            $nextRole = 'Manager Keuangan';
+            $nextRole = 'Korektor Pusat';
             break;
+            case 'Korektor Pusat':
+              $nextRole = 'Manager Keuangan';
+              break;
           case 'Manager Keuangan':
             $nextRole = 'Bendahara';
             break;
@@ -116,13 +119,11 @@ class BaseService{
             $nextRole = 'Kepala Sekolah';
             break;
           case 'Manager Keuangan':
-            $nextRole = 'Korektor Perwakilan';
+            $nextRole = 'Korektor Pusat';
             break;
           case 'Bendahara':
             $nextRole = 'Manager Keuangan';
             break;
-          default:
-            $nextRole = 'Bendahara';
       }
       $prevRole = $userGroup->name;
     }

@@ -80,6 +80,6 @@ class Budgets extends Model
     }
 
     public function workflow() {
-      return $this->morphOne('App\Workflows', 'entity');
+      return $this->morphMany('App\Workflows', 'entity');
     }
 }

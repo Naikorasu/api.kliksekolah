@@ -199,12 +199,15 @@ class FundRequestsService extends BaseService {
 
     $budgetDetails = BudgetDetails::remains()->with('head','parameter_code')->orderBy('code_of_account')
       ->where(function($q) use($currentMonth) {
-        if($currentMonth < 7) {
-          $q->where('semester', 2);
-        } else {
-          $q->where('semester', 1);
+        if(isset($filters) && startsWith('52', $filters['code'])) {
+          if($currentMonth < 7) {
+            $q->where('semester', 2);
+          } else {
+            $q->where('semester', 1);
+          }
         }
       });
+
     if(isset($filters)) {
       if(isset($filters['periode']) || isset($filters['head'])) {
         $budgetDetails->whereHas('head', function($q) use($filters) {

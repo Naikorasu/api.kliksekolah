@@ -24,6 +24,8 @@ class UpdateBudgetDetailDraftRevisions extends Migration
             'budget_detail_drafts_id',
             'user_groups_id'
           ], 'PrimaryRevision');
+
+          $table->timestamps();
       });
     }
 

@@ -128,7 +128,7 @@ class BudgetDetailDrafts extends Model
       return $this->morphOne('App\File', 'entity');
     }
 
-    public function revisions() {
+    public function recommendations() {
       return $this->hasMany('App\BudgetDetailDraftRevisions');
     }
 }

@@ -130,6 +130,17 @@ class BudgetDetails extends Model
       return $this->hasOne('App\BudgetDetailDrafts', 'unique_id', 'unique_id');
     }
 
+    public function recommendations() {
+      return $this->hasOneThrough(
+        'App\BudgetDetailDraftRevisions',
+        'App\BudgetDetailDrafts',
+        'unique_id',
+        'budget_detail_drafts_id',
+        'unique_id',
+        'unique_id'
+      );
+    }
+
     public function file() {
       return $this->morphOne('App\File', 'entity');
     }

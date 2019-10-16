@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Exceptions\DataNotFoundException;
+use App\BudgetDetailDraftRevisions;
 use App\BudgetDetailDrafts;
 use App\Budgets;
 use App\BudgetDetails;
@@ -125,189 +126,147 @@ class BudgetDetailsService extends BaseService {
       $results = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)
         ->rAPBU()
         ->where($conditions)
-        ->with('budgetDetailDraft')
-        ->orderBy('created_at', 'DESC')
+        ->with('budgetDetailDraft', 'recommendations')
+        ->orderBy('code_of_account', 'ASC')
         ->get();
     } else {
-      $results = BudgetDetailDrafts::parameterCode($codeOfAccountValue, $codeOfAccountType)->rAPBU()->where($conditions)->orderBy('created_at', 'DESC')->get();
+      $results = BudgetDetailDrafts::parameterCode($codeOfAccountValue, $codeOfAccountType)
+        ->rAPBU()
+        ->where($conditions)
+        ->with('recommendations')
+        ->orderBy('created_at', 'DESC')
+        ->get();
     }
 
     $ganjil = [
       'pendapatan' => [],
-      'pengeluaran' => [],
-      'inventaris' => [],
-      'total_pendapatan' => 0,
-      'total_pengeluaran' => 0,
-      'total_inventaris' => 0,
-      'total_beban' => 0,
-      'total_pendapatan_ypl' => 0,
-      'total_pengeluaran_ypl' => 0,
-      'total_inventaris_ypl' => 0,
-      'total_beban_ypl' => 0,
-      'total_pendapatan_komite' => 0,
-      'total_pengeluaran_komite' => 0,
-      'total_inventaris_komite' => 0,
-      'total_beban_komite' => 0,
-      'total_pendapatan_intern' => 0,
-      'total_pengeluaran_intern' => 0,
-      'total_inventaris_intern' => 0,
-      'total_beban_intern' => 0,
-      'total_pendapatan_bos' => 0,
-      'total_pengeluaran_bos' => 0,
-      'total_inventaris_bos' => 0,
-      'total_beban_bos' => 0,
-      'total_estimasi_ypl' => 0,
-      'total_estimasi_komite' => 0,
-      'total_estimasi_bos' => 0,
-      'total_estimasi_intern' => 0
+      'pengeluaran' => []
     ];
 
     $genap = [
       'pendapatan' => [],
-      'pengeluaran' => [],
-      'inventaris' => [],
-      'total_pendapatan' => 0,
-      'total_pengeluaran' => 0,
-      'total_inventaris' => 0,
-      'total_beban' => 0,
-      'total_pendapatan_ypl' => 0,
-      'total_pengeluaran_ypl' => 0,
-      'total_inventaris_ypl' => 0,
-      'total_beban_ypl' => 0,
-      'total_pendapatan_komite' => 0,
-      'total_pengeluaran_komite' => 0,
-      'total_inventaris_komite' => 0,
-      'total_beban_komite' => 0,
-      'total_pendapatan_intern' => 0,
-      'total_pengeluaran_intern' => 0,
-      'total_inventaris_intern' => 0,
-      'total_beban_intern' => 0,
-      'total_pendapatan_bos' => 0,
-      'total_pengeluaran_bos' => 0,
-      'total_inventaris_bos' => 0,
-      'total_beban_bos' => 0,
-      'total_estimasi_ypl' => 0,
-      'total_estimasi_komite' => 0,
-      'total_estimasi_bos' => 0,
-      'total_estimasi_intern' => 0
+      'pengeluaran' => []
     ];
 
-    $recommendations = [
-      'ypl' => null,
-      'intern' => null,
-      'committee' => null,
-      'bos' => null
-    ];
+    $inventaris = [];
+    $total_pendapatan= 0;
+    $total_pengeluaran= 0;
+    $total_inventaris= 0;
+    $total_pendapatan_ypl= 0;
+    $total_pengeluaran_ypl= 0;
+    $total_inventaris_ypl= 0;
+    $total_pendapatan_komite= 0;
+    $total_pengeluaran_komite= 0;
+    $total_inventaris_komite= 0;
+    $total_pendapatan_intern= 0;
+    $total_pengeluaran_intern= 0;
+    $total_inventaris_intern= 0;
+    $total_pendapatan_bos= 0;
+    $total_pengeluaran_bos= 0;
+    $total_inventaris_bos= 0;
+    $total_estimasi_ypl= 0;
+    $total_estimasi_komite= 0;
+    $total_estimasi_bos= 0;
+    $total_estimasi_intern= 0;
+    $total_saldo = 0;
+    $total_saldo_ypl = 0;
+    $total_saldo_komite = 0;
+    $total_saldo_intern = 0;
+    $total_saldo_bos = 0;
+
+    $recommendations = [];
 
     foreach($results as $result) {
       if(Str::startsWith($result->code_of_account,'4')) {
         if($result->semester == 1) {
           array_push($ganjil['pendapatan'],$result);
-          $ganjil['total_pendapatan'] += $result->total;
-          $ganjil['total_pendapatan_ypl'] += $result->ypl;
-          $ganjil['total_pendapatan_komite'] += $result->committee;
-          $ganjil['total_pendapatan_bos'] += $result->bos;
-          $ganjil['total_pendapatan_intern'] += $result->intern;
         } else {
           array_push($genap['pendapatan'],$result);
-          $genap['total_pendapatan'] += $result->total;
-          $genap['total_pendapatan_ypl'] += $result->ypl;
-          $genap['total_pendapatan_komite'] += $result->committee;
-          $genap['total_pendapatan_bos'] += $result->bos;
-          $genap['total_pendapatan_intern'] += $result->intern;
         }
+        $total_pendapatan += $result->total;
+        $total_pendapatan_ypl += $result->ypl;
+        $total_pendapatan_komite += $result->committee;
+        $total_pendapatan_bos += $result->bos;
+        $total_pendapatan_intern += $result->intern;
       } else {
         if(Str::startsWith($result->code_of_account,'13')) {
-          if($result->semester == 1) {
-            array_push($ganjil['inventaris'],$result);
-            $ganjil['total_inventaris'] += $result->total;
-            $ganjil['total_inventaris_ypl'] += $result->ypl;
-            $ganjil['total_inventaris_komite'] += $result->committee;
-            $ganjil['total_inventaris_bos'] += $result->bos;
-            $ganjil['total_inventaris_intern'] += $result->intern;
-          } else {
-            array_push($genap['inventaris'],$result);
-            $genap['total_inventaris'] += $result->total;
-            $genap['total_inventaris_ypl'] += $result->ypl;
-            $genap['total_inventaris_komite'] += $result->committee;
-            $genap['total_inventaris_bos'] += $result->bos;
-            $genap['total_inventaris_intern'] += $result->intern;
-          }
+          array_push($inventaris,$result);
+          $total_inventaris += $result->total;
+          $total_inventaris_ypl += $result->ypl;
+          $total_inventaris_komite += $result->committee;
+          $total_inventaris_bos += $result->bos;
+          $total_inventaris_intern += $result->intern;
         } else if(Str::startsWith($result->code_of_account,'5')) {
           if($result->semester == 1) {
             array_push($ganjil['pengeluaran'],$result);
-            $ganjil['total_pengeluaran'] += $result->total;
-            $ganjil['total_pengeluaran_ypl'] += $result->ypl;
-            $ganjil['total_pengeluaran_komite'] += $result->committee;
-            $ganjil['total_pengeluaran_bos'] += $result->bos;
-            $ganjil['total_pengeluaran_intern'] += $result->intern;
           } else {
             array_push($genap['pengeluaran'],$result);
-            $genap['total_pengeluaran'] += $result->total;
-            $genap['total_pengeluaran_ypl'] += $result->ypl;
-            $genap['total_pengeluaran_komite'] += $result->committee;
-            $genap['total_pengeluaran_bos'] += $result->bos;
-            $genap['total_pengeluaran_intern'] += $result->intern;
           }
-        }
-        if($result->semester == 1) {
-          $ganjil['total_beban'] += $result->total;
-          $ganjil['total_beban_ypl'] += $result->ypl;
-          $ganjil['total_beban_komite'] += $result->committee;
-          $ganjil['total_beban_bos'] += $result->bos;
-          $ganjil['total_beban_intern'] += $result->intern;
-        } else {
-          $genap['total_beban'] += $result->total;
-          $genap['total_beban_ypl'] += $result->ypl;
-          $genap['total_beban_komite'] += $result->committee;
-          $genap['total_beban_bos'] += $result->bos;
-          $genap['total_beban_intern'] += $result->intern;
+          $total_pengeluaran += $result->total;
+          $total_pengeluaran_ypl += $result->ypl;
+          $total_pengeluaran_komite += $result->committee;
+          $total_pengeluaran_bos += $result->bos;
+          $total_pengeluaran_intern += $result->intern;
         }
       }
 
-      if(isset($result->recommendation_ypl)) {
-        $recommendations['ypl'][$result->id] = $result->recommendation_ypl;
-      }
-      if(isset($result->recommendation_committee)) {
-        $recommendations['committee'][$result->id] = $result->recommendation_committee;
-      }
-      if(isset($result->recommendation_intern)) {
-        $recommendations['intern'][$result->id] = $result->recommendation_intern;
-      }
-      if(isset($result->recommendation_bos)) {
-        $recommendations['bos'][$result->id] = $result->recommendation_bos;
+      if(isset($result->recommendations)) {
+        foreach($result->recommendations as $recommendation) {
+          if(!isset($recommendations[$recommendation->user_groups_id])) {
+            $recommendations[$recommendation->user_groups_id] = [
+              'ypl' => null,
+              'committee' => null,
+              'intern' => null,
+              'bos' => null,
+            ];
+          }
+          $recommendations[$recommendation->user_groups_id][$recommendation->field][$recommendation->budget_detail_drafts_id] = $recommendation->value;
+        }
       }
     }
 
-    $ganjil['total_estimasi'] = $ganjil['total_pendapatan'] - $ganjil['total_pengeluaran'];
-    $ganjil['total_estimasi_ypl'] = $ganjil['total_pendapatan_ypl'] - $ganjil['total_pengeluaran_ypl'];
-    $ganjil['total_estimasi_komite'] = $ganjil['total_pendapatan_komite'] - $ganjil['total_pengeluaran_komite'];
-    $ganjil['total_estimasi_bos'] = $ganjil['total_pendapatan_bos'] - $ganjil['total_pengeluaran_bos'];
-    $ganjil['total_estimasi_intern'] = $ganjil['total_pendapatan_intern'] - $ganjil['total_pengeluaran_intern'];
-    $ganjil['total_saldo'] = $ganjil['total_pendapatan'] - $ganjil['total_beban'];
-    $ganjil['total_saldo_ypl'] = $ganjil['total_pendapatan_ypl'] - $ganjil['total_beban_ypl'];
-    $ganjil['total_saldo_komite'] = $ganjil['total_pendapatan_komite'] - $ganjil['total_beban_komite'];
-    $ganjil['total_saldo_bos'] = $ganjil['total_pendapatan_bos'] - $ganjil['total_beban_bos'];
-    $ganjil['total_saldo_intern'] = $ganjil['total_pendapatan_intern'] - $ganjil['total_beban_intern'];
-    $ganjil['status'] = ($ganjil['total_estimasi'] > 0) ? 'SURPLUS' : 'DEFISIT';
-
-    $genap['total_estimasi'] = $genap['total_pendapatan'] - $genap['total_pengeluaran'];
-    $genap['total_estimasi_ypl'] = $genap['total_pendapatan_ypl'] - $genap['total_pengeluaran_ypl'];
-    $genap['total_estimasi_komite'] = $genap['total_pendapatan_komite'] - $genap['total_pengeluaran_komite'];
-    $genap['total_estimasi_bos'] = $genap['total_pendapatan_bos'] - $genap['total_pengeluaran_bos'];
-    $genap['total_estimasi_intern'] = $genap['total_pendapatan_intern'] - $genap['total_pengeluaran_intern'];
-    $genap['total_saldo'] = $genap['total_pendapatan'] - $genap['total_beban'];
-    $genap['total_saldo_ypl'] = $genap['total_pendapatan_ypl'] - $genap['total_beban_ypl'];
-    $genap['total_saldo_komite'] = $genap['total_pendapatan_komite'] - $genap['total_beban_komite'];
-    $genap['total_saldo_bos'] = $genap['total_pendapatan_bos'] - $genap['total_beban_bos'];
-    $genap['total_saldo_intern'] = $genap['total_pendapatan_intern'] - $genap['total_beban_intern'];
-    $genap['status'] = ($genap['total_estimasi'] > 0) ? 'SURPLUS' : 'DEFISIT';
+    $total_estimasi = $total_pendapatan - $total_pengeluaran;
+    $total_estimasi_ypl = $total_pendapatan_ypl - $total_pengeluaran_ypl;
+    $total_estimasi_komite = $total_pendapatan_komite - $total_pengeluaran_komite;
+    $total_estimasi_bos = $total_pendapatan_bos - $total_pengeluaran_bos;
+    $total_estimasi_intern = $total_pendapatan_intern - $total_pengeluaran_intern;
+    $total_saldo = $total_pendapatan - $total_pengeluaran - $total_inventaris;
+    $total_saldo_ypl = $total_pendapatan_ypl - $total_pengeluaran_ypl - $total_inventaris_ypl;
+    $total_saldo_komite = $total_pendapatan_komite - $total_pengeluaran_komite - $total_inventaris_komite;
+    $total_saldo_bos = $total_pendapatan_bos - $total_pengeluaran_bos - $total_inventaris_bos;
+    $total_saldo_intern = $total_pendapatan_intern - $total_pengeluaran_intern - $total_inventaris_intern;
+    $status = ($total_estimasi > 0) ? 'SURPLUS' : 'DEFISIT';
 
     $data = array(
         'ganjil' => $ganjil,
         'genap' => $genap,
         'recommendations' => $recommendations,
         'workflow' => $budget->workflow,
+        'inventaris' => $inventaris,
+        'total_pendapatan' => $total_pendapatan,
+        'total_pengeluaran' => $total_pengeluaran,
+        'total_inventaris' => $total_inventaris,
+        'total_pendapatan_ypl' => $total_inventaris_ypl,
+        'total_pengeluaran_ypl' => $total_pengeluaran_ypl,
+        'total_inventaris_ypl' => $total_inventaris_ypl,
+        'total_pendapatan_komite' => $total_pendapatan_komite,
+        'total_pengeluaran_komite' => $total_pengeluaran_komite,
+        'total_inventaris_komite' => $total_inventaris_komite,
+        'total_pendapatan_intern' => $total_pendapatan_intern,
+        'total_pengeluaran_intern' => $total_pengeluaran_intern,
+        'total_inventaris_intern' => $total_inventaris_intern,
+        'total_pendapatan_bos' => $total_pendapatan_bos,
+        'total_pengeluaran_bos' => $total_pengeluaran_bos,
+        'total_inventaris_bos' => $total_inventaris_bos,
+        'total_estimasi_ypl' => $total_estimasi_ypl,
+        'total_estimasi_komite' => $total_estimasi_komite,
+        'total_estimasi_bos' => $total_estimasi_bos,
+        'total_estimasi_intern' => $total_estimasi_intern,
+        'total_saldo' => $total_saldo,
+        'total_saldo_ypl' => $total_saldo_ypl,
+        'total_saldo_komite' => $total_saldo_komite,
+        'total_saldo_intern' => $total_saldo_intern,
+        'total_saldo_bos' => $total_saldo_bos
     );
 
     return $data;
@@ -379,13 +338,25 @@ class BudgetDetailsService extends BaseService {
   public function saveRecommendation($data) {
     $user = Auth::user();
     //dd($data);
-    foreach($data as $pos => $ids) {
-      if(isset($data[$pos])) {
-        foreach($ids as $budgetDetailId => $value) {
-          $budgetDetail = BudgetDetails::find($budgetDetailId);
-          if($user->user_groups_id == 2 || $user->user_groups_id == 8) {
-            $budgetDetail['recommendation_' . $pos] = $value;
-            $budgetDetail->save();
+    foreach($data as $userGroupsId => $pos) {
+      if(isset($pos)) {
+        foreach($pos as $key => $budgetDetailIds) {
+          if(isset($budgetDetailIds)) {
+            foreach($budgetDetailIds as $id => $value) {
+              if(isset($value) && (float) $value > 0) {
+                $revisions = BudgetDetailDraftRevisions::updateOrCreate(
+                [
+                  'budget_detail_drafts_id' => $id,
+                  'user_groups_id' => $userGroupsId,
+                  'field' => $key,
+                ], [
+                  'budget_detail_drafts_id' => $id,
+                  'field' => $key,
+                  'value' => (float) $value,
+                  'user_groups_id' => $userGroupsId
+                ]);
+              }
+            }
           }
         }
       }
