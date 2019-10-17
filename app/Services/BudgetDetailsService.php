@@ -365,7 +365,7 @@ class BudgetDetailsService extends BaseService {
 
   public function submitApproval($data) {
     $user = Auth::user();
-    if($user->user_groups_id == 2 || $user->user_groups_id == 8) {
+    if($user->user_groups_id == 10 || $user->user_groups_id == 8 || $user->user_groups_id == 9) {
       $this->saveRecommendation($data->recommendations);
     }
 
