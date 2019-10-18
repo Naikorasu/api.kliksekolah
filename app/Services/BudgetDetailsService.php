@@ -376,14 +376,28 @@ class BudgetDetailsService extends BaseService {
     } else {
       $budget->approved = true;
       $budget->save();
-      if(isset($data->selectedBudgetDetails)) {
-        foreach($data->selectedBudgetDetails as $index => $id) {
-          $draft = BudgetDetailDrafts::find($id)->toArray();
-          BudgetDetails::create(
-            $draft
-          );
+      if(isset($data->recommendations[$user->user_groups_id])) {
+        $recommendations = $data->recommendations[$user->user_groups_id];
+        foreach($recommendations as $pos => $ids) {
+          if(isset($ids)) {
+            foreach($ids as $id => $value) {
+              $draft = BudgetDetailDrafts::find($id)->toArray();
+              $draft[$pos] = $value;
+              BudgetDetails::updateOrCreate([
+                'unique_id' => $draft['unique_id']
+              ], $draft);
+            }
+          }
         }
       }
+      // if(isset($data->selectedBudgetDetails)) {
+      //   foreach($data->selectedBudgetDetails as $index => $id) {
+      //     $draft = BudgetDetailDrafts::find($id)->toArray();
+      //     BudgetDetails::create(
+      //       $draft
+      //     );
+      //   }
+      // }
       $this->updateWorkflow($budget, true);
     }
   }

@@ -147,7 +147,9 @@ class BaseService{
     $user = Auth::user()->load('userGroup');
 
     $model->load('workflow');
-    if(!isset($model->workflow) || $user->userGroup->name == $model->workflow['next_role']) {
+    $workflow = $model->workflow->last();
+
+    if(!isset($workflow) || $user->userGroup->name == $workflow['next_role']) {
       return true;
     } else {
       return false;
