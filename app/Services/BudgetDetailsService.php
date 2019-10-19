@@ -422,6 +422,7 @@ class BudgetDetailsService extends BaseService {
 
   public function saveRecommendation($data) {
     $user = Auth::user();
+
     //dd($data);
     foreach($data as $userGroupsId => $pos) {
       if(isset($pos)) {
@@ -461,25 +462,49 @@ class BudgetDetailsService extends BaseService {
     } else {
       $budget->approved = true;
       $budget->save();
+      $result = [];
+
       if(isset($data->recommendations[$user->user_groups_id])) {
         $recommendations = $data->recommendations[$user->user_groups_id];
+
         foreach($recommendations as $pos => $ids) {
           if(isset($ids)) {
             foreach($ids as $id => $value) {
-              if($value > 0) {
-                $draft = BudgetDetailDrafts::find($id)->toArray();
-                $draft[$pos] = $value;
-                $budgetDetails = BudgetDetails::updateOrCreate([
-                  'unique_id' => $draft['unique_id']
-                ], $draft);
+              $value = (float) $value;
+
+              if(isset($value) && $value > 0) {
+                if(!isset($result[$id])) {
+                  $draft = BudgetDetailDrafts::find($id)->toArray();
+                  $result[$id] = $draft;
+                  $result['total'] = 0;
+                }
+                $result[$id][$pos] = $value;
+                $result[$id]['total'] += $value;
+              } else {
+                if(isset($result[$id])) {
+                  $result[$id][$pos] = 0;
+                }
               }
             }
           }
         }
-        $budget->load('budgetDetails');
+
+        if(isset($result)) {
+          foreach($result as $id => $values) {
+            $budgetDetails = BudgetDetails::updateOrCreate(
+              ['unique_id' => $values['unique_id']],
+              $values
+            );
+          }
+        }
+
       }
+      $budget->load('budgetDetails', 'budgetDetailDrafts', 'budgetDetailDrafts.recommendations');
 
       $this->updateWorkflow($budget, true);
+
+      return $budget;
+
     }
   }
 
