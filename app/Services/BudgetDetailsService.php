@@ -174,6 +174,32 @@ class BudgetDetailsService extends BaseService {
     $total_saldo_intern = 0;
     $total_saldo_bos = 0;
 
+    $total_rapbu_pendapatan= 0;
+    $total_rapbu_pengeluaran= 0;
+    $total_rapbu_inventaris= 0;
+    $total_rapbu_pendapatan_ypl= 0;
+    $total_rapbu_pengeluaran_ypl= 0;
+    $total_rapbu_inventaris_ypl= 0;
+    $total_rapbu_pendapatan_komite= 0;
+    $total_rapbu_pengeluaran_komite= 0;
+    $total_rapbu_inventaris_komite= 0;
+    $total_rapbu_pendapatan_intern= 0;
+    $total_rapbu_pengeluaran_intern= 0;
+    $total_rapbu_inventaris_intern= 0;
+    $total_rapbu_pendapatan_bos= 0;
+    $total_rapbu_pengeluaran_bos= 0;
+    $total_rapbu_inventaris_bos= 0;
+    $total_rapbu_estimasi_ypl= 0;
+    $total_rapbu_estimasi_komite= 0;
+    $total_rapbu_estimasi_bos= 0;
+    $total_rapbu_estimasi_intern= 0;
+    $total_rapbu_saldo = 0;
+    $total_rapbu_saldo_ypl = 0;
+    $total_rapbu_saldo_komite = 0;
+    $total_rapbu_saldo_intern = 0;
+    $total_rapbu_saldo_bos = 0;
+
+
     $recommendations = [];
 
     foreach($results as $result) {
@@ -188,6 +214,13 @@ class BudgetDetailsService extends BaseService {
         $total_pendapatan_komite += $result->committee;
         $total_pendapatan_bos += $result->bos;
         $total_pendapatan_intern += $result->intern;
+        if($budget->approved == true) {
+          $total_rapbu_pendapatan += $result->budgetDetailDraft->total;
+          $total_rapbu_pendapatan_ypl += $result->budgetDetailDraft->ypl;
+          $total_rapbu_pendapatan_komite += $result->budgetDetailDraft->committee;
+          $total_rapbu_pendapatan_bos += $result->budgetDetailDraft->bos;
+          $total_rapbu_pendapatan_intern += $result->budgetDetailDraft->intern;
+        }
       } else {
         if(Str::startsWith($result->code_of_account,'13')) {
           array_push($inventaris,$result);
@@ -196,6 +229,14 @@ class BudgetDetailsService extends BaseService {
           $total_inventaris_komite += $result->committee;
           $total_inventaris_bos += $result->bos;
           $total_inventaris_intern += $result->intern;
+
+          if($budget->approved == true) {
+            $total_rapbu_inventaris += $result->budgetDetailDraft->total;
+            $total_rapbu_inventaris_ypl += $result->budgetDetailDraft->ypl;
+            $total_rapbu_inventaris_komite += $result->budgetDetailDraft->committee;
+            $total_rapbu_inventaris_bos += $result->budgetDetailDraft->bos;
+            $total_rapbu_inventaris_intern += $result->budgetDetailDraft->intern;
+          }
         } else if(Str::startsWith($result->code_of_account,'5')) {
           if($result->semester == 1) {
             array_push($ganjil['pengeluaran'],$result);
@@ -207,6 +248,14 @@ class BudgetDetailsService extends BaseService {
           $total_pengeluaran_komite += $result->committee;
           $total_pengeluaran_bos += $result->bos;
           $total_pengeluaran_intern += $result->intern;
+
+          if($budget->approved == true) {
+            $total_rapbu_pengeluaran += $result->budgetDetailDraft->total;
+            $total_rapbu_pengeluaran_ypl += $result->budgetDetailDraft->ypl;
+            $total_rapbu_pengeluaran_komite += $result->budgetDetailDraft->committee;
+            $total_rapbu_pengeluaran_bos += $result->budgetDetailDraft->bos;
+            $total_rapbu_pengeluaran_intern += $result->budgetDetailDraft->intern;
+          }
         }
       }
 
@@ -237,6 +286,18 @@ class BudgetDetailsService extends BaseService {
     $total_saldo_intern = $total_pendapatan_intern - $total_pengeluaran_intern - $total_inventaris_intern;
     $status = ($total_estimasi > 0) ? 'SURPLUS' : 'DEFISIT';
 
+    $total_rapbu_estimasi = $total_rapbu_pendapatan - $total_rapbu_pengeluaran;
+    $total_rapbu_estimasi_ypl = $total_rapbu_pendapatan_ypl - $total_rapbu_pengeluaran_ypl;
+    $total_rapbu_estimasi_komite = $total_rapbu_pendapatan_komite - $total_rapbu_pengeluaran_komite;
+    $total_rapbu_estimasi_bos = $total_rapbu_pendapatan_bos - $total_rapbu_pengeluaran_bos;
+    $total_rapbu_estimasi_intern = $total_rapbu_pendapatan_intern - $total_rapbu_pengeluaran_intern;
+    $total_rapbu_saldo = $total_rapbu_pendapatan - $total_rapbu_pengeluaran - $total_rapbu_inventaris;
+    $total_rapbu_saldo_ypl = $total_rapbu_pendapatan_ypl - $total_rapbu_pengeluaran_ypl - $total_rapbu_inventaris_ypl;
+    $total_rapbu_saldo_komite = $total_rapbu_pendapatan_komite - $total_rapbu_pengeluaran_komite - $total_rapbu_inventaris_komite;
+    $total_rapbu_saldo_bos = $total_rapbu_pendapatan_bos - $total_rapbu_pengeluaran_bos - $total_rapbu_inventaris_bos;
+    $total_rapbu_saldo_intern = $total_rapbu_pendapatan_intern - $total_rapbu_pengeluaran_intern - $total_rapbu_inventaris_intern;
+    $status = ($total_rapbu_estimasi > 0) ? 'SURPLUS' : 'DEFISIT';
+
     $data = array(
         'ganjil' => $ganjil,
         'genap' => $genap,
@@ -246,7 +307,7 @@ class BudgetDetailsService extends BaseService {
         'total_pendapatan' => $total_pendapatan,
         'total_pengeluaran' => $total_pengeluaran,
         'total_inventaris' => $total_inventaris,
-        'total_pendapatan_ypl' => $total_inventaris_ypl,
+        'total_pendapatan_ypl' => $total_pendapatan_ypl,
         'total_pengeluaran_ypl' => $total_pengeluaran_ypl,
         'total_inventaris_ypl' => $total_inventaris_ypl,
         'total_pendapatan_komite' => $total_pendapatan_komite,
@@ -266,7 +327,31 @@ class BudgetDetailsService extends BaseService {
         'total_saldo_ypl' => $total_saldo_ypl,
         'total_saldo_komite' => $total_saldo_komite,
         'total_saldo_intern' => $total_saldo_intern,
-        'total_saldo_bos' => $total_saldo_bos
+        'total_saldo_bos' => $total_saldo_bos,
+        'total_rapbu_pendapatan' => $total_rapbu_pendapatan,
+        'total_rapbu_pengeluaran' => $total_rapbu_pengeluaran,
+        'total_rapbu_inventaris' => $total_rapbu_inventaris,
+        'total_rapbu_pendapatan_ypl' => $total_rapbu_pendapatan_ypl,
+        'total_rapbu_pengeluaran_ypl' => $total_rapbu_pengeluaran_ypl,
+        'total_rapbu_inventaris_ypl' => $total_rapbu_inventaris_ypl,
+        'total_rapbu_pendapatan_komite' => $total_rapbu_pendapatan_komite,
+        'total_rapbu_pengeluaran_komite' => $total_rapbu_pengeluaran_komite,
+        'total_rapbu_inventaris_komite' => $total_rapbu_inventaris_komite,
+        'total_rapbu_pendapatan_intern' => $total_rapbu_pendapatan_intern,
+        'total_rapbu_pengeluaran_intern' => $total_rapbu_pengeluaran_intern,
+        'total_rapbu_inventaris_intern' => $total_rapbu_inventaris_intern,
+        'total_rapbu_pendapatan_bos' => $total_rapbu_pendapatan_bos,
+        'total_rapbu_pengeluaran_bos' => $total_rapbu_pengeluaran_bos,
+        'total_rapbu_inventaris_bos' => $total_rapbu_inventaris_bos,
+        'total_rapbu_estimasi_ypl' => $total_rapbu_estimasi_ypl,
+        'total_rapbu_estimasi_komite' => $total_rapbu_estimasi_komite,
+        'total_rapbu_estimasi_bos' => $total_rapbu_estimasi_bos,
+        'total_rapbu_estimasi_intern' => $total_rapbu_estimasi_intern,
+        'total_rapbu_saldo' => $total_rapbu_saldo,
+        'total_rapbu_saldo_ypl' => $total_rapbu_saldo_ypl,
+        'total_rapbu_saldo_komite' => $total_rapbu_saldo_komite,
+        'total_rapbu_saldo_intern' => $total_rapbu_saldo_intern,
+        'total_rapbu_saldo_bos' => $total_rapbu_saldo_bos,
     );
 
     return $data;
@@ -381,23 +466,19 @@ class BudgetDetailsService extends BaseService {
         foreach($recommendations as $pos => $ids) {
           if(isset($ids)) {
             foreach($ids as $id => $value) {
-              $draft = BudgetDetailDrafts::find($id)->toArray();
-              $draft[$pos] = $value;
-              BudgetDetails::updateOrCreate([
-                'unique_id' => $draft['unique_id']
-              ], $draft);
+              if($value > 0) {
+                $draft = BudgetDetailDrafts::find($id)->toArray();
+                $draft[$pos] = $value;
+                $budgetDetails = BudgetDetails::updateOrCreate([
+                  'unique_id' => $draft['unique_id']
+                ], $draft);
+              }
             }
           }
         }
+        $budget->load('budgetDetails');
       }
-      // if(isset($data->selectedBudgetDetails)) {
-      //   foreach($data->selectedBudgetDetails as $index => $id) {
-      //     $draft = BudgetDetailDrafts::find($id)->toArray();
-      //     BudgetDetails::create(
-      //       $draft
-      //     );
-      //   }
-      // }
+
       $this->updateWorkflow($budget, true);
     }
   }
