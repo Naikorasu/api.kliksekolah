@@ -25,13 +25,18 @@ class BudgetsService extends BaseService {
     $user = Auth::user();
 
     try {
-      if(!isset($unit_id)) {
+      if(!isset($unit_id) || $unit_id == 0) {
         $unit_id = $user->prm_school_units_id;
-        if(!isset($unit_id) && isset($user->prm_perwakilan_id)) {
-          $unit_id = SchoolUnits::select('id')->where('prm_perwakilan_id', $user->prm_perwakilan_id)->get();
+        if((!isset($unit_id))) {
+          if (isset($user->prm_perwakilan_id)) {
+            $unit_id = SchoolUnits::select('id')
+              ->where('prm_perwakilan_id', $user->prm_perwakilan_id)
+              ->get()->pluck('id')->all();
+          } else {
+            $unit_id = SchoolUnits::select('id')->get()->pluck('id')->all();
+          }
         }
       }
-
 
       $query = Budgets::withUnitId($unit_id)
         ->where($conditions)

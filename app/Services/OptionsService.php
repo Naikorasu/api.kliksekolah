@@ -238,7 +238,9 @@ class OptionsService extends BaseService {
         ->orWhere('unit_code', 'like', '%'.$keyword.'%')->get();
       }
 
-      $options = [];
+      $options = [
+        ["id" => '0', "title" => "SEMUA UNIT"]
+      ];
       foreach($collection as $option) {
         array_push($options, [
           "id" => $option->id,

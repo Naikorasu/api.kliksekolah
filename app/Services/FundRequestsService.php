@@ -13,6 +13,7 @@ use App\Budgets;
 use App\CodeAccount;
 use App\Services\BudgetDetailsService;
 use App\EntityUnits;
+use App\SchoolUnits;
 
 class FundRequestsService extends BaseService {
 
@@ -42,17 +43,22 @@ class FundRequestsService extends BaseService {
     $user = Auth::user();
     $user->load('userGroup');
 
-    if(!isset($unit_id)) {
+    if(!isset($unit_id) || $unit_id == 0) {
       $unit_id = $user->prm_school_units_id;
-      if(!isset($unit_id) && isset($user->prm_perwakilan_id)) {
-        $unit_id = SchoolUnits::select('id')->where('prm_perwakilan_id', $user->prm_perwakilan_id)->get();
+      if((!isset($unit_id))) {
+        if (isset($user->prm_perwakilan_id)) {
+          $unit_id = SchoolUnits::select('id')
+            ->where('prm_perwakilan_id', $user->prm_perwakilan_id)
+            ->get()->pluck('id')->all();
+        } else {
+          $unit_id = SchoolUnits::select('id')->get()->pluck('id')->all();
+        }
       }
     }
 
 
     $fundRequests = FundRequests::withUnitId($unit_id)
-      ->with('workflow')
-      ->select('id', 'created_at', 'nomor_permohonan', 'description')
+      ->with('workflow', 'school_unit')
       ->totalAmount()
       ->where($conditions)
       ->orderBy('created_at', 'DESC')
