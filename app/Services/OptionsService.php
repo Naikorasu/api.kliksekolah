@@ -227,15 +227,25 @@ class OptionsService extends BaseService {
   }
 
   public function getUnit($filters, $keyword = null) {
+    $user = Auth::user();
     $conditions = $this->buildFilters($filters);
-
 
     try {
       if(!isset($keyword)) {
-        $collection = SchoolUnits::get();
+        if(isset($user->prm_perwakilan_id)) {
+          $collection = SchoolUnits::where('prm_perwakilan_id', $user->prm_perwakilan_id)->get();
+        } else {
+          $collection = SchoolUnits::get();
+        }
       } else {
-        $collection = SchoolUnits::where('name', 'like' ,'%'.$keyword.'%')
-        ->orWhere('unit_code', 'like', '%'.$keyword.'%')->get();
+        if(isset($user->prm_perwakilan_id)) {
+          $collection = SchoolUnits::where('prm_perwakilan_id', $user->prm_perwakilan_id)
+          ->where('name', 'like' ,'%'.$keyword.'%')
+          ->orWhere('unit_code', 'like', '%'.$keyword.'%')->get();
+        } else {
+          $collection = SchoolUnits::where('name', 'like' ,'%'.$keyword.'%')
+          ->orWhere('unit_code', 'like', '%'.$keyword.'%')->get();
+        }
       }
 
       $options = [

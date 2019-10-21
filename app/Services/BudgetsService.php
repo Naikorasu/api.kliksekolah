@@ -23,6 +23,8 @@ class BudgetsService extends BaseService {
 
     $conditions = $this->buildFilters($filters);
     $user = Auth::user();
+    $user->load('userGroup');
+    $userGroup = $user->userGroup->name;
 
     try {
       if(!isset($unit_id) || $unit_id == 0) {
@@ -38,12 +40,23 @@ class BudgetsService extends BaseService {
         }
       }
 
-      $query = Budgets::withUnitId($unit_id)
-        ->where($conditions)
-        ->orderBy('created_at', 'DESC')
-        ->with('account', 'workflow')
-        ->paginate(5);
-
+      if($userGroup == 'Korektor Pusat'
+        || $userGroup =='Manager Keuangan' || $userGroup == 'Bendahara') {
+          $query = Budgets::withUnitId($unit_id)
+            ->where($conditions)
+            ->orderBy('created_at', 'DESC')
+            ->with('account', 'workflow', 'school_unit')
+            ->whereHas('workflow', function($q) use($userGroup) {
+                $q->where('next_role', $userGroup);
+            })
+            ->paginate(5);
+      } else {
+        $query = Budgets::withUnitId($unit_id)
+          ->where($conditions)
+          ->orderBy('created_at', 'DESC')
+          ->with('account', 'workflow', 'school_unit')
+          ->paginate(5);
+      }
       return $query;
     } catch(ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());

@@ -605,6 +605,7 @@ class ComposerStaticInit70f86058477796cc8791554fb9c01655
         'App\\Http\\Controllers\\CashJournalsController' => __DIR__ . '/../..' . '/app/Http/Controllers/CashJournalsController.php',
         'App\\Http\\Controllers\\CodeAccountingController' => __DIR__ . '/../..' . '/app/Http/Controllers/CodeAccountingController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
+        'App\\Http\\Controllers\\FileController' => __DIR__ . '/../..' . '/app/Http/Controllers/FileController.php',
         'App\\Http\\Controllers\\FileUploadController' => __DIR__ . '/../..' . '/app/Http/Controllers/FileUploadController.php',
         'App\\Http\\Controllers\\FlowController' => __DIR__ . '/../..' . '/app/Http/Controllers/FlowController.php',
         'App\\Http\\Controllers\\FundRequestsController' => __DIR__ . '/../..' . '/app/Http/Controllers/FundRequestsController.php',

@@ -142,7 +142,14 @@ class BudgetDetails extends Model
     }
 
     public function file() {
-      return $this->morphOne('App\File', 'entity');
+      return $this->hasOneThrough(
+        'App\File',
+        'App\BudgetDetailDrafts',
+        'unique_id',
+        'entity_id',
+        'unique_id',
+        'unique_id'
+       );
     }
 
 }

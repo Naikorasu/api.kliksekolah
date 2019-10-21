@@ -46,6 +46,12 @@ Route::group([
     });
 
     Route::group([
+      'prefix' => 'file'
+    ], function() {
+      Route::post('upload', 'FileUploadController@upload');
+    });
+
+    Route::group([
       'prefix' => 'options'
     ], function() {
 
@@ -169,12 +175,6 @@ Route::group([
             Route::post('list','CodeAccountingController@list');
         });
 
-    });
-
-    Route::group([
-      'prefix' => 'file'
-    ], function() {
-      Route::post('upload', 'FileUploadController@upload');
     });
 
 });

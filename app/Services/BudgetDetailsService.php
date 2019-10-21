@@ -5,6 +5,7 @@ namespace App\Services;
 use Auth;
 use Maatwebsite\Excel\Excel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Exceptions\DataNotFoundException;
@@ -44,7 +45,7 @@ class BudgetDetailsService extends BaseService {
 
     //$conditions = $this->buildFilters($filters);
     if(isset($filters['head'])) {
-      $budget = Budgets::select('approved')->where('unique_id', $filters['head'])->first();
+      $budget = Budgets::with('workflow')->where('unique_id', $filters['head'])->first();
     }
 
     if($budget->approved == true) {
@@ -93,6 +94,10 @@ class BudgetDetailsService extends BaseService {
       'genap' => []
     ];
 
+    if(isset($budget->workflow)) {
+      $data['lastWorkflow'] = $budget->workflow->values()->last();
+    }
+
     foreach($results as $result) {
       if($result->semester == 1) {
         array_push($data['ganjil'], $result);
@@ -121,12 +126,12 @@ class BudgetDetailsService extends BaseService {
     $conditions = $this->buildFilters($filters);
 
     $budget = Budgets::with('workflow')->where('unique_id', $filters['head'])->first();
-
     if($budget->approved == true) {
       $results = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)
         ->rAPBU()
         ->where($conditions)
         ->with('budgetDetailDraft', 'recommendations')
+        ->whereHas('budgetDetailDraft')
         ->orderBy('code_of_account', 'ASC')
         ->get();
     } else {
@@ -379,7 +384,27 @@ class BudgetDetailsService extends BaseService {
         $budgetDetail->account = $account;
         $budgetDetail->save();
       }
-      $budgetDetail->load('parameter_code');
+
+      if(isset($data['file'])) {
+        $filepath = $data['file']['path'];
+        if(Storage::disk('temp')->exists($filepath)) {
+          $info = pathinfo(storage_path('app/temp').$filepath);
+          $file = Storage::disk('temp')->get($filepath);
+          $extension = $info['extension'];
+          $size = Storage::disk('temp')->size($filepath);
+          $filename = 'budget_'.$budgetDetail->head.'_'.$budgetDetail->id.'.'.$extension;
+          $newPath = Storage::move('/temp/'.$filepath, '/public/'.$filename);
+
+          $file = $budgetDetail->file()->create([
+            'name' => $filename,
+            'display_name' => $data['file']['filename'],
+            'path' => $newPath,
+            'extension' => $extension,
+            'size' => $size
+          ]);
+        }
+      }
+      $budgetDetail->load('parameter_code', 'file');
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
@@ -463,9 +488,8 @@ class BudgetDetailsService extends BaseService {
       $budget->approved = true;
       $budget->save();
       $result = [];
-
-      if(isset($data->recommendations[$user->user_groups_id])) {
-        $recommendations = $data->recommendations[$user->user_groups_id];
+      if(isset($data->recommendations[8])) {
+        $recommendations = $data->recommendations[8];
 
         foreach($recommendations as $pos => $ids) {
           if(isset($ids)) {
@@ -476,7 +500,7 @@ class BudgetDetailsService extends BaseService {
                 if(!isset($result[$id])) {
                   $draft = BudgetDetailDrafts::find($id)->toArray();
                   $result[$id] = $draft;
-                  $result['total'] = 0;
+                  $result[$id]['total'] = 0;
                 }
                 $result[$id][$pos] = $value;
                 $result[$id]['total'] += $value;

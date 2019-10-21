@@ -53,6 +53,7 @@ return array(
     'App\\Http\\Controllers\\CashJournalsController' => $baseDir . '/app/Http/Controllers/CashJournalsController.php',
     'App\\Http\\Controllers\\CodeAccountingController' => $baseDir . '/app/Http/Controllers/CodeAccountingController.php',
     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',
+    'App\\Http\\Controllers\\FileController' => $baseDir . '/app/Http/Controllers/FileController.php',
     'App\\Http\\Controllers\\FileUploadController' => $baseDir . '/app/Http/Controllers/FileUploadController.php',
     'App\\Http\\Controllers\\FlowController' => $baseDir . '/app/Http/Controllers/FlowController.php',
     'App\\Http\\Controllers\\FundRequestsController' => $baseDir . '/app/Http/Controllers/FundRequestsController.php',
