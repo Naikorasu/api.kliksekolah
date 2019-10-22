@@ -169,6 +169,7 @@ class BudgetDetailsService extends BaseService {
     $total_pendapatan_bos= 0;
     $total_pengeluaran_bos= 0;
     $total_inventaris_bos= 0;
+    $total_estimasi = 0;
     $total_estimasi_ypl= 0;
     $total_estimasi_komite= 0;
     $total_estimasi_bos= 0;
@@ -324,6 +325,7 @@ class BudgetDetailsService extends BaseService {
         'total_pendapatan_bos' => $total_pendapatan_bos,
         'total_pengeluaran_bos' => $total_pengeluaran_bos,
         'total_inventaris_bos' => $total_inventaris_bos,
+        'total_estimasi' => $total_estimasi,
         'total_estimasi_ypl' => $total_estimasi_ypl,
         'total_estimasi_komite' => $total_estimasi_komite,
         'total_estimasi_bos' => $total_estimasi_bos,
