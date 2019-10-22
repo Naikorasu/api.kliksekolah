@@ -267,15 +267,15 @@ class BudgetDetailsService extends BaseService {
 
       if(isset($result->recommendations)) {
         foreach($result->recommendations as $recommendation) {
-          if(!isset($recommendations[$recommendation->user_groups_id])) {
-            $recommendations[$recommendation->user_groups_id] = [
+          if(!isset($recommendations[$recommendation['user_groups_id']])) {
+            $recommendations[$recommendation['user_groups_id']] = [
               'ypl' => null,
               'committee' => null,
               'intern' => null,
               'bos' => null,
             ];
           }
-          $recommendations[$recommendation->user_groups_id][$recommendation->field][$recommendation->budget_detail_drafts_id] = $recommendation->value;
+          $recommendations[$recommendation['user_groups_id']][$recommendation['field']][$recommendation['budget_detail_drafts_id']] = $recommendation['value'];
         }
       }
     }
