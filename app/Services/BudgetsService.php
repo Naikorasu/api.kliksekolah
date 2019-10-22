@@ -46,9 +46,6 @@ class BudgetsService extends BaseService {
             ->where($conditions)
             ->orderBy('created_at', 'DESC')
             ->with('account', 'workflow', 'school_unit')
-            ->whereHas('workflow', function($q) use($userGroup) {
-                $q->where('next_role', $userGroup);
-            })
             ->paginate(5);
       } else {
         $query = Budgets::withUnitId($unit_id)
