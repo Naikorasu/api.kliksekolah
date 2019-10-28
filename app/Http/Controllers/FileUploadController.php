@@ -23,4 +23,15 @@ class FileUploadController extends Controller
           'path' => $path        ]
       ]);
     }
+
+    public function download(Request $request, $filename) {
+      $path = storage_path() .'/app/public/'. $filename;
+      if(file_exists($path)) {
+        return response()->download($path, $filename, [
+          'Content-Length: ' . filesize($path)
+        ]);
+      } else {
+        exit('Requested file does not exist');
+      }
+    }
 }

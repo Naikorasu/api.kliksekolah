@@ -49,9 +49,9 @@ class BudgetDetailsService extends BaseService {
     }
 
     if($budget->approved == true) {
-      $query = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->orderBy('created_at')->remains();
+      $query = BudgetDetails::with('file')->parameterCode($codeOfAccountValue, $codeOfAccountType)->orderBy('created_at')->remains();
     } else {
-      $query = BudgetDetailDrafts::parameterCode($codeOfAccountValue, $codeOfAccountType)->orderBy('created_at');
+      $query = BudgetDetailDrafts::with('file')->parameterCode($codeOfAccountValue, $codeOfAccountType)->orderBy('created_at');
     }
 
     if(isset($filters)) {
@@ -88,14 +88,16 @@ class BudgetDetailsService extends BaseService {
     } catch (ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
     }
+
     //return dd(BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)->where($conditions)->remains()->toSql());
     $data = [
       'ganjil' => [],
-      'genap' => []
+      'genap' => [],
+      'links' => []
     ];
 
     if(isset($budget->workflow)) {
-      $data['lastWorkflow'] = $budget->workflow->values()->last();
+      $data['workflow'] = $budget->workflow;
     }
 
     foreach($results as $result) {
@@ -269,6 +271,7 @@ class BudgetDetailsService extends BaseService {
     foreach($results as $result) {
       if(Str::startsWith($result->code_of_account,'4')) {
         array_push($pendapatan_id, $result->id);
+
         if($result->semester == 1) {
           array_push($ganjil['pendapatan'],$result);
         } else {
@@ -339,12 +342,19 @@ class BudgetDetailsService extends BaseService {
               'bos' => null,
             ];
           }
-
-          if(floatVal($result->budgetDetailDraft[$field]) > 0) {
-            $persentase[$field][$recommendation['budget_detail_drafts_id']] =
-            floatVal($value)/floatVal($result->budgetDetailDraft[$field])*100;
-          } else {
+          if($userGroupId == 8) {
             $persentase[$field][$recommendation['budget_detail_drafts_id']] = 0;
+            if($budget->approved) {
+              if(floatVal($result->budgetDetailDraft[$field]) > 0) {
+                $persentase[$field][$recommendation['budget_detail_drafts_id']] =
+                round(floatVal($value)/floatVal($result->budgetDetailDraft[$field])*100, 2);
+              }
+            } else {
+              if(floatVal($result[$field]) > 0) {
+                $persentase[$field][$recommendation['budget_detail_drafts_id']] =
+                round(floatVal($value)/floatVal($result[$field])*100,2);
+              }
+            }
           }
 
           $recommendations[$userGroupId][$field][$recommendation['budget_detail_drafts_id']] = $value;
@@ -352,43 +362,45 @@ class BudgetDetailsService extends BaseService {
       }
     }
 
-    $recommendation = $recommendations[10];
-    if(isset($recommendation)) {
-      foreach($recommendation as $field => $refs) {
-        $fieldname = $field;
-        if($field == 'committee') {
-          $fieldname = 'komite';
-        }
-        if(isset($refs) && !empty($refs)) {
-          foreach($refs as $ref => $value) {
+    if(isset($recommendations) && !empty($recommendations)) {
+      $recommendation = $recommendations[10];
+      if(isset($recommendation)) {
+        foreach($recommendation as $field => $refs) {
+          $fieldname = $field;
+          if($field == 'committee') {
+            $fieldname = 'komite';
+          }
+          if(isset($refs) && !empty($refs)) {
+            foreach($refs as $ref => $value) {
 
-            if(in_array($ref, $pendapatan_id)) {
-              ${"total_pendapatan_rekomendasi_" . $fieldname} += floatval($value);
-            } else if (in_array($ref, $pengeluaran_id)) {
-              ${"total_pengeluaran_rekomendasi_" . $fieldname} += floatval($value);
-            } else if (in_array($ref, $inventaris_id)) {
-              ${"total_inventaris_rekomendasi_" . $fieldname} += floatval($value);
+              if(in_array($ref, $pendapatan_id)) {
+                ${"total_pendapatan_rekomendasi_" . $fieldname} += floatval($value);
+              } else if (in_array($ref, $pengeluaran_id)) {
+                ${"total_pengeluaran_rekomendasi_" . $fieldname} += floatval($value);
+              } else if (in_array($ref, $inventaris_id)) {
+                ${"total_inventaris_rekomendasi_" . $fieldname} += floatval($value);
+              }
             }
           }
         }
       }
-    }
 
-    $recommendation = $recommendations[8];
-    if(isset($recommendation)) {
-      foreach($recommendation as $field => $refs) {
-        $fieldname = $field;
-        if($field == 'committee') {
-          $fieldname = 'komite';
-        }
-        if(isset($refs) && !empty($refs)) {
-          foreach($refs as $ref => $value) {
-            if(in_array($ref, $pendapatan_id)) {
-              ${"total_pendapatan_apbu_" . $fieldname} += floatval($value);
-            } else if (in_array($ref, $pengeluaran_id)) {
-              ${"total_pengeluaran_apbu_" . $fieldname} += floatval($value);
-            } else if (in_array($ref, $inventaris_id)) {
-              ${"total_inventaris_apbu_" . $fieldname} += floatval($value);
+      $recommendation = $recommendations[8];
+      if(isset($recommendation)) {
+        foreach($recommendation as $field => $refs) {
+          $fieldname = $field;
+          if($field == 'committee') {
+            $fieldname = 'komite';
+          }
+          if(isset($refs) && !empty($refs)) {
+            foreach($refs as $ref => $value) {
+              if(in_array($ref, $pendapatan_id)) {
+                ${"total_pendapatan_apbu_" . $fieldname} += floatval($value);
+              } else if (in_array($ref, $pengeluaran_id)) {
+                ${"total_pengeluaran_apbu_" . $fieldname} += floatval($value);
+              } else if (in_array($ref, $inventaris_id)) {
+                ${"total_inventaris_apbu_" . $fieldname} += floatval($value);
+              }
             }
           }
         }

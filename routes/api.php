@@ -49,6 +49,8 @@ Route::group([
       'prefix' => 'file'
     ], function() {
       Route::post('upload', 'FileUploadController@upload');
+      Route::get('download/{filename}', 'FileUploadController@download')
+      ->where('filename', '[A-Za-z0-9\-\_\.]+');
     });
 
     Route::group([
