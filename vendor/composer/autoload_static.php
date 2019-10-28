@@ -560,6 +560,7 @@ class ComposerStaticInit70f86058477796cc8791554fb9c01655
     public static $classMap = array (
         'App\\Auth' => __DIR__ . '/../..' . '/app/Auth.php',
         'App\\BankAccounts' => __DIR__ . '/../..' . '/app/BankAccounts.php',
+        'App\\Banks' => __DIR__ . '/../..' . '/app/Banks.php',
         'App\\BudgetAccounts' => __DIR__ . '/../..' . '/app/BudgetAccounts.php',
         'App\\BudgetDetailDraftRevisions' => __DIR__ . '/../..' . '/app/BudgetDetailDraftRevisions.php',
         'App\\BudgetDetailDrafts' => __DIR__ . '/../..' . '/app/BudgetDetailDrafts.php',
@@ -613,6 +614,7 @@ class ComposerStaticInit70f86058477796cc8791554fb9c01655
         'App\\Http\\Controllers\\JournalsController' => __DIR__ . '/../..' . '/app/Http/Controllers/JournalsController.php',
         'App\\Http\\Controllers\\NonBudgetsController' => __DIR__ . '/../..' . '/app/Http/Controllers/NonBudgetsController.php',
         'App\\Http\\Controllers\\OptionsController' => __DIR__ . '/../..' . '/app/Http/Controllers/OptionsController.php',
+        'App\\Http\\Controllers\\ParametersController' => __DIR__ . '/../..' . '/app/Http/Controllers/ParametersController.php',
         'App\\Http\\Controllers\\ReportController' => __DIR__ . '/../..' . '/app/Http/Controllers/ReportController.php',
         'App\\Http\\Controllers\\SchoolUnitController' => __DIR__ . '/../..' . '/app/Http/Controllers/SchoolUnitController.php',
         'App\\Http\\Controllers\\TestController' => __DIR__ . '/../..' . '/app/Http/Controllers/TestController.php',

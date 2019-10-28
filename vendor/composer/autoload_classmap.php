@@ -8,6 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'App\\Auth' => $baseDir . '/app/Auth.php',
     'App\\BankAccounts' => $baseDir . '/app/BankAccounts.php',
+    'App\\Banks' => $baseDir . '/app/Banks.php',
     'App\\BudgetAccounts' => $baseDir . '/app/BudgetAccounts.php',
     'App\\BudgetDetailDraftRevisions' => $baseDir . '/app/BudgetDetailDraftRevisions.php',
     'App\\BudgetDetailDrafts' => $baseDir . '/app/BudgetDetailDrafts.php',
@@ -61,6 +62,7 @@ return array(
     'App\\Http\\Controllers\\JournalsController' => $baseDir . '/app/Http/Controllers/JournalsController.php',
     'App\\Http\\Controllers\\NonBudgetsController' => $baseDir . '/app/Http/Controllers/NonBudgetsController.php',
     'App\\Http\\Controllers\\OptionsController' => $baseDir . '/app/Http/Controllers/OptionsController.php',
+    'App\\Http\\Controllers\\ParametersController' => $baseDir . '/app/Http/Controllers/ParametersController.php',
     'App\\Http\\Controllers\\ReportController' => $baseDir . '/app/Http/Controllers/ReportController.php',
     'App\\Http\\Controllers\\SchoolUnitController' => $baseDir . '/app/Http/Controllers/SchoolUnitController.php',
     'App\\Http\\Controllers\\TestController' => $baseDir . '/app/Http/Controllers/TestController.php',

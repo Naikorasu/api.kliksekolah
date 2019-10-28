@@ -114,6 +114,8 @@ class BudgetDetailsService extends BaseService {
 
   public function getRAPBUList($filters=[]) {
     $user = Auth::user();
+    $user->load('userGroup');
+    $userGroup = $user->userGroup;
 
     $codeOfAccountValue = null;
     $codeOfAccountType = null;
@@ -125,7 +127,11 @@ class BudgetDetailsService extends BaseService {
     }
     $conditions = $this->buildFilters($filters);
 
-    $budget = Budgets::with('workflow')->where('unique_id', $filters['head'])->first();
+    $budget = Budgets::with([
+      'workflow' => function($q) {
+        $q->orderBy('updated_at', 'ASC');
+      }
+    ])->where('unique_id', $filters['head'])->first();
     if($budget->approved == true) {
       $results = BudgetDetails::parameterCode($codeOfAccountValue, $codeOfAccountType)
         ->rAPBU()
@@ -205,11 +211,64 @@ class BudgetDetailsService extends BaseService {
     $total_rapbu_saldo_intern = 0;
     $total_rapbu_saldo_bos = 0;
 
+    $total_pendapatan_rekomendasi= 0;
+    $total_pengeluaran_rekomendasi= 0;
+    $total_inventaris_rekomendasi= 0;
+    $total_pendapatan_rekomendasi_ypl= 0;
+    $total_pengeluaran_rekomendasi_ypl= 0;
+    $total_inventaris_rekomendasi_ypl= 0;
+    $total_pendapatan_rekomendasi_komite= 0;
+    $total_pengeluaran_rekomendasi_komite= 0;
+    $total_inventaris_rekomendasi_komite= 0;
+    $total_pendapatan_rekomendasi_intern= 0;
+    $total_pengeluaran_rekomendasi_intern= 0;
+    $total_inventaris_rekomendasi_intern= 0;
+    $total_pendapatan_rekomendasi_bos= 0;
+    $total_pengeluaran_rekomendasi_bos= 0;
+    $total_inventaris_rekomendasi_bos= 0;
+    $total_estimasi_rekomendasi_ypl= 0;
+    $total_estimasi_rekomendasi_komite= 0;
+    $total_estimasi_rekomendasi_bos= 0;
+    $total_estimasi_rekomendasi_intern= 0;
+    $total_saldo_rekomendasi = 0;
+    $total_saldo_rekomendasi_ypl = 0;
+    $total_saldo_rekomendasi_komite = 0;
+    $total_saldo_rekomendasi_intern = 0;
+    $total_saldo_rekomendasi_bos = 0;
+    $total_pendapatan_apbu= 0;
+    $total_pengeluaran_apbu= 0;
+    $total_inventaris_apbu= 0;
+    $total_pendapatan_apbu_ypl= 0;
+    $total_pengeluaran_apbu_ypl= 0;
+    $total_inventaris_apbu_ypl= 0;
+    $total_pendapatan_apbu_komite= 0;
+    $total_pengeluaran_apbu_komite= 0;
+    $total_inventaris_apbu_komite= 0;
+    $total_pendapatan_apbu_intern= 0;
+    $total_pengeluaran_apbu_intern= 0;
+    $total_inventaris_apbu_intern= 0;
+    $total_pendapatan_apbu_bos= 0;
+    $total_pengeluaran_apbu_bos= 0;
+    $total_inventaris_apbu_bos= 0;
+    $total_estimasi_apbu_ypl= 0;
+    $total_estimasi_apbu_komite= 0;
+    $total_estimasi_apbu_bos= 0;
+    $total_estimasi_apbu_intern= 0;
+    $total_saldo_apbu = 0;
+    $total_saldo_apbu_ypl = 0;
+    $total_saldo_apbu_komite = 0;
+    $total_saldo_apbu_intern = 0;
+    $total_saldo_apbu_bos = 0;
 
     $recommendations = [];
+    $pendapatan_id = [];
+    $inventaris_id = [];
+    $pengeluaran_id = [];
+    $persentase = [];
 
     foreach($results as $result) {
       if(Str::startsWith($result->code_of_account,'4')) {
+        array_push($pendapatan_id, $result->id);
         if($result->semester == 1) {
           array_push($ganjil['pendapatan'],$result);
         } else {
@@ -229,6 +288,7 @@ class BudgetDetailsService extends BaseService {
         }
       } else {
         if(Str::startsWith($result->code_of_account,'13')) {
+          array_push($inventaris_id, $result->id);
           array_push($inventaris,$result);
           $total_inventaris += $result->total;
           $total_inventaris_ypl += $result->ypl;
@@ -244,6 +304,7 @@ class BudgetDetailsService extends BaseService {
             $total_rapbu_inventaris_intern += $result->budgetDetailDraft->intern;
           }
         } else if(Str::startsWith($result->code_of_account,'5')) {
+          array_push($pengeluaran_id, $result->id);
           if($result->semester == 1) {
             array_push($ganjil['pengeluaran'],$result);
           } else {
@@ -267,15 +328,69 @@ class BudgetDetailsService extends BaseService {
 
       if(isset($result->recommendations)) {
         foreach($result->recommendations as $recommendation) {
-          if(!isset($recommendations[$recommendation['user_groups_id']])) {
-            $recommendations[$recommendation['user_groups_id']] = [
+          $field = $recommendation['field'];
+          $value = $recommendation['value'];
+          $userGroupId = $recommendation['user_groups_id'];
+          if(!isset($recommendations[$userGroupId])) {
+            $recommendations[$userGroupId] = [
               'ypl' => null,
               'committee' => null,
               'intern' => null,
               'bos' => null,
             ];
           }
-          $recommendations[$recommendation['user_groups_id']][$recommendation['field']][$recommendation['budget_detail_drafts_id']] = $recommendation['value'];
+
+          if(floatVal($result->budgetDetailDraft[$field]) > 0) {
+            $persentase[$field][$recommendation['budget_detail_drafts_id']] =
+            floatVal($value)/floatVal($result->budgetDetailDraft[$field])*100;
+          } else {
+            $persentase[$field][$recommendation['budget_detail_drafts_id']] = 0;
+          }
+
+          $recommendations[$userGroupId][$field][$recommendation['budget_detail_drafts_id']] = $value;
+        }
+      }
+    }
+
+    $recommendation = $recommendations[10];
+    if(isset($recommendation)) {
+      foreach($recommendation as $field => $refs) {
+        $fieldname = $field;
+        if($field == 'committee') {
+          $fieldname = 'komite';
+        }
+        if(isset($refs) && !empty($refs)) {
+          foreach($refs as $ref => $value) {
+
+            if(in_array($ref, $pendapatan_id)) {
+              ${"total_pendapatan_rekomendasi_" . $fieldname} += floatval($value);
+            } else if (in_array($ref, $pengeluaran_id)) {
+              ${"total_pengeluaran_rekomendasi_" . $fieldname} += floatval($value);
+            } else if (in_array($ref, $inventaris_id)) {
+              ${"total_inventaris_rekomendasi_" . $fieldname} += floatval($value);
+            }
+          }
+        }
+      }
+    }
+
+    $recommendation = $recommendations[8];
+    if(isset($recommendation)) {
+      foreach($recommendation as $field => $refs) {
+        $fieldname = $field;
+        if($field == 'committee') {
+          $fieldname = 'komite';
+        }
+        if(isset($refs) && !empty($refs)) {
+          foreach($refs as $ref => $value) {
+            if(in_array($ref, $pendapatan_id)) {
+              ${"total_pendapatan_apbu_" . $fieldname} += floatval($value);
+            } else if (in_array($ref, $pengeluaran_id)) {
+              ${"total_pengeluaran_apbu_" . $fieldname} += floatval($value);
+            } else if (in_array($ref, $inventaris_id)) {
+              ${"total_inventaris_apbu_" . $fieldname} += floatval($value);
+            }
+          }
         }
       }
     }
@@ -304,12 +419,41 @@ class BudgetDetailsService extends BaseService {
     $total_rapbu_saldo_intern = $total_rapbu_pendapatan_intern - $total_rapbu_pengeluaran_intern - $total_rapbu_inventaris_intern;
     $status = ($total_rapbu_estimasi > 0) ? 'SURPLUS' : 'DEFISIT';
 
+    $total_estimasi_rekomendasi = $total_pendapatan_rekomendasi - $total_pengeluaran_rekomendasi;
+    $total_estimasi_rekomendasi_ypl = $total_pendapatan_rekomendasi_ypl - $total_pengeluaran_rekomendasi_ypl;
+    $total_estimasi_rekomendasi_komite = $total_pendapatan_rekomendasi_komite - $total_pengeluaran_rekomendasi_komite;
+    $total_estimasi_rekomendasi_bos = $total_pendapatan_rekomendasi_bos - $total_pengeluaran_rekomendasi_bos;
+    $total_estimasi_rekomendasi_intern = $total_pendapatan_rekomendasi_intern - $total_pengeluaran_rekomendasi_intern;
+    $total_saldo_rekomendasi = $total_pendapatan_rekomendasi - $total_pengeluaran_rekomendasi - $total_inventaris;
+    $total_saldo_rekomendasi_ypl = $total_pendapatan_rekomendasi_ypl - $total_pengeluaran_rekomendasi_ypl - $total_inventaris_ypl;
+    $total_saldo_rekomendasi_komite = $total_pendapatan_rekomendasi_komite - $total_pengeluaran_rekomendasi_komite - $total_inventaris_komite;
+    $total_saldo_rekomendasi_bos = $total_pendapatan_rekomendasi_bos - $total_pengeluaran_rekomendasi_bos - $total_inventaris_bos;
+    $total_saldo_rekomendasi_intern = $total_pendapatan_rekomendasi_intern - $total_pengeluaran_rekomendasi_intern - $total_inventaris_intern;
+    $status = ($total_estimasi_rekomendasi > 0) ? 'SURPLUS' : 'DEFISIT';
+
+    $total_estimasi_apbu = $total_pendapatan_apbu - $total_pengeluaran_apbu;
+    $total_estimasi_apbu_ypl = $total_pendapatan_apbu_ypl - $total_pengeluaran_apbu_ypl;
+    $total_estimasi_apbu_komite = $total_pendapatan_apbu_komite - $total_pengeluaran_apbu_komite;
+    $total_estimasi_apbu_bos = $total_pendapatan_apbu_bos - $total_pengeluaran_apbu_bos;
+    $total_estimasi_apbu_intern = $total_pendapatan_apbu_intern - $total_pengeluaran_apbu_intern;
+    $total_saldo_apbu = $total_pendapatan_rekomendasi - $total_pengeluaran_rekomendasi - $total_inventaris;
+    $total_saldo_apbu_ypl = $total_pendapatan_rekomendasi_ypl - $total_pengeluaran_rekomendasi_ypl - $total_inventaris_ypl;
+    $total_saldo_apbu_komite = $total_pendapatan_rekomendasi_komite - $total_pengeluaran_rekomendasi_komite - $total_inventaris_komite;
+    $total_saldo_apbu_bos = $total_pendapatan_rekomendasi_bos - $total_pengeluaran_rekomendasi_bos - $total_inventaris_bos;
+    $total_saldo_apbu_intern = $total_pendapatan_rekomendasi_intern - $total_pengeluaran_rekomendasi_intern - $total_inventaris_intern;
+    $status = ($total_estimasi_apbu > 0) ? 'SURPLUS' : 'DEFISIT';
+
+
     $data = array(
+        'persentase' => $persentase,
+        'pendapatan_id' => $pendapatan_id,
+        'pengeluaran_id' => $pengeluaran_id,
+        'inventaris_id' => $inventaris_id,
+        'inventaris' => $inventaris,
         'ganjil' => $ganjil,
         'genap' => $genap,
         'recommendations' => $recommendations,
         'workflow' => $budget->workflow,
-        'inventaris' => $inventaris,
         'total_pendapatan' => $total_pendapatan,
         'total_pengeluaran' => $total_pengeluaran,
         'total_inventaris' => $total_inventaris,
@@ -359,6 +503,54 @@ class BudgetDetailsService extends BaseService {
         'total_rapbu_saldo_komite' => $total_rapbu_saldo_komite,
         'total_rapbu_saldo_intern' => $total_rapbu_saldo_intern,
         'total_rapbu_saldo_bos' => $total_rapbu_saldo_bos,
+        'total_pendapatan_rekomendasi' => $total_pendapatan_rekomendasi,
+        'total_pengeluaran_rekomendasi' => $total_pengeluaran_rekomendasi,
+        'total_inventaris_rekomendasi' => $total_inventaris_rekomendasi,
+        'total_pendapatan_rekomendasi_ypl' => $total_pendapatan_rekomendasi_ypl,
+        'total_pengeluaran_rekomendasi_ypl' => $total_pengeluaran_rekomendasi_ypl,
+        'total_inventaris_rekomendasi_ypl' => $total_inventaris_rekomendasi_ypl,
+        'total_pendapatan_rekomendasi_komite' => $total_pendapatan_rekomendasi_komite,
+        'total_pengeluaran_rekomendasi_komite' => $total_pengeluaran_rekomendasi_komite,
+        'total_inventaris_rekomendasi_komite' => $total_inventaris_rekomendasi_komite,
+        'total_pendapatan_rekomendasi_intern' => $total_pendapatan_rekomendasi_intern,
+        'total_pengeluaran_rekomendasi_intern' => $total_pengeluaran_rekomendasi_intern,
+        'total_inventaris_rekomendasi_intern' => $total_inventaris_rekomendasi_intern,
+        'total_pendapatan_rekomendasi_bos' => $total_pendapatan_rekomendasi_bos,
+        'total_pengeluaran_rekomendasi_bos' => $total_pengeluaran_rekomendasi_bos,
+        'total_inventaris_rekomendasi_bos' => $total_inventaris_rekomendasi_bos,
+        'total_estimasi_rekomendasi_ypl' => $total_estimasi_rekomendasi_ypl,
+        'total_estimasi_rekomendasi_komite' => $total_estimasi_rekomendasi_komite,
+        'total_estimasi_rekomendasi_bos' => $total_estimasi_rekomendasi_bos,
+        'total_estimasi_rekomendasi_intern' => $total_estimasi_rekomendasi_intern,
+        'total_saldo_rekomendasi' => $total_saldo_rekomendasi,
+        'total_saldo_rekomendasi_ypl' => $total_saldo_rekomendasi_ypl,
+        'total_saldo_rekomendasi_komite' => $total_saldo_rekomendasi_komite,
+        'total_saldo_rekomendasi_intern' => $total_saldo_rekomendasi_intern,
+        'total_saldo_rekomendasi_bos' => $total_saldo_rekomendasi_bos,
+        'total_pendapatan_apbu' => $total_pendapatan_apbu,
+        'total_pengeluaran_apbu' => $total_pengeluaran_apbu,
+        'total_inventaris_apbu' => $total_inventaris_apbu,
+        'total_pendapatan_apbu_ypl' => $total_pendapatan_apbu_ypl,
+        'total_pengeluaran_apbu_ypl' => $total_pengeluaran_apbu_ypl,
+        'total_inventaris_apbu_ypl' => $total_inventaris_apbu_ypl,
+        'total_pendapatan_apbu_komite' => $total_pendapatan_apbu_komite,
+        'total_pengeluaran_apbu_komite' => $total_pengeluaran_apbu_komite,
+        'total_inventaris_apbu_komite' => $total_inventaris_apbu_komite,
+        'total_pendapatan_apbu_intern' => $total_pendapatan_apbu_intern,
+        'total_pengeluaran_apbu_intern' => $total_pengeluaran_apbu_intern,
+        'total_inventaris_apbu_intern' => $total_inventaris_apbu_intern,
+        'total_pendapatan_apbu_bos' => $total_pendapatan_apbu_bos,
+        'total_pengeluaran_apbu_bos' => $total_pengeluaran_apbu_bos,
+        'total_inventaris_apbu_bos' => $total_inventaris_apbu_bos,
+        'total_estimasi_apbu_ypl' => $total_estimasi_apbu_ypl,
+        'total_estimasi_apbu_komite' => $total_estimasi_apbu_komite,
+        'total_estimasi_apbu_bos' => $total_estimasi_apbu_bos,
+        'total_estimasi_apbu_intern' => $total_estimasi_apbu_intern,
+        'total_saldo_apbu' => $total_saldo_apbu,
+        'total_saldo_apbu_ypl' => $total_saldo_apbu_ypl,
+        'total_saldo_apbu_komite' => $total_saldo_apbu_komite,
+        'total_saldo_apbu_intern' => $total_saldo_apbu_intern,
+        'total_saldo_apbu_bos' => $total_saldo_apbu_bos,
     );
 
     return $data;
@@ -528,10 +720,9 @@ class BudgetDetailsService extends BaseService {
       $budget->load('budgetDetails', 'budgetDetailDrafts', 'budgetDetailDrafts.recommendations');
 
       $this->updateWorkflow($budget, true);
-
-      return $budget;
-
     }
+
+    return $budget;
   }
 
   public function rejectApproval($data) {

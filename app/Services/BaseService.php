@@ -132,15 +132,16 @@ class BaseService{
       'prev_role' => $prevRole,
       'next_role' => $nextRole,
       'is_done' => $is_done,
+      'action' => $is_rejected ? 'reject' : 'submit',
       'remarks' => $remarks
     ];
 
-    if($userGroup->name == 'Keuangan Sekolah') {
-      $model->workflow()->create($workflow);
-    } else {
-      $existingWorkflow = $model->workflow()->latest()->first();
-      $existingWorkflow->update($workflow);
-    }
+    //if($userGroup->name == 'Keuangan Sekolah') {
+    $model->workflow()->create($workflow);
+    // } else {
+    //   $existingWorkflow = $model->workflow()->latest()->first();
+    //   $existingWorkflow->update($workflow);
+    // }
   }
 
   protected function validateUserGroupForSaving($model) {

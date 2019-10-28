@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePrmBanks extends Migration
+class AddActionToWorkflows extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,8 @@ class CreatePrmBanks extends Migration
      */
     public function up()
     {
-        Schema::table('prm_banks', function (Blueprint $table) {
-            $table->string('account_number', 50)->unique()->change();
-            
+        Schema::table('workflows', function (Blueprint $table) {
+            $table->string('action',20)->default('submit');
         });
     }
 
@@ -26,6 +25,8 @@ class CreatePrmBanks extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('prm_banks');
+        Schema::table('workflows', function (Blueprint $table) {
+            //
+        });
     }
 }

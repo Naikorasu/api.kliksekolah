@@ -45,13 +45,19 @@ class BudgetsService extends BaseService {
           $query = Budgets::withUnitId($unit_id)
             ->where($conditions)
             ->orderBy('created_at', 'DESC')
-            ->with('account', 'workflow', 'school_unit')
+            ->with(['account',
+            'workflow' => function($q) {
+              $q->orderBy('updated_at', 'ASC');
+            }, 'school_unit'])
             ->paginate(5);
       } else {
         $query = Budgets::withUnitId($unit_id)
           ->where($conditions)
           ->orderBy('created_at', 'DESC')
-          ->with('account', 'workflow', 'school_unit')
+          ->with(['account',
+          'workflow' => function($q) {
+            $q->orderBy('updated_at', 'ASC');
+          }, 'school_unit'])
           ->paginate(5);
       }
       return $query;
