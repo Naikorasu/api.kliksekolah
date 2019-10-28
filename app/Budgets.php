@@ -84,7 +84,7 @@ class Budgets extends Model
     }
 
     public function school_unit() {
-      return $this->morphMany('App\EntityUnits', 'entity');
+      return $this->morphOne('App\EntityUnits', 'entity');
     }
 
     public function workflow() {
