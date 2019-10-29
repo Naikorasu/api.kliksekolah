@@ -24,6 +24,8 @@ class BudgetDetailsImport implements ToCollection, WithMultipleSheets, WithStart
 
         if(trim($row[0]) == 'B. Semester ke I Tahun Ajaran Berikutnya') {
           $semester = 1;
+        } else {
+          $semester = 2;
         }
 
         if(trim($row[0]) == 'Pengeluaran') {
