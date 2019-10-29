@@ -441,11 +441,11 @@ class BudgetDetailsService extends BaseService {
     $total_estimasi_rekomendasi_komite = $total_pendapatan_rekomendasi_komite - $total_pengeluaran_rekomendasi_komite;
     $total_estimasi_rekomendasi_bos = $total_pendapatan_rekomendasi_bos - $total_pengeluaran_rekomendasi_bos;
     $total_estimasi_rekomendasi_intern = $total_pendapatan_rekomendasi_intern - $total_pengeluaran_rekomendasi_intern;
-    $total_saldo_rekomendasi = $total_pendapatan_rekomendasi - $total_pengeluaran_rekomendasi - $total_inventaris;
-    $total_saldo_rekomendasi_ypl = $total_pendapatan_rekomendasi_ypl - $total_pengeluaran_rekomendasi_ypl - $total_inventaris_ypl;
-    $total_saldo_rekomendasi_komite = $total_pendapatan_rekomendasi_komite - $total_pengeluaran_rekomendasi_komite - $total_inventaris_komite;
-    $total_saldo_rekomendasi_bos = $total_pendapatan_rekomendasi_bos - $total_pengeluaran_rekomendasi_bos - $total_inventaris_bos;
-    $total_saldo_rekomendasi_intern = $total_pendapatan_rekomendasi_intern - $total_pengeluaran_rekomendasi_intern - $total_inventaris_intern;
+    $total_saldo_rekomendasi = $total_pendapatan_rekomendasi - $total_pengeluaran_rekomendasi - $total_inventaris_rekomendasi;
+    $total_saldo_rekomendasi_ypl = $total_pendapatan_rekomendasi_ypl - $total_pengeluaran_rekomendasi_ypl - $total_inventaris_rekomendasi_ypl;
+    $total_saldo_rekomendasi_komite = $total_pendapatan_rekomendasi_komite - $total_pengeluaran_rekomendasi_komite - $total_inventaris_rekomendasi_komite;
+    $total_saldo_rekomendasi_bos = $total_pendapatan_rekomendasi_bos - $total_pengeluaran_rekomendasi_bos - $total_inventaris_rekomendasi_bos;
+    $total_saldo_rekomendasi_intern = $total_pendapatan_rekomendasi_intern - $total_pengeluaran_rekomendasi_intern - $total_inventaris_rekomendasi_intern;
     $status = ($total_estimasi_rekomendasi > 0) ? 'SURPLUS' : 'DEFISIT';
 
     $total_estimasi_apbu = $total_pendapatan_apbu - $total_pengeluaran_apbu;
@@ -453,11 +453,11 @@ class BudgetDetailsService extends BaseService {
     $total_estimasi_apbu_komite = $total_pendapatan_apbu_komite - $total_pengeluaran_apbu_komite;
     $total_estimasi_apbu_bos = $total_pendapatan_apbu_bos - $total_pengeluaran_apbu_bos;
     $total_estimasi_apbu_intern = $total_pendapatan_apbu_intern - $total_pengeluaran_apbu_intern;
-    $total_saldo_apbu = $total_pendapatan_rekomendasi - $total_pengeluaran_rekomendasi - $total_inventaris;
-    $total_saldo_apbu_ypl = $total_pendapatan_rekomendasi_ypl - $total_pengeluaran_rekomendasi_ypl - $total_inventaris_ypl;
-    $total_saldo_apbu_komite = $total_pendapatan_rekomendasi_komite - $total_pengeluaran_rekomendasi_komite - $total_inventaris_komite;
-    $total_saldo_apbu_bos = $total_pendapatan_rekomendasi_bos - $total_pengeluaran_rekomendasi_bos - $total_inventaris_bos;
-    $total_saldo_apbu_intern = $total_pendapatan_rekomendasi_intern - $total_pengeluaran_rekomendasi_intern - $total_inventaris_intern;
+    $total_saldo_apbu = $total_pendapatan_apbu - $total_pengeluaran_apbu - $total_inventaris_apbu;
+    $total_saldo_apbu_ypl = $total_pendapatan_apbu_ypl - $total_pengeluaran_apbu_ypl - $total_inventaris_apbu_ypl;
+    $total_saldo_apbu_komite = $total_pendapatan_apbu_komite - $total_pengeluaran_apbu_komite - $total_inventaris_apbu_komite;
+    $total_saldo_apbu_bos = $total_pendapatan_apbu_bos - $total_pengeluaran_apbu_bos - $total_inventaris_apbu_bos;
+    $total_saldo_apbu_intern = $total_pendapatan_apbu_intern - $total_pengeluaran_apbu_intern - $total_inventaris_apbu_intern;
     $status = ($total_estimasi_apbu > 0) ? 'SURPLUS' : 'DEFISIT';
 
 
