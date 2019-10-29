@@ -21,16 +21,16 @@ class BudgetDetailsImport implements ToCollection, WithMultipleSheets, WithStart
       $accountType = 40000;
       foreach($rows as $row) {
         $data = [];
-
-        if(trim($row[0]) == 'B. Semester ke I Tahun Ajaran Berikutnya') {
+        $firstCol = trim($row[0]);
+        if($firstCol == 'B. Semester ke I Tahun Ajaran Berikutnya') {
           $semester = 1;
-        } else {
+        } else if($firstCol == 'A. Semester ke II Tahun Ajaran Berjalan'){
           $semester = 2;
         }
 
-        if(trim($row[0]) == 'Pengeluaran') {
+        if($firstCol == 'Pengeluaran') {
           $accountType = 50000;
-        } else if(trim($row[0]) == 'Inventaris') {
+        } else if($firstCol == 'Inventaris') {
           $accountType = 13000;
         }
 
