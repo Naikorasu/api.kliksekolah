@@ -7,10 +7,11 @@ use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\Importable;
 use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Maatwebsite\Excel\Concerns\WithConditionalSheets;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 
-class BudgetDetailsImport implements ToCollection, WithValidation, WithStartRow
+class BudgetDetailsImport implements ToCollection, WithMultipleSheets, WithStartRow
 {
     public $collection = [];
 
@@ -21,18 +22,18 @@ class BudgetDetailsImport implements ToCollection, WithValidation, WithStartRow
       foreach($rows as $row) {
         $data = [];
 
-        if(trim($row[0]) === 'B. Semester ke I Tahun Ajaran Berikutnya') {
+        if(trim($row[0]) == 'B. Semester ke I Tahun Ajaran Berikutnya') {
           $semester = 1;
         }
 
-        if(trim($row[0]) === 'Pengeluaran') {
+        if(trim($row[0]) == 'Pengeluaran') {
           $accountType = 50000;
-        } else if(trim($row[0]) === 'Inventaris') {
+        } else if(trim($row[0]) == 'Inventaris') {
           $accountType = 13000;
         }
 
-        if(is_float($row[0])) {
-          $data['account_type'] = $accountType;      
+        if(is_float($row[0]) && !empty($row[0])) {
+          $data['account_type'] = $accountType;
           $data['semester'] = $semester ;
           $data['code_of_account'] = intval($row[0]);
           $data['desc'] = $row[2];
@@ -50,17 +51,13 @@ class BudgetDetailsImport implements ToCollection, WithValidation, WithStartRow
       }
     }
 
-    public function rules(): array
-    {
-      return [
-        '1' => function($attribute, $value, $onFailure) {
-          print_r($attribute, $value);
-          //dd($attribute, $value, $onFailure);
-        }
-      ];
-    }
-
     public function startRow(): int {
       return 10;
+    }
+
+    public function sheets(): array {
+        return [
+            0 => $this,
+        ];
     }
 }

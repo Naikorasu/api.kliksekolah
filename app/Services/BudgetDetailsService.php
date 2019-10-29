@@ -51,9 +51,9 @@ class BudgetDetailsService extends BaseService {
     }
 
     if($budget->approved == true) {
-      $query = BudgetDetails::with('file')->parameterCode($codeOfAccountValue, $codeOfAccountType)->orderBy('created_at')->remains();
+      $query = BudgetDetails::with('file')->parameterCode($codeOfAccountValue, $codeOfAccountType)->orderBy('code_of_account', 'ASC')->remains();
     } else {
-      $query = BudgetDetailDrafts::with('file')->parameterCode($codeOfAccountValue, $codeOfAccountType)->orderBy('created_at');
+      $query = BudgetDetailDrafts::with('file')->parameterCode($codeOfAccountValue, $codeOfAccountType)->orderBy('code_of_account', 'ASC');
     }
 
     if(isset($filters)) {
@@ -765,7 +765,9 @@ class BudgetDetailsService extends BaseService {
       $account = '';
       $currentAccountType = '';
       $budgetDetails = [];
-      $head = Budgets::find($data->head);
+
+      $budget = Budgets::where('unique_id', $data->head)->first();
+      $budget->budgetDetailDrafts()->forceDelete();
       foreach ($collection as $row) {
         if($currentAccountType != $row['account_type']) {
           $currentAccountType = $row['account_type'];
@@ -775,7 +777,7 @@ class BudgetDetailsService extends BaseService {
         }
         $budgetDetail = $this->save(
           $row,
-          $head->unique_id,
+          $data->head,
           $account->unique_id,
           $currentAccountType
         );

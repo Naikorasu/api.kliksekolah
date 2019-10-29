@@ -135,7 +135,6 @@ class BudgetDetailsController extends Controller
     return response()->json([
         'message' => 'Successfully uploaded rapbu',
         'data' => $result,
-        'error' => $delete,
     ], 200);
   }
 }
