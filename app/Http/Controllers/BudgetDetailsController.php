@@ -127,10 +127,15 @@ class BudgetDetailsController extends Controller
       }
   }
 
-  public function uploadRAPBU(Request $request) {
-    $file = $request->file('rapbu');
+  public function upload(Request $request) {
+    $file = $request->file('file');
 
-    $this->budgetDetailService->parseFile($file);
+    $result = $this->budgetDetailService->uploadRapbu($request);
 
+    return response()->json([
+        'message' => 'Successfully uploaded rapbu',
+        'data' => $result,
+        'error' => $delete,
+    ], 200);
   }
 }

@@ -3,12 +3,14 @@
 namespace App\Services;
 
 use Auth;
-use Maatwebsite\Excel\Excel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Exceptions\DataNotFoundException;
+use App\Imports\BudgetDetailsImport;
+use App\BudgetAccounts;
 use App\BudgetDetailDraftRevisions;
 use App\BudgetDetailDrafts;
 use App\Budgets;
@@ -578,9 +580,9 @@ class BudgetDetailsService extends BaseService {
     $budget = Budgets::where('unique_id', $head)->first();
 
     try {
-      if(!$this->validateUserGroupForSaving($budget)) {
-        throw new ModelNotFoundException('Budget Detail had been submitted.');
-      }
+      // if(!$this->validateUserGroupForSaving($budget)) {
+      //   throw new ModelNotFoundException('Budget Detail had been submitted.');
+      // }
 
       if($id) {
         try {
@@ -754,11 +756,34 @@ class BudgetDetailsService extends BaseService {
     $this->updateWorkflow($budget, false, true, $data->remarks);
   }
 
-  public function parseFile($file) {
+  public function uploadRapbu($data) {
     try {
-
+      $file = $data->file('file');
+      $import = new BudgetDetailsImport;
+      Excel::import($import, $file);
+      $collection = $import->collection;
+      $account = '';
+      $currentAccountType = '';
+      $budgetDetails = [];
+      $head = Budgets::find($data->head);
+      foreach ($collection as $row) {
+        if($currentAccountType != $row['account_type']) {
+          $currentAccountType = $row['account_type'];
+          $account = BudgetAccounts::select('unique_id')
+            ->where('account_type', $currentAccountType)
+            ->first();
+        }
+        $budgetDetail = $this->save(
+          $row,
+          $head->unique_id,
+          $account->unique_id,
+          $currentAccountType
+        );
+        array_push($budgetDetails, $budgetDetail);
+      }
     } catch (Exception $exception) {
 
     }
+    return $budgetDetails;
   }
 }

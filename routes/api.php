@@ -93,6 +93,7 @@ Route::group([
             Route::post('add','BudgetDetailsController@add_detail');
             Route::post('edit','BudgetDetailsController@edit_detail');
             Route::post('delete','BudgetDetailsController@delete_detail');
+            Route::post('upload', 'BudgetDetailsController@upload');
         });
 
         Route::group([

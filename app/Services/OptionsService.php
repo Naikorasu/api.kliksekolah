@@ -134,8 +134,8 @@ class OptionsService extends BaseService {
       $options = [];
       foreach($collection as $option) {
         array_push($options, [
-          "id" => $option->periode,
-          "title" => $option->periode
+          "value" => $option->periode,
+          "label" => $option->periode
         ]);
       }
       return $options;
