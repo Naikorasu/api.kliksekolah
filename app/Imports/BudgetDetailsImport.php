@@ -10,8 +10,9 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\WithConditionalSheets;
 use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 
-class BudgetDetailsImport implements ToCollection, WithMultipleSheets, WithStartRow
+class BudgetDetailsImport implements ToCollection, WithMultipleSheets, WithStartRow, WithCalculatedFormulas
 {
     public $collection = [];
 

@@ -60,6 +60,21 @@ class BudgetsService extends BaseService {
           }, 'school_unit'])
           ->paginate(5);
       }
+      $query->getCollection()->transform(function($row){
+        if(isset($row->workflow)) {
+          $workflow = $row->workflow->toArray();
+          if(!empty($workflow)) {
+            $status = end($workflow);
+            if($status['action'] == 'reject') {
+              $flow = 'dikembalikan';
+            } else {
+              $flow = 'diajukan';
+            }
+            $row->status = 'Telah '.$flow.' ke '.$status['next_role'];
+          }
+        }
+        return $row;
+      });
       return $query;
     } catch(ModelNotFoundException $exception) {
       throw new DataNotFoundException($exception->getMessage());
