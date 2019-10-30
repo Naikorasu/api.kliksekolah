@@ -11,8 +11,10 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\WithConditionalSheets;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class BudgetDetailsImport implements ToCollection, WithMultipleSheets, WithStartRow, WithCalculatedFormulas
+
+class BudgetDetailsImport implements ToCollection, WithMultipleSheets, WithStartRow, WithCalculatedFormulas, WithChunkReading
 {
     public $collection = [];
 
@@ -62,5 +64,10 @@ class BudgetDetailsImport implements ToCollection, WithMultipleSheets, WithStart
         return [
             0 => $this,
         ];
+    }
+
+    public function chunkSize(): int
+    {
+        return 200;
     }
 }
