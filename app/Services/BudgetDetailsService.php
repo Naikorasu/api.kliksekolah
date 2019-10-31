@@ -271,6 +271,8 @@ class BudgetDetailsService extends BaseService {
     $pengeluaran_id = [];
     $persentase = [];
 
+    $pos = ['ypl', 'komite', 'intern', 'bos'];
+
     foreach($results as $result) {
       if(Str::startsWith($result->code_of_account,'4')) {
         array_push($pendapatan_id, $result->id);
@@ -332,6 +334,18 @@ class BudgetDetailsService extends BaseService {
         }
       }
 
+      if($budget->approved) {
+        foreach($pos as $field) {
+          $apbu = $result[$field];
+          $rapbu = $result->budgetDetailDraft[$field];
+          $persentase[$field][$result->id] = 0;
+          if(floatVal($rapbu > 0)) {
+            $persentase[$field][$result->id] =
+            round(floatVal($apbu)/floatVal($rapbu)*100, 2);
+          }
+        }
+      }
+
       if(isset($result->recommendations)) {
         foreach($result->recommendations as $recommendation) {
           $field = $recommendation['field'];
@@ -347,16 +361,10 @@ class BudgetDetailsService extends BaseService {
           }
           if($userGroupId == 8) {
             $persentase[$field][$recommendation['budget_detail_drafts_id']] = 0;
-            if($budget->approved) {
-              if(floatVal($result->budgetDetailDraft[$field]) > 0) {
-                $persentase[$field][$recommendation['budget_detail_drafts_id']] =
-                round(floatVal($value)/floatVal($result->budgetDetailDraft[$field])*100, 2);
-              }
-            } else {
-              if(floatVal($result[$field]) > 0) {
-                $persentase[$field][$recommendation['budget_detail_drafts_id']] =
-                round(floatVal($value)/floatVal($result[$field])*100,2);
-              }
+
+            if(floatVal($result[$field]) > 0) {
+              $persentase[$field][$recommendation['budget_detail_drafts_id']] =
+              round(floatVal($value)/floatVal($result[$field])*100,2);
             }
           }
 

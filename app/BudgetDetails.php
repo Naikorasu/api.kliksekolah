@@ -137,7 +137,7 @@ class BudgetDetails extends Model
         'unique_id',
         'budget_detail_drafts_id',
         'unique_id',
-        'unique_id'
+        'id'
       );
     }
 
