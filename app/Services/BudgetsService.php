@@ -65,12 +65,16 @@ class BudgetsService extends BaseService {
           $workflow = $row->workflow->toArray();
           if(!empty($workflow)) {
             $status = end($workflow);
-            if($status['action'] == 'reject') {
-              $flow = 'dikembalikan';
+            if(!$status['is_done']) {
+              if($status['action'] == 'reject') {
+                $flow = 'dikembalikan';
+              } else {
+                $flow = 'diajukan';
+              }
+              $row->status = 'Telah '.$flow.' ke '.$status['next_role'];
             } else {
-              $flow = 'diajukan';
+              $row->status = 'Telah disetujui oleh Bendahara';
             }
-            $row->status = 'Telah '.$flow.' ke '.$status['next_role'];
           }
         }
         return $row;
